@@ -77,10 +77,9 @@
 #include "MoveMap.h"
 #include "SpellModMgr.h"
 #include "NodesMgr.h"
-#include "Anticheat.h"
+#include "Anticheat.hpp"
 #include "MovementBroadcaster.h"
 #include "HonorMgr.h"
-#include "Anticheat/Anticheat.h"
 #include "AuraRemovalMgr.h"
 #include "InstanceStatistics.h"
 
@@ -254,7 +253,6 @@ void World::AddSession_(WorldSession* s)
         }
     }
 
-    sAnticheatLib->SessionAdded(s);
     m_sessions[s->GetAccountId()] = s;
 
     uint32 Sessions = GetActiveAndQueuedSessionCount();
@@ -874,8 +872,6 @@ void World::LoadConfigSettings(bool reload)
 void World::LoadNostalriusConfig(bool reload)
 {
     sLog.outString(">> Loading Nostalrius config ...");
-
-    sAnticheatLib->LoadConfig();
 
     // Bots
     sPlayerBotMgr.LoadConfig();
@@ -1589,7 +1585,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadSpellDisabledEntrys();
 
     sLog.outString("Loading anticheat library");
-    sAnticheatLib->LoadAnticheatData();
+    sAnticheatLib->Initialize();
 
     if (!isMapServer)
     {
@@ -2739,14 +2735,12 @@ void World::LogCharacter(Player* character, const char* action)
         return;
     ASSERT(character);
     static SqlStatementID insLogChar;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO logs_characters SET type=?, guid=?, account=?, name=?, ip=?, clientHash=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO logs_characters SET type=?, guid=?, account=?, name=?, ip=?");
     logStmt.addString(action);
     logStmt.addUInt32(character->GetGUIDLow());
     logStmt.addUInt32(character->GetSession()->GetAccountId());
     logStmt.addString(character->GetName());
     logStmt.addString(character->GetSession()->GetRemoteAddress());
-    character->GetSession()->ComputeClientHash();
-    logStmt.addString(character->GetSession()->GetClientHash());
     logStmt.Execute();
 }
 
@@ -2756,14 +2750,12 @@ void World::LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& 
         return;
     ASSERT(sess);
     static SqlStatementID insLogChar;
-    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO logs_characters SET type=?, guid=?, account=?, name=?, ip=?, clientHash=?");
+    SqlStatement logStmt = LogsDatabase.CreateStatement(insLogChar, "INSERT INTO logs_characters SET type=?, guid=?, account=?, name=?, ip=?");
     logStmt.addString(action);
     logStmt.addUInt32(lowGuid);
     logStmt.addUInt32(sess->GetAccountId());
     logStmt.addString(charName);
     logStmt.addString(sess->GetRemoteAddress());
-    sess->ComputeClientHash();
-    logStmt.addString(sess->GetClientHash());
     logStmt.Execute();
 }
 

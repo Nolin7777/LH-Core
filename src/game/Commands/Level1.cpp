@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
- * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
+* Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+* Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+* Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+* Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
@@ -40,7 +40,7 @@
 #include "MapPersistentStateMgr.h"
 #include "Mail.h"
 #include "Util.h"
-#include "Anticheat.h"
+#include "Anticheat.hpp"
 #include "SQLStorages.h"
 #include "AsyncCommandHandlers.h"
 #ifdef _DEBUG_VMAPS
@@ -350,16 +350,16 @@ bool ChatHandler::HandleGPSCommand(char* args)
     }
 
     PSendSysMessage(LANG_MAP_POSITION,
-                    obj->GetMapId(), (mapEntry ? mapEntry->name : "<unknown>"),
-                    zone_id, zoneName.c_str(), area_id, areaName.c_str(),
-                    obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation(),
-                    cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), obj->GetInstanceId(),
-                    zone_x, zone_y, ground_z, floor_z, have_map, have_vmap);
+        obj->GetMapId(), (mapEntry ? mapEntry->name : "<unknown>"),
+        zone_id, zoneName.c_str(), area_id, areaName.c_str(),
+        obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation(),
+        cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), obj->GetInstanceId(),
+        zone_x, zone_y, ground_z, floor_z, have_map, have_vmap);
 
     DEBUG_LOG("Player %s GPS call for %s '%s' (%s: %u):",
-              m_session ? GetNameLink().c_str() : GetMangosString(LANG_CONSOLE_COMMAND),
-              (obj->GetTypeId() == TYPEID_PLAYER ? "player" : "creature"), obj->GetName(),
-              (obj->GetTypeId() == TYPEID_PLAYER ? "GUID" : "Entry"), (obj->GetTypeId() == TYPEID_PLAYER ? obj->GetGUIDLow() : obj->GetEntry()));
+        m_session ? GetNameLink().c_str() : GetMangosString(LANG_CONSOLE_COMMAND),
+        (obj->GetTypeId() == TYPEID_PLAYER ? "player" : "creature"), obj->GetName(),
+        (obj->GetTypeId() == TYPEID_PLAYER ? "GUID" : "Entry"), (obj->GetTypeId() == TYPEID_PLAYER ? obj->GetGUIDLow() : obj->GetEntry()));
 
     if (zoneEntry)
         sObjectMgr.GetAreaLocaleString(zoneEntry->Id, sWorld.GetDefaultDbcLocale(), &zoneName);
@@ -368,11 +368,11 @@ bool ChatHandler::HandleGPSCommand(char* args)
         sObjectMgr.GetAreaLocaleString(areaEntry->Id, sWorld.GetDefaultDbcLocale(), &areaName);
 
     DEBUG_LOG(GetMangosString(LANG_MAP_POSITION),
-              obj->GetMapId(), (mapEntry ? mapEntry->name : "<unknown>"),
-              zone_id, zoneName.c_str(), area_id, areaName.c_str(),
-              obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation(),
-              cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), obj->GetInstanceId(),
-              zone_x, zone_y, ground_z, floor_z, have_map, have_vmap);
+        obj->GetMapId(), (mapEntry ? mapEntry->name : "<unknown>"),
+        zone_id, zoneName.c_str(), area_id, areaName.c_str(),
+        obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation(),
+        cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), obj->GetInstanceId(),
+        zone_x, zone_y, ground_z, floor_z, have_map, have_vmap);
 
     GridMapLiquidData liquid_status;
     GridMapLiquidStatus res = terrain->getLiquidStatus(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), MAP_ALL_LIQUIDS, &liquid_status);
@@ -452,11 +452,11 @@ bool ChatHandler::HandleNamegoCommand(char* args)
 
         // in point where GM stay
         Player::SavePositionInDB(target_guid, m_session->GetPlayer()->GetMapId(),
-                                 m_session->GetPlayer()->GetPositionX(),
-                                 m_session->GetPlayer()->GetPositionY(),
-                                 m_session->GetPlayer()->GetPositionZ(),
-                                 m_session->GetPlayer()->GetOrientation(),
-                                 m_session->GetPlayer()->GetZoneId());
+            m_session->GetPlayer()->GetPositionX(),
+            m_session->GetPlayer()->GetPositionY(),
+            m_session->GetPlayer()->GetPositionZ(),
+            m_session->GetPlayer()->GetOrientation(),
+            m_session->GetPlayer()->GetZoneId());
     }
 
     return true;
@@ -503,7 +503,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
             }
             // all's well, set bg id
             // when porting out from the bg, it will be reset to 0
-            if(_player->GetBattleGroundId() != target->GetBattleGroundId())
+            if (_player->GetBattleGroundId() != target->GetBattleGroundId())
             {
                 _player->SetBattleGroundId(target->GetBattleGroundId(), target->GetBattleGroundTypeId());
                 teleFlags |= TELE_TO_FORCE_MAP_CHANGE;
@@ -820,9 +820,9 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
         if (chr)
         {
             uint32 factionid = chr->getFaction();
-            uint32 flag      = chr->GetUInt32Value(UNIT_FIELD_FLAGS);
-            uint32 npcflag   = chr->GetUInt32Value(UNIT_NPC_FLAGS);
-            uint32 dyflag    = chr->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
+            uint32 flag = chr->GetUInt32Value(UNIT_FIELD_FLAGS);
+            uint32 npcflag = chr->GetUInt32Value(UNIT_NPC_FLAGS);
+            uint32 dyflag = chr->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
             PSendSysMessage(LANG_CURRENT_FACTION, chr->GetGUIDLow(), factionid, flag, npcflag, dyflag);
         }
         return true;
@@ -937,7 +937,7 @@ bool ChatHandler::HandleModifyASpeedCommand(char* args)
         return false;
 
     float modSpeed = (float)atof(args);
-    
+
     if (modSpeed > 4.0f && GetAccessLevel() < SEC_BASIC_ADMIN)
         modSpeed = 4.0f;
 
@@ -956,11 +956,6 @@ bool ChatHandler::HandleModifyASpeedCommand(char* args)
         return false;
     }
 
-    // check online security
-    /*  if (HasLowerSecurity(chr))
-            return false;
-
-        std::string chrNameLink = GetNameLink(chr);*/
     std::string chrNameLink = (chr->GetTypeId() == TYPEID_PLAYER) ? ((Player*)chr)->GetName() : "<creature>";
 
     if (chr->IsTaxiFlying())
@@ -971,11 +966,11 @@ bool ChatHandler::HandleModifyASpeedCommand(char* args)
     }
     PSendSysMessage(LANG_YOU_CHANGE_ASPEED, modSpeed, chrNameLink.c_str());
     /*if (needReportToTarget(chr))
-        ChatHandler(chr).PSendSysMessage(LANG_YOURS_ASPEED_CHANGED, GetNameLink().c_str(), modSpeed);
+    ChatHandler(chr).PSendSysMessage(LANG_YOURS_ASPEED_CHANGED, GetNameLink().c_str(), modSpeed);
     */
-    chr->UpdateSpeed(MOVE_WALK,   true, modSpeed);
-    chr->UpdateSpeed(MOVE_RUN,    true, modSpeed);
-    chr->UpdateSpeed(MOVE_SWIM,   true, modSpeed);
+    chr->UpdateSpeed(MOVE_WALK, true, modSpeed);
+    chr->UpdateSpeed(MOVE_RUN, true, modSpeed);
+    chr->UpdateSpeed(MOVE_SWIM, true, modSpeed);
     //chr->UpdateSpeed(MOVE_TURN,   true, modSpeed);
     return true;
 }
@@ -1193,217 +1188,217 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
     uint32 num = atoi(args);
     switch (num)
     {
-        case 1:
-            mId = 14340;
-            break;
-        case 2:
-            mId = 4806;
-            break;
-        case 3:
-            mId = 6471;
-            break;
-        case 4:
-            mId = 12345;
-            break;
-        case 5:
-            mId = 6472;
-            break;
-        case 6:
-            mId = 6473;
-            break;
-        case 7:
-            mId = 10670;
-            break;
-        case 8:
-            mId = 10719;
-            break;
-        case 9:
-            mId = 10671;
-            break;
-        case 10:
-            mId = 10672;
-            break;
-        case 11:
-            mId = 10720;
-            break;
-        case 12:
-            mId = 14349;
-            break;
-        case 13:
-            mId = 11641;
-            break;
-        case 14:
-            mId = 12244;
-            break;
-        case 15:
-            mId = 12242;
-            break;
-        case 16:
-            mId = 14578;
-            break;
-        case 17:
-            mId = 14579;
-            break;
-        case 18:
-            mId = 14349;
-            break;
-        case 19:
-            mId = 12245;
-            break;
-        case 20:
-            mId = 14335;
-            break;
-        case 21:
-            mId = 207;
-            break;
-        case 22:
-            mId = 2328;
-            break;
-        case 23:
-            mId = 2327;
-            break;
-        case 24:
-            mId = 2326;
-            break;
-        case 25:
-            mId = 14573;
-            break;
-        case 26:
-            mId = 14574;
-            break;
-        case 27:
-            mId = 14575;
-            break;
-        case 28:
-            mId = 604;
-            break;
-        case 29:
-            mId = 1166;
-            break;
-        case 30:
-            mId = 2402;
-            break;
-        case 31:
-            mId = 2410;
-            break;
-        case 32:
-            mId = 2409;
-            break;
-        case 33:
-            mId = 2408;
-            break;
-        case 34:
-            mId = 2405;
-            break;
-        case 35:
-            mId = 14337;
-            break;
-        case 36:
-            mId = 6569;
-            break;
-        case 37:
-            mId = 10661;
-            break;
-        case 38:
-            mId = 10666;
-            break;
-        case 39:
-            mId = 9473;
-            break;
-        case 40:
-            mId = 9476;
-            break;
-        case 41:
-            mId = 9474;
-            break;
-        case 42:
-            mId = 14374;
-            break;
-        case 43:
-            mId = 14376;
-            break;
-        case 44:
-            mId = 14377;
-            break;
-        case 45:
-            mId = 2404;
-            break;
-        case 46:
-            mId = 2784;
-            break;
-        case 47:
-            mId = 2787;
-            break;
-        case 48:
-            mId = 2785;
-            break;
-        case 49:
-            mId = 2736;
-            break;
-        case 50:
-            mId = 2786;
-            break;
-        case 51:
-            mId = 14347;
-            break;
-        case 52:
-            mId = 14346;
-            break;
-        case 53:
-            mId = 14576;
-            break;
-        case 54:
-            mId = 9695;
-            break;
-        case 55:
-            mId = 9991;
-            break;
-        case 56:
-            mId = 6448;
-            break;
-        case 57:
-            mId = 6444;
-            break;
-        case 58:
-            mId = 6080;
-            break;
-        case 59:
-            mId = 6447;
-            break;
-        case 60:
-            mId = 4805;
-            break;
-        case 61:
-            mId = 9714;
-            break;
-        case 62:
-            mId = 6448;
-            break;
-        case 63:
-            mId = 6442;
-            break;
-        case 64:
-            mId = 14632;
-            break;
-        case 65:
-            mId = 14332;
-            break;
-        case 66:
-            mId = 14331;
-            break;
-        case 67:
-            mId = 8469;
-            break;
-        case 68:
-            mId = 2830;
-            break;
-        case 69:
-            mId = 2346;
-            break;
-        default:
-            SendSysMessage(LANG_NO_MOUNT);
-            SetSentErrorMessage(true);
-            return false;
+    case 1:
+        mId = 14340;
+        break;
+    case 2:
+        mId = 4806;
+        break;
+    case 3:
+        mId = 6471;
+        break;
+    case 4:
+        mId = 12345;
+        break;
+    case 5:
+        mId = 6472;
+        break;
+    case 6:
+        mId = 6473;
+        break;
+    case 7:
+        mId = 10670;
+        break;
+    case 8:
+        mId = 10719;
+        break;
+    case 9:
+        mId = 10671;
+        break;
+    case 10:
+        mId = 10672;
+        break;
+    case 11:
+        mId = 10720;
+        break;
+    case 12:
+        mId = 14349;
+        break;
+    case 13:
+        mId = 11641;
+        break;
+    case 14:
+        mId = 12244;
+        break;
+    case 15:
+        mId = 12242;
+        break;
+    case 16:
+        mId = 14578;
+        break;
+    case 17:
+        mId = 14579;
+        break;
+    case 18:
+        mId = 14349;
+        break;
+    case 19:
+        mId = 12245;
+        break;
+    case 20:
+        mId = 14335;
+        break;
+    case 21:
+        mId = 207;
+        break;
+    case 22:
+        mId = 2328;
+        break;
+    case 23:
+        mId = 2327;
+        break;
+    case 24:
+        mId = 2326;
+        break;
+    case 25:
+        mId = 14573;
+        break;
+    case 26:
+        mId = 14574;
+        break;
+    case 27:
+        mId = 14575;
+        break;
+    case 28:
+        mId = 604;
+        break;
+    case 29:
+        mId = 1166;
+        break;
+    case 30:
+        mId = 2402;
+        break;
+    case 31:
+        mId = 2410;
+        break;
+    case 32:
+        mId = 2409;
+        break;
+    case 33:
+        mId = 2408;
+        break;
+    case 34:
+        mId = 2405;
+        break;
+    case 35:
+        mId = 14337;
+        break;
+    case 36:
+        mId = 6569;
+        break;
+    case 37:
+        mId = 10661;
+        break;
+    case 38:
+        mId = 10666;
+        break;
+    case 39:
+        mId = 9473;
+        break;
+    case 40:
+        mId = 9476;
+        break;
+    case 41:
+        mId = 9474;
+        break;
+    case 42:
+        mId = 14374;
+        break;
+    case 43:
+        mId = 14376;
+        break;
+    case 44:
+        mId = 14377;
+        break;
+    case 45:
+        mId = 2404;
+        break;
+    case 46:
+        mId = 2784;
+        break;
+    case 47:
+        mId = 2787;
+        break;
+    case 48:
+        mId = 2785;
+        break;
+    case 49:
+        mId = 2736;
+        break;
+    case 50:
+        mId = 2786;
+        break;
+    case 51:
+        mId = 14347;
+        break;
+    case 52:
+        mId = 14346;
+        break;
+    case 53:
+        mId = 14576;
+        break;
+    case 54:
+        mId = 9695;
+        break;
+    case 55:
+        mId = 9991;
+        break;
+    case 56:
+        mId = 6448;
+        break;
+    case 57:
+        mId = 6444;
+        break;
+    case 58:
+        mId = 6080;
+        break;
+    case 59:
+        mId = 6447;
+        break;
+    case 60:
+        mId = 4805;
+        break;
+    case 61:
+        mId = 9714;
+        break;
+    case 62:
+        mId = 6448;
+        break;
+    case 63:
+        mId = 6442;
+        break;
+    case 64:
+        mId = 14632;
+        break;
+    case 65:
+        mId = 14332;
+        break;
+    case 66:
+        mId = 14331;
+        break;
+    case 67:
+        mId = 8469;
+        break;
+    case 68:
+        mId = 2830;
+        break;
+    case 69:
+        mId = 2346;
+        break;
+    default:
+        SendSysMessage(LANG_NO_MOUNT);
+        SetSentErrorMessage(true);
+        return false;
     }
 
     Player *chr = getSelectedPlayer();
@@ -1805,7 +1800,7 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
 
         PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), GetMangosString(LANG_OFFLINE), tele->name.c_str());
         Player::SavePositionInDB(target_guid, tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation,
-                                 sTerrainMgr.GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z));
+            sTerrainMgr.GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z));
     }
 
     return true;
@@ -1910,12 +1905,13 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
     }
 
     Map* gmMap = m_session->GetPlayer()->GetMap();
-    bool to_instance =  gmMap->Instanceable();
+
+    bool to_instance = gmMap->Instanceable();
 
     // we are in instance, and can summon only player in our group with us as lead
     if (to_instance && (
-                !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
-                (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid())))
+        !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
+        (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid())))
         // the last check is a bit excessive, but let it be, just in case
     {
         SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);
@@ -2198,7 +2194,7 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
     if (mapEntry->Instanceable())
     {
         PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->Id, areaName.c_str(),
-                        mapEntry->id, mapEntry->name);
+            mapEntry->id, mapEntry->name);
         SetSentErrorMessage(true);
         return false;
     }
@@ -2206,7 +2202,7 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
     if (!Zone2MapCoordinates(x, y, zoneEntry->Id))
     {
         PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->Id, areaName.c_str(),
-                        mapEntry->id, mapEntry->name);
+            mapEntry->id, mapEntry->name);
         SetSentErrorMessage(true);
         return false;
     }
@@ -2269,7 +2265,7 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAnticheatCommand(char*)
 {
-    sAnticheatLib->LoadAnticheatData();
+    sAnticheatLib->Initialize();
     SendSysMessage(">> Anticheat data reloaded");
     return true;
 }

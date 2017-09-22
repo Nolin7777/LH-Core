@@ -70,7 +70,6 @@ set (game_SRCS
 	AI/ScriptedInstance.cpp
 	AI/ScriptedPetAI.cpp
 	AI/TotemAI.cpp
-	Anticheat/Anticheat.cpp
 	AuctionHouse/AuctionHouseBotMgr.cpp
 	AuctionHouse/AuctionHouseMgr.cpp
 	AutoTesting/AutoTestingMgr.cpp
@@ -288,7 +287,7 @@ set (game_SRCS
 	AI/ScriptedInstance.h
 	AI/ScriptedPetAI.h
 	AI/TotemAI.h
-	Anticheat/Anticheat.h
+	Anticheat/Anticheat.hpp
 	AuctionHouse/AuctionHouseBotMgr.h
 	AuctionHouse/AuctionHouseMgr.h
 	AutoTesting/AutoTestingMgr.h
@@ -453,23 +452,29 @@ endif()
 if(USE_ANTICHEAT)
   list(APPEND game_SRCS
       Anticheat/module/libanticheat.cpp
-      Anticheat/module/libanticheat.h
+      Anticheat/module/libanticheat.hpp
       Anticheat/module/Antispam/Antispam.cpp
       Anticheat/module/Antispam/Antispam.h
       Anticheat/module/MovementAnticheat/Cheat.cpp
       Anticheat/module/MovementAnticheat/Cheat.h
       Anticheat/module/WardenAnticheat/Warden.cpp
-      Anticheat/module/WardenAnticheat/Warden.h
+      Anticheat/module/WardenAnticheat/Warden.hpp
       Anticheat/module/WardenAnticheat/WardenMac.cpp
-      Anticheat/module/WardenAnticheat/WardenMac.h
+      Anticheat/module/WardenAnticheat/WardenMac.hpp
       Anticheat/module/WardenAnticheat/WardenWin.cpp
-      Anticheat/module/WardenAnticheat/WardenWin.h
-      Anticheat/module/WardenAnticheat/WardenStorageMgr.cpp
-      Anticheat/module/WardenAnticheat/WardenStorageMgr.h
-      Anticheat/module/WardenAnticheat/WardenModuleMac.h
-      Anticheat/module/WardenAnticheat/WardenModuleWin.h
+      Anticheat/module/WardenAnticheat/WardenWin.hpp
+      Anticheat/module/WardenAnticheat/WardenModule.hpp
+      Anticheat/module/WardenAnticheat/WardenModule.cpp
+      Anticheat/module/WardenAnticheat/WardenModuleMgr.hpp
+      Anticheat/module/WardenAnticheat/WardenModuleMgr.cpp
+      Anticheat/module/WardenAnticheat/WardenScan.cpp
+      Anticheat/module/WardenAnticheat/WardenScan.hpp
+      Anticheat/module/WardenAnticheat/WardenScanMgr.cpp
+      Anticheat/module/WardenAnticheat/WardenScanMgr.hpp
       Anticheat/module/WardenAnticheat/WardenKeyGeneration.h
   )
+else()
+  list(APPEND game_SRCS Anticheat/Anticheat.cpp)
 endif()
 
 

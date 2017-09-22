@@ -56,6 +56,7 @@ class BigNumber;
 class BehaviorAnalyzer;
 class NodeSession;
 class MasterPlayer;
+class SessionAnticheatInterface;
 
 struct OpcodeHandler;
 struct PlayerBotEntry;
@@ -305,10 +306,12 @@ class MANGOS_DLL_SPEC WorldSession
         void SetSecurity(AccountTypes security) { _security = security; }
         std::string const& GetRemoteAddress() const { return m_Address; }
         std::string const& GetClientHash() const { return _clientHash; }
-        void SetPlayer(Player *plr) { _player = plr; }
+        void SetPlayer(Player *plr);
         void SetMasterPlayer(MasterPlayer *plr) { m_masterPlayer = plr; }
         void LoginPlayer(ObjectGuid playerGuid);
         WorldSocket* GetSocket() { return m_Socket; }
+
+        SessionAnticheatInterface * GetAnticheat() const { return _anticheat.get(); }
 
         /// Session in auth.queue currently
         void SetInQueue(bool state) { m_inQueue = state; }
@@ -473,7 +476,7 @@ class MANGOS_DLL_SPEC WorldSession
         // Bot system
         std::stringstream _chatBotHistory;
         PlayerBotEntry* GetBot() { return m_bot; }
-        void SetBot(PlayerBotEntry* b) { m_bot = b; }
+        void SetBot(PlayerBotEntry* b);
 
         // Player online / socket offline system
         void SetDisconnectedSession(); // Remove from World::m_session. Used when an account gets disconnected.
@@ -483,17 +486,10 @@ class MANGOS_DLL_SPEC WorldSession
         bool m_connected;
         uint32 m_disconnectTimer;
 
-        // Warden / Anticheat
-        void InitWarden(BigNumber* K);
         bool AllowPacket(uint16 opcode);
-        void ProcessAnticheatAction(const char* detector, const char* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
         uint32 GetLastReceivedPacketTime() const { return m_lastReceivedPacketTime; }
-        void AddClientIdentifier(uint32 i, std::string str);
-        ClientIdentifiersMap const& GetClientIdentifiers() const { return _clientIdentifiers; }
-        void ComputeClientHash();
-        bool IsClientHashComputed() const { return _clientHashComputeStep != HASH_NOT_COMPUTED; }
 
-        WardenInterface* GetWarden() const { return m_warden; }
+        void InitializeAnticheat(const BigNumber &K);
 
         void AddScript(std::string name, WorldSessionScript* script)
         {
@@ -920,6 +916,9 @@ class MANGOS_DLL_SPEC WorldSession
         AccountTypes _security;
         uint32 _accountId;
 
+        // Warden / Anticheat
+        std::unique_ptr<SessionAnticheatInterface> _anticheat;
+
         time_t _logoutTime;
         bool m_inQueue;                                     // session wait in auth.queue
         bool m_playerLoading;                               // code processed in LoginPlayer
@@ -934,7 +933,7 @@ class MANGOS_DLL_SPEC WorldSession
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool _receivedPacketType[PACKET_PROCESS_MAX_TYPE];
 
-        WardenInterface* m_warden;
+        //WardenInterface* m_warden;
         std::string m_username;
         uint32 _floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         PlayerBotEntry* m_bot;
@@ -945,13 +944,6 @@ class MANGOS_DLL_SPEC WorldSession
         uint32          _gameBuild;
         uint32          _charactersCount;
         uint32          _characterMaxLevel;
-        enum ClientHashStep
-        {
-            HASH_NOT_COMPUTED,
-            HASH_COMPUTED,
-            HASH_NOTIFIED,
-        };
-        ClientHashStep  _clientHashComputeStep;
 
         std::set<std::string> _addons;
 

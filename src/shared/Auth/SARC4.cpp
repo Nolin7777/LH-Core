@@ -17,20 +17,21 @@
  */
 
 #include "Auth/SARC4.h"
+
 #include <openssl/sha.h>
 
-SARC4::SARC4(uint8 len) : m_ctx()
+SARC4::SARC4(size_t len) : m_ctx()
 {
     EVP_CIPHER_CTX_init(&m_ctx);
     EVP_EncryptInit_ex(&m_ctx, EVP_rc4(), NULL, NULL, NULL);
-    EVP_CIPHER_CTX_set_key_length(&m_ctx, len);
+    EVP_CIPHER_CTX_set_key_length(&m_ctx, static_cast<int>(len));
 }
 
-SARC4::SARC4(uint8 *seed, uint8 len) : m_ctx()
+SARC4::SARC4(const uint8 *seed, size_t len) : m_ctx()
 {
     EVP_CIPHER_CTX_init(&m_ctx);
     EVP_EncryptInit_ex(&m_ctx, EVP_rc4(), NULL, NULL, NULL);
-    EVP_CIPHER_CTX_set_key_length(&m_ctx, len);
+    EVP_CIPHER_CTX_set_key_length(&m_ctx, static_cast<int>(len));
     EVP_EncryptInit_ex(&m_ctx, NULL, NULL, seed, NULL);
 }
 
@@ -39,14 +40,14 @@ SARC4::~SARC4()
     EVP_CIPHER_CTX_cleanup(&m_ctx);
 }
 
-void SARC4::Init(uint8 *seed)
+void SARC4::Init(const uint8 *seed)
 {
     EVP_EncryptInit_ex(&m_ctx, NULL, NULL, seed, NULL);
 }
 
-void SARC4::UpdateData(int len, uint8 *data)
+void SARC4::UpdateData(uint8 *data, size_t len)
 {
     int outlen = 0;
-    EVP_EncryptUpdate(&m_ctx, data, &outlen, data, len);
+    EVP_EncryptUpdate(&m_ctx, data, &outlen, data, static_cast<int>(len));
     EVP_EncryptFinal_ex(&m_ctx, data, &outlen);
 }

@@ -1947,9 +1947,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void ChangeSpeakTime(int utime);
         bool FallGround(uint8 fallMode);
 
-        /// Anticheat
-        PlayerAnticheatInterface* _cheatData;
-        PlayerAnticheatInterface* GetCheatData() const { return _cheatData; }
+        /// Anticheat XXX FIXME TODO CHECK THESE OTHER FUNCTIONS!!
         void OnDisconnected();
         void RelocateToLastClientPosition();
         void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = NULL) const;
@@ -2329,6 +2327,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         typedef std::list<Channel*> JoinedChannelsList;
         JoinedChannelsList m_channels;
 
+        // has a value of zero when the player needs to see the initial cinematic for their race
         uint32 m_cinematic;
 
         TradeData* m_trade;

@@ -19,10 +19,10 @@
 #include "Auth/HMACSHA1.h"
 #include "BigNumber.h"
 
-HMACSHA1::HMACSHA1(uint32 len, uint8 *seed)
+HMACSHA1::HMACSHA1(const uint8 *seed, size_t len)
 {
     HMAC_CTX_init(&m_ctx);
-    HMAC_Init_ex(&m_ctx, seed, len, EVP_sha1(), NULL);
+    HMAC_Init_ex(&m_ctx, seed, static_cast<int>(len), EVP_sha1(), nullptr);
 }
 
 HMACSHA1::~HMACSHA1()
@@ -30,7 +30,7 @@ HMACSHA1::~HMACSHA1()
     HMAC_CTX_cleanup(&m_ctx);
 }
 
-void HMACSHA1::UpdateBigNumber(BigNumber *bn)
+void HMACSHA1::UpdateBigNumber(const BigNumber *bn)
 {
     UpdateData(bn->AsByteArray());
 }
@@ -40,7 +40,7 @@ void HMACSHA1::UpdateData(const std::vector<uint8>& data)
     HMAC_Update(&m_ctx, data.data(), data.size());
 }
 
-void HMACSHA1::UpdateData(const uint8 *data, int length)
+void HMACSHA1::UpdateData(const uint8 *data, size_t length)
 {
     HMAC_Update(&m_ctx, data, length);
 }
@@ -53,14 +53,14 @@ void HMACSHA1::UpdateData(const std::string &str)
 void HMACSHA1::Finalize()
 {
     uint32 length = 0;
-    HMAC_Final(&m_ctx, (uint8*)m_digest, &length);
+    HMAC_Final(&m_ctx, m_digest, &length);
     //MANGOS_ASSERT(length == SHA_DIGEST_LENGTH);
 }
 
-uint8 *HMACSHA1::ComputeHash(BigNumber *bn)
+const uint8 *HMACSHA1::ComputeHash(const BigNumber *bn)
 {
     auto byteArray = bn->AsByteArray();
     HMAC_Update(&m_ctx, byteArray.data(), byteArray.size());
     Finalize();
-    return (uint8*)m_digest;
+    return m_digest;
 }

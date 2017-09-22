@@ -32,7 +32,6 @@
 #include "WorldSession.h"
 #include "Chat.h"
 #include "MasterPlayer.h"
-#include "Anticheat.h"
 
 extern DatabaseType LoginDatabase;
 
@@ -430,11 +429,6 @@ uint32 AccountPersistentData::CountWhispersTo(MasterPlayer* from, MasterPlayer* 
     if (data.whispers_count == 1)
         data.score = GetWhisperScore(from, player);
     return data.whispers_count-1;
-}
-
-bool AccountPersistentData::CanWhisper(MasterPlayer* player) const
-{
-    return sAnticheatLib->CanWhisper(*this, player);
 }
 
 uint32 AccountPersistentData::GetWhisperScore(MasterPlayer* from, MasterPlayer* target) const

@@ -894,27 +894,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 
-    static ChatCommand anticheatClientCommandTable[] =
-    {
-        { NODE, "find",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleClientSearchCommand,        "", nullptr },
-        { NODE, "",               SEC_GAMEMASTER,     true,  &ChatHandler::HandleClientInfosCommand,         "", nullptr },
-        { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
-    };
-
-    static ChatCommand anticheatWardenCommandTable[] =
-    {
-        { NODE, "read",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleWardenReadCommand,           "", nullptr },
-        { NODE, "",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleWardenCommand,               "", nullptr },
-        { MSTR, nullptr,       0,                  false, nullptr,                                            "", nullptr }
-    };
-
-    static ChatCommand anticheatCommandTable[] =
-    {
-        { NODE, "server",         SEC_GAMEMASTER,     true,  &ChatHandler::HandleAnticheatCommand,      "", nullptr },
-        { NODE, "warden",         SEC_GAMEMASTER,     true, nullptr,                                      "", anticheatWardenCommandTable },
-        { NODE, "client",         SEC_ADMINISTRATOR,  true, nullptr,                                      "", anticheatClientCommandTable },
-        { MSTR, nullptr,       0,                  false, nullptr,                                            "", nullptr }
-    };
     static ChatCommand replayCommandTable[] =
     {
         { NODE, "play",           SEC_ADMINISTRATOR,  false, &ChatHandler::HandleReplayPlayCommand,           "", nullptr },
@@ -975,23 +954,6 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { NODE, "del_characters",     SEC_ADMINISTRATOR,    true,  &ChatHandler::HandleServiceDeleteCharacters,   "", nullptr },
         { NODE, nullptr,              0,                    false, nullptr,                                       "", nullptr }
-    };
-
-    static ChatCommand spamerCommandTable[] =
-    {
-        { MSTR, "mute",               SEC_GAMEMASTER,       true,  &ChatHandler::HandleSpamerMute,                "", nullptr },
-        { MSTR, "unmute",             SEC_GAMEMASTER,       true,  &ChatHandler::HandleSpamerUnmute,              "", nullptr },
-        { MSTR, "list",               SEC_GAMEMASTER,       true,  &ChatHandler::HandleSpamerList,                "", nullptr },
-        { MSTR, nullptr,              0,                    false, nullptr,                                       "", nullptr }
-    };
-
-    static ChatCommand AntiSpamCommandTable[] =
-    {
-        { MSTR, "add",                SEC_GAMEMASTER,       true,  &ChatHandler::HandleAntiSpamAdd,                "", nullptr },
-        { MSTR, "remove",             SEC_ADMINISTRATOR,    true,  &ChatHandler::HandleAntiSpamRemove,             "", nullptr },
-        { MSTR, "replace",            SEC_GAMEMASTER,       true,  &ChatHandler::HandleAntiSpamReplace,            "", nullptr },
-        { MSTR, "removereplace",      SEC_ADMINISTRATOR,    true,  &ChatHandler::HandleAntiSpamRemoveReplace,      "", nullptr },
-        { MSTR, nullptr,              0,                    false, nullptr,                                        "", nullptr }
     };
 
     static ChatCommand goldCommandTable[] =
@@ -1113,15 +1075,13 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "mmap",           SEC_GAMEMASTER,     false, nullptr,                                           "", mmapCommandTable },
         { NODE, "video",          SEC_GAMEMASTER,     false, nullptr,                                           "", videosCommandTable },
         { NODE, "freez",          SEC_GAMEMASTER,     false, &ChatHandler::HandleFreezCommand,               "", nullptr },
-        { NODE, "anticheat",      SEC_GAMEMASTER,     false, nullptr,                                           "", anticheatCommandTable },
+        { MSTR, "anticheat",      SEC_GAMEMASTER,     false, &ChatHandler::HandleAnticheatCommand,           "", nullptr },
         { NODE, "groupspell",     SEC_ADMINISTRATOR,  true, nullptr,                                           "", groupSpellCommandTable},
         { NODE, "pet",            SEC_ADMINISTRATOR,  true, nullptr,                                           "", petCommandTable},
         { NODE, "channel",        SEC_GAMEMASTER,     false, nullptr,                                           "", channelCommandTable},
         { NODE, "nodes",          SEC_GAMEMASTER,     true, nullptr,                                           "", nodeServersCommandTable},
         { MSTR, "runtest",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleRunTestCommand,             "", nullptr },
         { MSTR, "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
-        { MSTR, "spamer",         SEC_GAMEMASTER,     true, nullptr,                                           "", spamerCommandTable },
-        { MSTR, "antispam",       SEC_GAMEMASTER,     true, nullptr,                                           "", AntiSpamCommandTable },
         { MSTR, "gold",           SEC_GAMEMASTER,     true, nullptr,                                           "", goldCommandTable },
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };

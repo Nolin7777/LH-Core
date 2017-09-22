@@ -1,0 +1,3 @@
+[submodule "src/game/Anticheat/module"]
+	path = src/game/Anticheat/module
+	url = git@gitlab.com:lights-hope/anticheat.git

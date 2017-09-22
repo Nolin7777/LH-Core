@@ -45,7 +45,7 @@
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "ZoneScript.h"
-#include "Anticheat.h"
+#include "Anticheat.hpp"
 #include "MasterPlayer.h"
 #include "GossipDef.h"
 #include "GameEventMgr.h"
@@ -705,7 +705,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 
     if (!guid) // Cheating attempt
     {
-        ProcessAnticheatAction("SAC", "Instant resurrect hack detected", CHEAT_ACTION_LOG);
+        _anticheat->MiscAction("SAC", "Instant resurrect hack detected", CHEAT_ACTION_LOG);
         return;
     }
 
@@ -986,6 +986,8 @@ void WorldSession::HandleCompleteCinematic(WorldPacket & /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Player is watching cinema");
     GetPlayer()->CinematicEnd();
+
+    _anticheat->CompleteCinematic();
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)
@@ -1258,11 +1260,5 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket & /*recv_data */)
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket & recv_data)
 {
-    if (!m_warden)
-    {
-        sLog.outWarden("HandleWardenDataOpcode: warden interface not found!");
-        return;
-    }
-
-    m_warden->HandleWardenDataOpcode(recv_data);
+    _anticheat->WardenPacket(recv_data);
 }

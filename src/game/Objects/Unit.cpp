@@ -50,6 +50,7 @@
 #include "VMapFactory.h"
 #include "MovementGenerator.h"
 #include "Transport.h"
+#include "Anticheat.hpp"
 
 #include "ZoneScript.h"
 #include "Nostalrius.h"
@@ -60,7 +61,6 @@
 #include "MoveSpline.h"
 #include "packet_builder.h"
 #include "Chat.h"
-#include "Anticheat.h"
 #include "CreatureLinkingMgr.h"
 #include "InstanceStatistics.h"
 
@@ -8128,10 +8128,7 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
                 dataForMe << uint32(0);
                 dataForMe << float(GetSpeed(mtype));
                 me->GetSession()->SendPacket(&dataForMe);
-                me->GetCheatData()->OrderSent(&dataForMe);
-                //if (this == me)
-                    //if (WardenInterface* warden = me->GetSession()->GetWarden())
-                        //warden->SendSpeedChange(mtype, GetSpeed(mtype));
+                me->GetSession()->GetAnticheat()->OrderSent(dataForMe);
             }
         }
 
@@ -10420,7 +10417,7 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         data << float(-verticalSpeed);                      // Z Movement speed (vertical)
         SendMovementMessageToSet(std::move(data), true);
 
-        ToPlayer()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
+        ToPlayer()->GetSession()->GetAnticheat()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
     }
 }
 
@@ -10770,7 +10767,7 @@ void Unit::GetRandomAttackPoint(const Unit* attacker, float &x, float &y, float 
 
     // Moving player: try to interpolate movement a bit
     if (GetTypeId() == TYPEID_PLAYER && IsMoving())
-        if (!ToPlayer()->GetCheatData()->InterpolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
+        if (!ToPlayer()->GetSession()->GetAnticheat()->InterpolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
             GetPosition(initialPosX, initialPosY, initialPosZ);
 
     float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +
@@ -11464,7 +11461,7 @@ void Unit::SetMovement(UnitMovementType pType)
     data << uint32(WorldTimer::getMSTime()); // Peut etre msTime : WorldTimer::getMSTime() ?
     if (mePlayer)
     {
-        mePlayer->GetCheatData()->OrderSent(&data);
+        mePlayer->GetSession()->GetAnticheat()->OrderSent(data);
         mePlayer->GetSession()->SendPacket(&data);
 
         // We can't send movement info here because it is out-of-date with the client

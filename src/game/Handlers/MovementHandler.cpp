@@ -34,7 +34,7 @@
 #include "ObjectMgr.h"
 
 #include "World.h"
-#include "Anticheat.h"
+#include "Anticheat.hpp"
 #include "packet_builder.h"
 #include "MoveSpline.h"
 #include "MovementBroadcaster.h"
@@ -299,11 +299,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
     if (!VerifyMovementInfo(movementInfo))
         return;
 
-    if (plMover && !plMover->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
-        return;
-
-    // this must be called after HandleAnticheatTests because that function will update order counters (for things like slow fall, water walk, etc.)
-    if (plMover && !plMover->GetCheatData()->CheckTeleport(opcode, movementInfo))
+    // check if anticheat approves of this movement
+    if (!_anticheat->Movement(movementInfo, recv_data))
         return;
 
     // Interrupt spell cast at move
@@ -361,7 +358,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         return;
 
     // Process anticheat checks, remember client-side speed ...
-    if (_player->IsSelfMover() && !_player->GetCheatData()->HandleSpeedChangeAck(movementInfo, this, &recv_data, newspeed))
+    if (_player->IsSelfMover() && !_anticheat->SpeedChangeAck(movementInfo, recv_data, newspeed))
         return;
 
     // Process position-change
@@ -434,6 +431,8 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
+
+    _anticheat->Movement(_player->GetMover()->m_movementInfo, recv_data);
 
     ObjectGuid guid;
     recv_data >> guid;
@@ -526,7 +525,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
     if (!VerifyMovementInfo(movementInfo, guid))
         return;
 
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
+    if (!_anticheat->Movement(movementInfo, recv_data))
         return;
 
     HandleMoverRelocation(movementInfo);
@@ -624,8 +623,8 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
 
         if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
         {
-            GetPlayer()->GetCheatData()->OnTransport(plMover, movementInfo.GetTransportGuid());
             Unit* loadPetOnTransport = nullptr;
+
             if (!plMover->GetTransport())
             {
                 if (Transport* t = plMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
@@ -640,6 +639,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
             }
             else
                 plMover->SetJustBoarded(false);
+
             if (plMover->GetTransport())
             {
                 movementInfo.pos.x = movementInfo.GetTransportPos()->x;
@@ -782,7 +782,7 @@ void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
     if (!VerifyMovementInfo(movementInfo))
         return;
 
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
+    if (!_anticheat->Movement(movementInfo, recv_data))
         return;
 
     // Position change
@@ -815,7 +815,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     if (!VerifyMovementInfo(movementInfo))
         return;
 
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
+    if (!_anticheat->Movement(movementInfo, recv_data))
         return;
 
     // Update position if it has changed (possible on UNROOT ack?)
@@ -851,7 +851,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     if (!VerifyMovementInfo(movementInfo))
         return;
 
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
+    if (!_anticheat->Movement(movementInfo, recv_data))
         return;
 
     // Position change

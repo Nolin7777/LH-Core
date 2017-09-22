@@ -49,10 +49,10 @@
 #include "CellImpl.h"
 #include "MapManager.h"
 #include "MoveSpline.h"
+#include "Anticheat.hpp"
 
 #include "ZoneScript.h"
 #include "PlayerAI.h"
-#include "Anticheat.h"
 
 #define NULL_AURA_SLOT 0xFF
 
@@ -2139,7 +2139,7 @@ void Aura::HandleAuraWaterWalk(bool apply, bool Real)
     if (Player* t = GetTarget()->ToPlayer())
     {
         t->GetSession()->SendPacket(&data);
-        t->GetCheatData()->OrderSent(&data);
+        t->GetSession()->GetAnticheat()->OrderSent(data);
     }
     else
         GetTarget()->SendMovementMessageToSet(std::move(data), true);
@@ -2161,7 +2161,7 @@ void Aura::HandleAuraFeatherFall(bool apply, bool Real)
     if (Player* t = GetTarget()->ToPlayer())
     {
         t->GetSession()->SendPacket(&data);
-        t->GetCheatData()->OrderSent(&data);
+        t->GetSession()->GetAnticheat()->OrderSent(data);
         // start fall from current height
         if (!apply)
             t->SetFallInformation(0, t->GetPositionZ());
@@ -2185,7 +2185,7 @@ void Aura::HandleAuraHover(bool apply, bool Real)
     data << uint32(0);
     GetTarget()->SendMovementMessageToSet(std::move(data), true);
     if (Player* t = GetTarget()->ToPlayer())
-        t->GetCheatData()->OrderSent(&data);
+        t->GetSession()->GetAnticheat()->OrderSent(data);
 }
 
 void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)

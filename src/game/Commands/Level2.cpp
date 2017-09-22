@@ -57,6 +57,7 @@
 #include <typeinfo>
 #include "Formulas.h"
 #include "AsyncCommandHandlers.h"
+#include "Anticheat.hpp"
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 

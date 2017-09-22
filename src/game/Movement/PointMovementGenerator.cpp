@@ -25,7 +25,7 @@
 #include "World.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
-#include "Anticheat.h"
+#include "Anticheat.hpp"
 
 //----- Point Movement Generator
 template<class T>
@@ -245,9 +245,11 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     // Improved path to victim future estimated position
     if (Player* victimPlayer = victim.ToPlayer())
     {
-        PlayerAnticheatInterface* data = victimPlayer->GetCheatData();
-        if ((data->InterpolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o)) &&
-                (data->InterpolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o)))
+        auto const anticheat = victimPlayer->GetSession()->GetAnticheat();
+
+        if (!!anticheat &&
+            anticheat->InterpolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o) &&
+            anticheat->InterpolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o))
         {
             // Victim speed per sec.
             victimSpd -= victimPos;
@@ -266,9 +268,10 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
                     pathTravelTime = (uint32)(1000 * 2 * currDistance / _speed);
 
                 pathTravelTime *= 0.45f; // Attenuation factor (empirical)
-                _interpolateDelay = (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.time) + pathTravelTime;
-                if (_interpolateDelay > 1500) _interpolateDelay = 1500;
-                if (data->InterpolateMovement(victimPlayer->m_movementInfo, _interpolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
+
+                _interpolateDelay = std::min(1500u, (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.time) + pathTravelTime);
+
+                if (anticheat->InterpolateMovement(victimPlayer->m_movementInfo, _interpolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
                 {
                     victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
                     path.calculate(victimPos.x, victimPos.y, victimPos.z, false);

@@ -37,7 +37,7 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Chat.h"
-#include "Anticheat.h"
+#include "Anticheat.hpp"
 #include "AccountMgr.h"
 #include "Database/DatabaseImpl.h"
 
@@ -223,7 +223,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     // Check for overflow
     if (reqmoney < req->money)
     {
-        ProcessAnticheatAction("MailCheck", "Attempt to send free mails with money overflow", CHEAT_ACTION_LOG);
+        _anticheat->MiscAction("MailCheck", "Attempt to send free mails with money overflow", CHEAT_ACTION_LOG);
         pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
         return;
     }
@@ -305,7 +305,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
 
         std::stringstream oss;
         oss << "Mail limit reached (\"" << req->body.substr(0, 30) << "...\") [log #" << logId << "]";
-        ProcessAnticheatAction("ChatSpam", oss.str().c_str(), CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+        _anticheat->MiscAction("ChatSpam", oss.str().c_str(), CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         pl->SendMailResult(0, MAIL_SEND, MAIL_OK);
         return;
     }
@@ -372,7 +372,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     if (!item && req->COD)
     {
         req->COD = 0;
-        ProcessAnticheatAction("MailCheck", "Attempt to send COD mail without any item", CHEAT_ACTION_LOG);
+        _anticheat->MiscAction("MailCheck", "Attempt to send COD mail without any item", CHEAT_ACTION_LOG);
     }
     // will delete item or place to receiver mail list
     draft
@@ -413,7 +413,7 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data)
     {
         if (m->state == MAIL_STATE_DELETED)
         {
-            ProcessAnticheatAction("MailCheck", "Attempt to mark deleted mail as read", CHEAT_ACTION_LOG);
+            _anticheat->MiscAction("MailCheck", "Attempt to mark deleted mail as read", CHEAT_ACTION_LOG);
             return;
         }
         pl->DecreaseUnreadMailsCount();

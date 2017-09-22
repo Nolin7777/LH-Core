@@ -29,6 +29,7 @@
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
 #include "AddonHandler.h"
+#include "Anticheat.hpp"
 
 #include "Opcodes.h"
 #include "MangosSocketImpl.h"
@@ -319,7 +320,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     m_Session->SetAccountFlags(accFlags);
     m_Session->SetOS(clientOs);
     m_Session->LoadTutorialsData();
-    m_Session->InitWarden(&K);
+    m_Session->InitializeAnticheat(K);
 
     // In case needed sometime the second arg is in microseconds 1 000 000 = 1 sec
     ACE_OS::sleep(ACE_Time_Value(0, 10000));

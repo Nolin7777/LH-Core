@@ -2132,13 +2132,19 @@ void Aura::HandleAuraWaterWalk(bool apply, bool Real)
         data.Initialize(SMSG_MOVE_WATER_WALK, 8 + 4);
     else
         data.Initialize(SMSG_MOVE_LAND_WALK, 8 + 4);
+
     data << GetTarget()->GetPackGUID();
+
+    auto const counterPos = data.wpos();
     data << uint32(0);
 
     if (Player* t = GetTarget()->ToPlayer())
     {
+        auto const counter = t->GetSession()->GetOrderCounter();
+        data.put(counterPos, counter);
         t->GetSession()->SendPacket(&data);
-        t->GetSession()->GetAnticheat()->OrderSent(data);
+        t->GetSession()->GetAnticheat()->OrderSent(data.GetOpcode(), counter);
+        t->GetSession()->IncrementOrderCounter();
     }
     else
         GetTarget()->SendMovementMessageToSet(std::move(data), true);
@@ -2154,13 +2160,19 @@ void Aura::HandleAuraFeatherFall(bool apply, bool Real)
         data.Initialize(SMSG_MOVE_FEATHER_FALL, 8 + 4);
     else
         data.Initialize(SMSG_MOVE_NORMAL_FALL, 8 + 4);
+
     data << GetTarget()->GetPackGUID();
+
+    auto const counterPos = data.wpos();
     data << uint32(0);
 
     if (Player* t = GetTarget()->ToPlayer())
     {
+        auto const counter = t->GetSession()->GetOrderCounter();
+        data.put(counterPos, counter);
         t->GetSession()->SendPacket(&data);
-        t->GetSession()->GetAnticheat()->OrderSent(data);
+        t->GetSession()->GetAnticheat()->OrderSent(data.GetOpcode(), counter);
+        t->GetSession()->IncrementOrderCounter();
         // start fall from current height
         if (!apply)
             t->SetFallInformation(0, t->GetPositionZ());
@@ -2180,11 +2192,22 @@ void Aura::HandleAuraHover(bool apply, bool Real)
         data.Initialize(SMSG_MOVE_SET_HOVER, 8 + 4);
     else
         data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
+
     data << GetTarget()->GetPackGUID();
+
+    auto const counterPos = data.wpos();
     data << uint32(0);
-    GetTarget()->SendMovementMessageToSet(std::move(data), true);
+
     if (Player* t = GetTarget()->ToPlayer())
-        t->GetSession()->GetAnticheat()->OrderSent(data);
+    {
+        auto const counter = t->GetSession()->GetOrderCounter();
+        data.put(counterPos, counter);
+        t->GetSession()->GetAnticheat()->OrderSent(data.GetOpcode(), counter);
+        t->GetSession()->IncrementOrderCounter();
+    }
+    
+    // XXX why is this not consistent with feather fall and water walk (in an else{})?
+    GetTarget()->SendMovementMessageToSet(std::move(data), true);
 }
 
 void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)

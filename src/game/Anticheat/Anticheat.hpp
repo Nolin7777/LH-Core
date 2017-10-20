@@ -60,14 +60,16 @@ class SessionAnticheatInterface
         virtual void MiscAction(const char *detector, const char *comment, uint32 action) = 0;
 
         // movement cheats
-        virtual bool Movement(MovementInfo &mi, const WorldPacket &packet) = 0;
+        virtual bool Movement(MovementInfo &mi, const WorldPacket &) = 0;
         virtual bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) = 0;
         virtual bool SpeedChangeAck(MovementInfo &mi, const WorldPacket &packet, float newSpeed) = 0;
         virtual void Unreachable(Unit *attacker) = 0;
         virtual bool IsInKnockBack() const = 0;
         virtual void KnockBack(float speedxy, float speedz, float cos, float sin) = 0;
         virtual void OnExplore(const AreaEntry *p) = 0;
-        virtual void OrderSent(const WorldPacket &packet) = 0;
+
+        virtual void OrderSent(uint16 opcode, uint32 counter) = 0;
+        virtual void OrderAck(uint16 opcode, uint32 counter) = 0;
 
         // warden
         virtual void WardenPacket(WorldPacket &packet) = 0;
@@ -136,7 +138,9 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual bool IsInKnockBack() const { return m_inKnockBack; }
         virtual void KnockBack(float speedxy, float speedz, float cos, float sin) { m_inKnockBack = true; }
         virtual void OnExplore(const AreaEntry *) {}
-        virtual void OrderSent(const WorldPacket &) {}
+
+        virtual void OrderSent(uint16, uint32) {}
+        virtual void OrderAck(uint16, uint32) {}
 
         // warden
         virtual void WardenPacket(WorldPacket &) {}

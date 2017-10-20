@@ -8129,12 +8129,16 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
         {
             if (Player* me = GetAffectingPlayer())
             {
+                auto const counter = me->GetSession()->GetOrderCounter();
+
                 WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 18);
                 dataForMe << GetPackGUID();
-                dataForMe << uint32(0);
-                dataForMe << float(GetSpeed(mtype));
+                dataForMe << counter;
+                dataForMe << GetSpeed(mtype);
+
                 me->GetSession()->SendPacket(&dataForMe);
-                me->GetSession()->GetAnticheat()->OrderSent(dataForMe);
+                me->GetSession()->GetAnticheat()->OrderSent(dataForMe.GetOpcode(), counter);
+                me->GetSession()->IncrementOrderCounter();
             }
         }
 
@@ -11463,12 +11467,21 @@ void Unit::SetMovement(UnitMovementType pType)
             sLog.outError("Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
             return;
     }
+
     data << GetPackGUID();
-    data << uint32(WorldTimer::getMSTime()); // Peut etre msTime : WorldTimer::getMSTime() ?
+
+    auto const counterPos = data.wpos();
+
     if (mePlayer)
     {
-        mePlayer->GetSession()->GetAnticheat()->OrderSent(data);
-        mePlayer->GetSession()->SendPacket(&data);
+        auto const session = mePlayer->GetSession();
+        auto const orderCounter = session->GetOrderCounter();
+
+        data.put(counterPos, orderCounter);
+
+        session->GetAnticheat()->OrderSent(data.GetOpcode(), orderCounter);
+        session->SendPacket(&data);
+        session->IncrementOrderCounter();
 
         // We can't send movement info here because it is out-of-date with the client
         // and causes issues with unit speed updates on death/res
@@ -11480,8 +11493,18 @@ void Unit::SetMovement(UnitMovementType pType)
             mePlayer->SendMovementMessageToSet(std::move(rootData), false);
         }*/
     }
+
     if (controller)
-        controller->GetSession()->SendPacket(&data);
+    {
+        auto const session = controller->GetSession();
+        auto const orderCounter = session->GetOrderCounter();
+
+        data.put(counterPos, orderCounter);
+
+        session->GetAnticheat()->OrderSent(data.GetOpcode(), orderCounter);
+        session->SendPacket(&data);
+        session->IncrementOrderCounter();
+    }
 }
 
 bool Unit::HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const

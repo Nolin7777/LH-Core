@@ -98,7 +98,7 @@ class MANGOS_DLL_SPEC ChatHandler
             FillMessageData( data, session, type, language, nullptr, ObjectGuid(), message, nullptr);
         }
 
-        void FillSystemMessageData( WorldPacket *data, const char* message )
+        void FillSystemMessageData( WorldPacket *data, const char* message ) const
         {
             FillMessageData( data, m_session, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, ObjectGuid(), message );
         }

@@ -454,6 +454,8 @@ class MANGOS_DLL_SPEC WorldSession
         uint32 getDialogStatus(Player *pPlayer, Object* questgiver, uint32 defstatus);
         uint32 GetAccountMaxLevel() const { return _characterMaxLevel; }
         void SetAccountMaxLevel(uint32 l) { _characterMaxLevel = l; }
+        uint32 GetOrderCounter() const { return _orderCounter; }
+        void IncrementOrderCounter() { ++_orderCounter; }
 
         bool IsReplaying() const { return _pcktReading != nullptr; }
         ObjectGuid GetRecorderGuid() const { return _recorderGuid; }
@@ -916,7 +918,7 @@ class MANGOS_DLL_SPEC WorldSession
         AccountTypes _security;
         uint32 _accountId;
 
-        // Warden / Anticheat
+        // anticheat
         std::unique_ptr<SessionAnticheatInterface> _anticheat;
 
         time_t _logoutTime;
@@ -933,7 +935,6 @@ class MANGOS_DLL_SPEC WorldSession
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool _receivedPacketType[PACKET_PROCESS_MAX_TYPE];
 
-        //WardenInterface* m_warden;
         std::string m_username;
         uint32 _floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         PlayerBotEntry* m_bot;
@@ -944,6 +945,7 @@ class MANGOS_DLL_SPEC WorldSession
         uint32          _gameBuild;
         uint32          _charactersCount;
         uint32          _characterMaxLevel;
+        uint32          _orderCounter;
 
         std::set<std::string> _addons;
 

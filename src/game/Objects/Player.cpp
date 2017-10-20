@@ -18244,14 +18244,18 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
     if (HasAuraType(SPELL_AURA_MOD_STUN))
         SetMovement(MOVE_ROOT);
 
-    // manual send package (have code in ApplyModifier(true,true); that don't must be re-applied.
+    // manual send packet (have code in ApplyModifier(true,true); that don't must be re-applied.
     if (HasAuraType(SPELL_AURA_MOD_ROOT))
     {
+        auto const counter = GetSession()->GetOrderCounter();
+
         WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
         data2 << GetPackGUID();
-        data2 << (uint32)2;
+        data2 << counter;
+
         SendObjectMessageToSet(&data2, true);
-        GetSession()->GetAnticheat()->OrderSent(data2);
+
+        GetSession()->GetAnticheat()->OrderSent(data2.GetOpcode(), counter);
     }
 
     SendEnchantmentDurations();                             // must be after add to map

@@ -336,16 +336,17 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 
 void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
 {
-    uint32 opcode = recv_data.GetOpcode();
+    auto const opcode = recv_data.GetOpcode();
     DEBUG_LOG("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     /* extract packet */
     ObjectGuid guid;
+    uint32 counter;
     MovementInfo movementInfo;
     float  newspeed;
 
     recv_data >> guid;
-    recv_data >> Unused<uint32>();                          // counter or moveEvent
+    recv_data >> counter;
     recv_data >> movementInfo;
     recv_data >> newspeed;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
@@ -354,8 +355,11 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     ObjectGuid moverGuid = _player->GetMover()->GetObjectGuid();
     if (guid != moverGuid && guid != _clientMoverGuid)
         return;
+
     if (!VerifyMovementInfo(movementInfo))
         return;
+
+    _anticheat->OrderAck(opcode, counter);
 
     // Process anticheat checks, remember client-side speed ...
     if (_player->IsSelfMover() && !_anticheat->SpeedChangeAck(movementInfo, recv_data, newspeed))
@@ -770,10 +774,9 @@ void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
     DEBUG_LOG("WORLD: CMSG_MOVE_FEATHER_FALL_ACK size %u", recv_data.wpos());
 
     ObjectGuid guid;
+    uint32 counter;
     MovementInfo movementInfo;
-    recv_data >> guid; // guid
-    recv_data.read_skip<uint32>(); // counter
-    recv_data >> movementInfo;
+    recv_data >> guid >> counter >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
     if (guid != _clientMoverGuid)
@@ -781,6 +784,8 @@ void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
 
     if (!VerifyMovementInfo(movementInfo))
         return;
+
+    _anticheat->OrderAck(recv_data.GetOpcode(), counter);
 
     if (!_anticheat->Movement(movementInfo, recv_data))
         return;
@@ -807,13 +812,17 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
+
+    uint32 counter;
     MovementInfo movementInfo;
-    recv_data.read_skip<uint32>();                          // unk
-    recv_data >> movementInfo;
+    recv_data >> counter >> movementInfo;
+
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
     if (!VerifyMovementInfo(movementInfo))
         return;
+
+    _anticheat->OrderAck(recv_data.GetOpcode(), counter);
 
     if (!_anticheat->Movement(movementInfo, recv_data))
         return;
@@ -843,13 +852,17 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
+
+    uint32 counter;
     MovementInfo movementInfo;
-    recv_data.read_skip<uint32>();                          // unk
-    recv_data >> movementInfo;
+    recv_data >> counter >> movementInfo;
+
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
     if (!VerifyMovementInfo(movementInfo))
         return;
+
+    _anticheat->OrderAck(recv_data.GetOpcode(), counter);
 
     if (!_anticheat->Movement(movementInfo, recv_data))
         return;

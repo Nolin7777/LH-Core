@@ -571,19 +571,22 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
             {
                 DETAIL_LOG("Disconnecting session [account id %u / address %s] for badly formatted packet.",
                            GetAccountId(), GetRemoteAddress().c_str());
-                _anticheat->MiscAction("Anticrash", "ByteBufferException", CHEAT_ACTION_KICK);
+                _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "Anticrash", "ByteBufferException");
+                KickPlayer();
             }
         }
         catch (std::runtime_error &e)
         {
             sLog.outInfo("CATCH Exception 'ASSERT' for account %u / IP %s", GetAccountId(), GetRemoteAddress().c_str());
             sLog.outInfo(e.what());
-            _anticheat->MiscAction("Anticrash", "ASSERT failed", CHEAT_ACTION_KICK);
+            _anticheat->RecordCheat(CHEAT_ACTION_KICK, "Anticrash", "ASSERT failed");
+            KickPlayer();
         }
         catch (...)
         {
             sLog.outInfo("CATCH Unknown exception. Account %u / IP %s", GetAccountId(), GetRemoteAddress().c_str());
-            _anticheat->MiscAction("Anticrash", "Exception raised", CHEAT_ACTION_KICK);
+            _anticheat->RecordCheat(CHEAT_ACTION_KICK, "Anticrash", "Exception raised");
+            KickPlayer();
         }
 
         delete packet;
@@ -602,7 +605,7 @@ void WorldSession::ClearIncomingPacketsByType(PacketProcessing type)
 void WorldSession::SetBot(PlayerBotEntry* b)
 {
     m_bot = b;
-    _anticheat.reset(new NullSessionAnticheat);
+    _anticheat.reset(new NullSessionAnticheat(this));
 }
 
 void WorldSession::SetDisconnectedSession()
@@ -1163,10 +1166,11 @@ bool WorldSession::AllowPacket(uint16 opcode)
         reason << _floodPacketsCount[FLOOD_SLOW_OPCODES] << " slow packets";
     if (_floodPacketsCount[FLOOD_TOTAL_PACKETS] > 300)
         reason << _floodPacketsCount[FLOOD_TOTAL_PACKETS] << " packets";
+
     if (reason.str() != "")
     {
         reason << " (" << LookupOpcodeName(opcode) << ")";
-        _anticheat->MiscAction("AntiFlood", reason.str().c_str(), sWorld.getConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION));
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG| sWorld.getConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION), "AntiFlood", reason.str().c_str());
         return false;
     }
 

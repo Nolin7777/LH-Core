@@ -10766,32 +10766,32 @@ void Unit::GetRandomAttackPoint(const Unit* attacker, float &x, float &y, float 
     angle += (attacker_number ? ((float(M_PI / 2) - float(M_PI) * rand_norm_f()) * attacker_number / sizeFactor) * 0.3f : 0);
 
     float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + rand_norm_f() * (attacker->GetMeleeReach() - attacker->GetObjectBoundingRadius());
-    float initialPosX, initialPosY, initialPosZ, o;
-    GetPosition(initialPosX, initialPosY, initialPosZ);
+    Position initialPos;
+    GetPosition(initialPos.x, initialPos.y, initialPos.z);
 
-    // Moving player: try to interpolate movement a bit
+    // Moving player: try to extrapolate movement a bit
     if (GetTypeId() == TYPEID_PLAYER && IsMoving())
-        if (!ToPlayer()->GetSession()->GetAnticheat()->InterpolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
-            GetPosition(initialPosX, initialPosY, initialPosZ);
+        if (!ToPlayer()->GetSession()->GetAnticheat()->ExtrapolateMovement(m_movementInfo, 200, initialPos))
+            GetPosition(initialPos.x, initialPos.y, initialPos.z);
 
-    float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +
-                                        pow(initialPosY - attacker->GetPositionY(), 2) +
-                                        pow(initialPosZ - attacker->GetPositionZ(), 2));
+    float attackerTargetDistance = sqrt(pow(initialPos.x - attacker->GetPositionX(), 2) +
+                                        pow(initialPos.y - attacker->GetPositionY(), 2) +
+                                        pow(initialPos.z - attacker->GetPositionZ(), 2));
     if (dist > attackerTargetDistance)
     {
         // On ne bouge pas, on est deja a portee.
         attacker->GetPosition(x, y, z);
         return;
     }
-    float normalizedVectZ = (attacker->GetPositionZ() - initialPosZ) / attackerTargetDistance;
+    float normalizedVectZ = (attacker->GetPositionZ() - initialPos.z) / attackerTargetDistance;
     float normalizedVectXY = sqrt(1 - normalizedVectZ * normalizedVectZ);
-    x = initialPosX + dist * cos(angle) * normalizedVectXY;
-    y = initialPosY + dist * sin(angle) * normalizedVectXY;
-    z = initialPosZ + dist * normalizedVectZ;
+    x = initialPos.x + dist * cos(angle) * normalizedVectXY;
+    y = initialPos.y + dist * sin(angle) * normalizedVectXY;
+    z = initialPos.z + dist * normalizedVectZ;
 
     if ((attacker->CanFly() || (attacker->CanSwim() && IsInWater())))
     {
-        GetMap()->GetLosHitPosition(initialPosX, initialPosY, initialPosZ, x, y, z, -0.2f);
+        GetMap()->GetLosHitPosition(initialPos.x, initialPos.y, initialPos.z, x, y, z, -0.2f);
         if (attacker->CanFly())
             return;
         float ground = 0.0f;
@@ -10809,7 +10809,7 @@ void Unit::GetRandomAttackPoint(const Unit* attacker, float &x, float &y, float 
         if (attacker->GetTypeId() != TYPEID_PLAYER)
             nav |= NAV_MAGMA | NAV_SLIME;
         // Try mmaps. On fail, use target position (but should not fail)
-        if (!GetMap()->GetWalkHitPosition(GetTransport(), initialPosX, initialPosY, initialPosZ, x, y, z, nav))
+        if (!GetMap()->GetWalkHitPosition(GetTransport(), initialPos.x, initialPos.y, initialPos.z, x, y, z, nav))
             GetPosition(x, y, z);
     }
 }
@@ -11360,7 +11360,7 @@ void Unit::Debug(uint32 flags, const char* format, ...) const
     va_list ap;
     va_start(ap, format);
     char str[2048];
-    vsnprintf(str, 2048, format, ap);
+    vsnprintf(str, sizeof(str), format, ap);
     va_end(ap);
     ChatHandler(player).SendSysMessage(str);
 }

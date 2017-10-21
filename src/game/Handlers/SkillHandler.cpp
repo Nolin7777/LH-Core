@@ -73,10 +73,9 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket & recv_data)
     SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill_id, GetPlayer()->getRace(), GetPlayer()->getClass());
     if (!rcEntry || !(rcEntry->flags & SKILL_FLAG_UNLEARNABLE))
     {
-        std::stringstream reason;
-        reason << "Attempt to unlearn not unlearnable skill #" << skill_id;
-        _anticheat->MiscAction("SAC", reason.str().c_str(), CHEAT_ACTION_LOG);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "SAC", "Attempt to unlearn not unlearnable skill #%u", skill_id);
         return;
     }
+
     GetPlayer()->SetSkill(skill_id, 0, 0);
 }

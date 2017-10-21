@@ -705,7 +705,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 
     if (!guid) // Cheating attempt
     {
-        _anticheat->MiscAction("SAC", "Instant resurrect hack detected", CHEAT_ACTION_LOG);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "SAC", "Instant resurrect hack detected");
         return;
     }
 

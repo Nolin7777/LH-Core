@@ -451,25 +451,27 @@ if(USE_ANTICHEAT)
   list(APPEND game_SRCS
       Anticheat/module/libanticheat.cpp
       Anticheat/module/libanticheat.hpp
+      Anticheat/module/Config.cpp
+      Anticheat/module/Config.hpp
       Anticheat/module/Antispam/Antispam.cpp
-      Anticheat/module/Antispam/Antispam.h
-      Anticheat/module/MovementAnticheat/Cheat.cpp
-      Anticheat/module/MovementAnticheat/Cheat.h
-      Anticheat/module/WardenAnticheat/Warden.cpp
-      Anticheat/module/WardenAnticheat/Warden.hpp
-      Anticheat/module/WardenAnticheat/WardenMac.cpp
-      Anticheat/module/WardenAnticheat/WardenMac.hpp
-      Anticheat/module/WardenAnticheat/WardenWin.cpp
-      Anticheat/module/WardenAnticheat/WardenWin.hpp
-      Anticheat/module/WardenAnticheat/WardenModule.hpp
-      Anticheat/module/WardenAnticheat/WardenModule.cpp
-      Anticheat/module/WardenAnticheat/WardenModuleMgr.hpp
-      Anticheat/module/WardenAnticheat/WardenModuleMgr.cpp
-      Anticheat/module/WardenAnticheat/WardenScan.cpp
-      Anticheat/module/WardenAnticheat/WardenScan.hpp
-      Anticheat/module/WardenAnticheat/WardenScanMgr.cpp
-      Anticheat/module/WardenAnticheat/WardenScanMgr.hpp
-      Anticheat/module/WardenAnticheat/WardenKeyGeneration.h
+      Anticheat/module/Antispam/Antispam.hpp
+      Anticheat/module/Movement/Movement.cpp
+      Anticheat/module/Movement/Movement.hpp
+      Anticheat/module/Warden/Warden.cpp
+      Anticheat/module/Warden/Warden.hpp
+      Anticheat/module/Warden/WardenMac.cpp
+      Anticheat/module/Warden/WardenMac.hpp
+      Anticheat/module/Warden/WardenWin.cpp
+      Anticheat/module/Warden/WardenWin.hpp
+      Anticheat/module/Warden/WardenModule.hpp
+      Anticheat/module/Warden/WardenModule.cpp
+      Anticheat/module/Warden/WardenModuleMgr.hpp
+      Anticheat/module/Warden/WardenModuleMgr.cpp
+      Anticheat/module/Warden/WardenScan.cpp
+      Anticheat/module/Warden/WardenScan.hpp
+      Anticheat/module/Warden/WardenScanMgr.cpp
+      Anticheat/module/Warden/WardenScanMgr.hpp
+      Anticheat/module/Warden/WardenKeyGeneration.h
   )
 else()
   list(APPEND game_SRCS Anticheat/Anticheat.cpp)

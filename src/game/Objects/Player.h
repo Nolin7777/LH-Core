@@ -924,7 +924,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         static bool BuildEnumData( QueryResult * result,  WorldPacket * p_data );
 
         // knockback/jumping states
-        bool IsLaunched() { return launched; }
+        bool IsLaunched() const { return launched; }
         void SetLaunched(bool apply) { launched = apply; }
         float GetXYSpeed() { return xy_speed; }
         void SetXYSpeed(float speed) { xy_speed = speed; }

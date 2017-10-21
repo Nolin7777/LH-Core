@@ -260,12 +260,13 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     // Client limit
     if (bid > 2000000000 || buyout > 2000000000)
     {
-        _anticheat->MiscAction("GoldDupe", "Putting too high auction price", CHEAT_ACTION_LOG);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "GoldDupe", "Putting too high auction price.  Bid: %u buyout: %u", bid, buyout);
         return;
     }
+
     if (buyout && bid > buyout)
     {
-        _anticheat->MiscAction("GoldDupe", "bid > buyout", CHEAT_ACTION_LOG);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "GoldDupe", "bid (%u) > buyout (%u)", bid, buyout);
         return;
     }
 

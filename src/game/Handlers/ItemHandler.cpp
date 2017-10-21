@@ -89,7 +89,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket & recv_data)
 
     if ((_player->IsBankPos(INVENTORY_SLOT_BAG_0, srcslot) || _player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot)) && !CanUseBank())
     {
-        _anticheat->MiscAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Attempt to cheat-bank items.  Source slot: %u destination slot: %u", srcslot, dstslot);
         return;
     }
 
@@ -147,7 +147,7 @@ void WorldSession::HandleSwapItem(WorldPacket & recv_data)
 
     if ((_player->IsBankPos(srcbag, srcslot) || _player->IsBankPos(dstbag, dstslot)) && !CanUseBank())
     {
-        _anticheat->MiscAction("ItemsCheck", "Attempt to cheat-bank items", CHEAT_ACTION_REPORT_GMS);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Attempt to cheat-bank items.  Source slot: %u destination slot: %u", srcslot, dstslot);
         return;
     }
 

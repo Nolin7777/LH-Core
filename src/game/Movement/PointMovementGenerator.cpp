@@ -224,7 +224,6 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     Vector3 victimPos; // victim position
     Vector3 chargeVect; // vector of the charge
     Vector3 victimSpd; // speed vector of victim
-    float o;
 
     if (Transport* t = attacker.GetTransport())
         path.SetTransport(t);
@@ -247,10 +246,17 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     {
         auto const anticheat = victimPlayer->GetSession()->GetAnticheat();
 
+        Position posSpd, posPos;
+        posSpd.x = victimSpd.x; posSpd.y = victimSpd.y; posSpd.z = victimSpd.z;
+        posPos.x = victimPos.x; posPos.y = victimPos.y; posPos.z = victimPos.z;
+
         if (!!anticheat &&
-            anticheat->InterpolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o) &&
-            anticheat->InterpolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o))
+            anticheat->ExtrapolateMovement(victimPlayer->m_movementInfo, 1000, posSpd) &&
+            anticheat->ExtrapolateMovement(victimPlayer->m_movementInfo, 0, posPos))
         {
+            victimSpd = { posSpd.x, posSpd.y, posSpd.z };
+            victimPos = { posPos.x, posPos.y, posPos.z };
+
             // Victim speed per sec.
             victimSpd -= victimPos;
             // We get only the component of the speed in the direction of charge vector
@@ -271,7 +277,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
 
                 _interpolateDelay = std::min(1500u, (WorldTimer::getMSTime() - victimPlayer->m_movementInfo.time) + pathTravelTime);
 
-                if (anticheat->InterpolateMovement(victimPlayer->m_movementInfo, _interpolateDelay, victimPos.x, victimPos.y, victimPos.z, o))
+                if (anticheat->ExtrapolateMovement(victimPlayer->m_movementInfo, _interpolateDelay, posPos))
                 {
                     victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
                     path.calculate(victimPos.x, victimPos.y, victimPos.z, false);

@@ -92,6 +92,7 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket & recv_data)
     HandleBattlemasterJoinOpcode(data);
     return;
 }
+
 void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
 {
     ObjectGuid guid;
@@ -117,9 +118,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
         sLog.outError("Battleground: invalid bgtype (%u) received. possible cheater? player guid %u", bgTypeId, _player->GetGUIDLow());
         return;
     }
+
     if (bgTypeId == BATTLEGROUND_AV && joinAsGroup)
     {
-        _anticheat->MiscAction("SAC", "Attempt to queue AV as group.", CHEAT_ACTION_LOG);
+        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "SAC", "Attempt to queue AV as group.");
         return;
     }
 

@@ -1,6 +1,6 @@
-/**
-* Contains interface and calls that have to be implemented by the anticheat lib.
-*/
+/*
+ * Contains interface and calls that have to be implemented by the anticheat lib.
+ */
 
 #ifndef __ANTICHEAT_HPP_
 #define __ANTICHEAT_HPP_
@@ -12,15 +12,31 @@
 
 enum CheatAction
 {
+    // take no action
     CHEAT_ACTION_NONE           = 0x00,
-    CHEAT_ACTION_LOG            = 0x01,
-    CHEAT_ACTION_REPORT_GMS     = 0x02,
+
+    // informational logging to the anticheat table of the log database, and gm notification
+    CHEAT_ACTION_INFO_LOG       = 0x01,
+
+    // log to the anticheat table of the log database, notify gms, and prompt for action
+    // NOTE: other actions combined with this one are considered acceptable candidates for
+    // MANUAL action and are NOT performed automatically!
+    CHEAT_ACTION_PROMPT_LOG     = 0x02,
+
+    // disconnect the offending world session
     CHEAT_ACTION_KICK           = 0x04,
+
+    // permanently ban the offending account
     CHEAT_ACTION_BAN_ACCOUNT    = 0x08,
+
+    // permanently ban the offending ip address
     CHEAT_ACTION_BAN_IP         = 0x10,
-    CHEAT_ACTION_TELEPORT_BACK  = 0x20,
-    CHEAT_ACTION_MUTE_PUB_CHANS = 0x40, // Mutes the account from public channels
-    CHEAT_MAX_ACTIONS,
+
+    // mutes the offending account (NOT player) from whispers
+    CHEAT_ACTION_MUTE_WHISPER   = 0x20,
+
+    // mutes the offending account (NOT player) from public channels
+    CHEAT_ACTION_MUTE_PUB_CHANS = 0x40,
 };
 
 enum NormalizeFlags
@@ -53,15 +69,15 @@ class SessionAnticheatInterface
         virtual void NewPlayer() = 0;
         virtual void LeaveWorld() = 0;
 
-        virtual void SendPlayerInfo(WorldSession *) = 0;
+        // chat
+        virtual void SendPlayerInfo(ChatHandler *) const = 0;
 
-        // miscellaneous action
-        // TODO: Let anticheat decide on action based on its configuration
-        virtual void MiscAction(const char *detector, const char *comment, uint32 action) = 0;
+        // miscellaneous cheat entry
+        virtual void RecordCheat(uint32 actionMask, const char *detector, const char *format, ...) = 0;
 
         // movement cheats
         virtual bool Movement(MovementInfo &mi, const WorldPacket &) = 0;
-        virtual bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) = 0;
+        virtual bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, Position &pos) = 0;
         virtual bool SpeedChangeAck(MovementInfo &mi, const WorldPacket &packet, float newSpeed) = 0;
         virtual void Unreachable(Unit *attacker) = 0;
         virtual bool IsInKnockBack() const = 0;
@@ -73,9 +89,6 @@ class SessionAnticheatInterface
 
         // warden
         virtual void WardenPacket(WorldPacket &packet) = 0;
-
-        // recording and acting on results
-        virtual void Action(uint8 type, const char *format, ...) = 0;
 };
 
 // interface to anticheat system
@@ -96,7 +109,7 @@ class AnticheatLibInterface
         virtual void UnmuteAccount(uint32 id) = 0;
 
         // GM .anticheat command handler
-        virtual bool ChatCommand(Player *target, const std::string &args) = 0;
+        virtual bool ChatCommand(ChatHandler *handler, const Player *target, const std::string &args) = 0;
 };
 
 AnticheatLibInterface* GetAnticheatLib();
@@ -105,10 +118,11 @@ AnticheatLibInterface* GetAnticheatLib();
 class NullSessionAnticheat : public SessionAnticheatInterface
 {
     private:
-        bool m_inKnockBack;
+        WorldSession * const _session;
+        bool _inKnockBack;
 
     public:
-        NullSessionAnticheat() : m_inKnockBack(false) {}
+        NullSessionAnticheat(WorldSession *session) : _session(session), _inKnockBack(false) {}
 
         virtual void Update(uint32) {}
 
@@ -119,24 +133,29 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual void NewPlayer() {} 
         virtual void LeaveWorld() {};
 
-        virtual void SendPlayerInfo(WorldSession *) {}
+        // chat
+        virtual void SendPlayerInfo(ChatHandler *) const {}
 
         // miscellaneous action
-        virtual void MiscAction(const char *detector, const char *comment, uint32 action) {};
+        virtual void RecordCheat(uint32 actionMask, const char *detector, const char *format, ...)
+        {
+            if (!!(actionMask & CHEAT_ACTION_KICK))
+                _session->KickPlayer();
+        }
 
         // movement cheats
         virtual bool Movement(MovementInfo &, const WorldPacket &packet)
         {
             if (packet.GetOpcode() == MSG_MOVE_FALL_LAND)
-                m_inKnockBack = false;
+                _inKnockBack = false;
 
             return true;
         }
-        virtual bool InterpolateMovement(MovementInfo const& , uint32, float &, float &, float &, float &) { return false; }
+        virtual bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, Position &pos) { return false; }
         virtual bool SpeedChangeAck(MovementInfo &, const WorldPacket &, float) { return true; }
         virtual void Unreachable(Unit *) {}
-        virtual bool IsInKnockBack() const { return m_inKnockBack; }
-        virtual void KnockBack(float speedxy, float speedz, float cos, float sin) { m_inKnockBack = true; }
+        virtual bool IsInKnockBack() const { return _inKnockBack; }
+        virtual void KnockBack(float speedxy, float speedz, float cos, float sin) { _inKnockBack = true; }
         virtual void OnExplore(const AreaEntry *) {}
 
         virtual void OrderSent(uint16, uint32) {}
@@ -144,9 +163,6 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 
         // warden
         virtual void WardenPacket(WorldPacket &) {}
-
-        // recording and acting on results
-        virtual void Action(uint8 type, const char *format, ...) {}
 };
 
 #ifdef USE_ANTICHEAT
@@ -157,9 +173,9 @@ class NullAnticheatLib sealed : public AnticheatLibInterface
     public:
         virtual void Initialize() {}
 
-        virtual std::unique_ptr<SessionAnticheatInterface> NewSession(WorldSession *, const BigNumber &)
+        virtual std::unique_ptr<SessionAnticheatInterface> NewSession(WorldSession *session, const BigNumber &)
         {
-            return std::make_unique<NullSessionAnticheat>();
+            return std::make_unique<NullSessionAnticheat>(session);
         }
 
         // anti spam
@@ -169,7 +185,8 @@ class NullAnticheatLib sealed : public AnticheatLibInterface
         virtual void MuteAccount(uint32) {}
         virtual void UnmuteAccount(uint32) {}
 
-        virtual bool ChatCommand(Player *, const std::string &) { return false; }
+        // GM .anticheat command handler
+        virtual bool ChatCommand(ChatHandler *, const Player *, const std::string &) { return false; }
 };
 #endif
 

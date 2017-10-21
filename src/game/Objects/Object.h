@@ -265,7 +265,7 @@ class MovementInfo
     //private:
         // common
         uint32  moveFlags;                                  // see enum MovementFlags
-        uint32  time;
+        uint32  time;  // Server time
         uint32  ctime; // Client time
         Position pos;
         // transport

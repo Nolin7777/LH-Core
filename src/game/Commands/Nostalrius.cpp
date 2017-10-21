@@ -2178,7 +2178,7 @@ bool ChatHandler::HandleAnticheatCommand(char* args)
     if (!ExtractPlayerTarget(&args, &player))
         player = m_session->GetPlayer();
 
-    return sAnticheatLib->ChatCommand(player, args);
+    return sAnticheatLib->ChatCommand(this, player, args);
 }
 
 bool ChatHandler::HandleListAddonsCommand(char* args)

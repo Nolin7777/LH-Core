@@ -2172,8 +2172,6 @@ void Player::AddToWorld()
 
 void Player::RemoveFromWorld()
 {
-    GetSession()->GetAnticheat()->LeaveWorld();
-
     if (m_transport)
         SendDestroyGroupMembers(true);
 
@@ -2201,7 +2199,10 @@ void Player::RemoveFromWorld()
     ///- It will crash when updating the ObjectAccessor
     ///- The player should only be removed when logging out
     if (IsInWorld())
+    {
+        GetSession()->GetAnticheat()->LeaveWorld();
         GetCamera().ResetView();
+    }
 
     SetEscortingGuid(ObjectGuid());
 

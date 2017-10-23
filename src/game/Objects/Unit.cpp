@@ -11466,6 +11466,8 @@ void Unit::SetMovement(UnitMovementType pType)
 
     auto const counterPos = data.wpos();
 
+    data << static_cast<uint32>(0); // place holder
+
     if (mePlayer)
     {
         auto const session = mePlayer->GetSession();

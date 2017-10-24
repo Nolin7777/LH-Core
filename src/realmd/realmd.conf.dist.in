@@ -117,7 +117,8 @@ ConfVersion=2010062001
 #    ValidateClient
 #        Enables client binary integrity validation for supported clients
 #        Default: 0 (don't validate client)
-#                 1 (validate client)
+#                 1 (validate client but don't kick on failure)
+#                 2 (validate and kick on failure)
 #
 ###################################################################################################################
 

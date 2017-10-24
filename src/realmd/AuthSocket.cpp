@@ -697,11 +697,15 @@ bool AuthSocket::_HandleLogonProof()
         return false;
 
 	// Validate client integrity
-    if (sConfig.GetBoolDefault("ValidateClient", false) && !ValidateClientIntegrity(lp.crc_hash, lp.A))
+    auto validateMode = sConfig.GetIntDefault("ValidateClient", 0);
+
+    if (validateMode && !ValidateClientIntegrity(lp.crc_hash, lp.A))
     {
-        BASIC_LOG("[AuthChallenge] account %s tried to login from %s with an invalid client",
-            _login.c_str(), get_remote_address().c_str());
-        return false;
+        BASIC_LOG("[AuthChallenge] account %s tried to login from %s with an invalid client (%u %u, build %u)",
+            _login.c_str(), get_remote_address().c_str(), _os, _platform, _build);
+
+        if (validateMode == 2)
+            return false;
     }
 
     Sha1Hash sha;

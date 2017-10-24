@@ -33,6 +33,7 @@
 #include "AuthSocket.h"
 #include "AuthCodes.h"
 #include "PatchHandler.h"
+#include "BinaryLoader.h"
 #include "Util.h"
 
 #include <openssl/md5.h>
@@ -393,20 +394,51 @@ bool AuthSocket::_HandleLogonChallenge()
     pkt << (uint8) CMD_AUTH_LOGON_CHALLENGE;
     pkt << (uint8) 0x00;
 
+    // Whether to continue handling the logon after prechecks or not
+    bool handle_logon = true;
+
     ///- Verify that this IP is not in the ip_banned table
     // No SQL injection possible (paste the IP address as passed by the socket)
     std::string address = get_remote_address();
     LoginDatabase.escape_string(address);
+
     QueryResult *result = LoginDatabase.PQuery("SELECT unbandate FROM ip_banned WHERE "
-    //    permanent                    still banned
+        //    permanent                    still banned
         "(unbandate = bandate OR unbandate > UNIX_TIMESTAMP()) AND ip = '%s'", address.c_str());
     if (result)
     {
         pkt << (uint8)WOW_FAIL_DB_BUSY;
         BASIC_LOG("[AuthChallenge] Banned ip %s tries to login!", get_remote_address().c_str());
         delete result;
+
+        handle_logon = false;
     }
-    else
+
+    // Throttle the number of successful connections to different accounts from
+    // a single IP within a certain timeframe
+    int throttleCount = sConfig.GetIntDefault("LoginThrottleCount", 0);
+    int throttleDuration = sConfig.GetIntDefault("LoginThrottleDuration", 300); // default throttle within last 5 mins
+    if (handle_logon && throttleCount > 0)
+    {
+        result = LoginDatabase.PQuery("SELECT COUNT(id) FROM account WHERE last_ip = '%s' AND last_login > NOW() - '%d'", address.c_str(), throttleDuration);
+        if (result)
+        {
+            int connections = result->Fetch()[0].GetInt32() + 1; // Include this connection in the throttle?
+
+            if (connections >= throttleCount)
+            {
+                pkt << (uint8)WOW_FAIL_DB_BUSY;
+                BASIC_LOG("[AuthChallenge] Too many successful login attempts from '%s' (%d) within last %d seconds (limit %d)",
+                    address.c_str(), connections, throttleDuration, throttleCount);
+
+                handle_logon = false;
+            }
+
+            delete result;
+        }
+    }
+
+    if (handle_logon)
     {
         ///- Get the account details from the account table
         // No SQL injection (escaped user name)
@@ -505,8 +537,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
                     MANGOS_ASSERT(gmod.GetNumBytes() <= 32);
 
-                    BigNumber unk3;
-                    unk3.SetRand(16 * 8);
+                    _checksumSalt.SetRand(16 * 8);
 
                     ///- Fill the response packet with the result
                     pkt << uint8(WOW_SUCCESS);
@@ -518,7 +549,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     pkt << uint8(32);
                     pkt.append(N.AsByteArray(32));
                     pkt.append(s.AsByteArray());        // 32 bytes
-                    pkt.append(unk3.AsByteArray(16));
+                    pkt.append(_checksumSalt.AsByteArray(16));
 
                     // figure out whether we need to display the PIN grid
                     promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
@@ -551,7 +582,7 @@ bool AuthSocket::_HandleLogonChallenge()
                         _localizationName[i] = ch->country[4-i-1];
 
                     LoadAccountSecurityLevels(account_id);
-                    BASIC_LOG("[AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
+                    BASIC_LOG("[AuthChallenge] account %s (%s) is using '%c%c%c%c' locale (%u)", _login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
 
                     _accountId = account_id;
 
@@ -665,6 +696,14 @@ bool AuthSocket::_HandleLogonProof()
     if ((A % N).isZero())
         return false;
 
+	// Validate client integrity
+    if (sConfig.GetBoolDefault("ValidateClient", false) && !ValidateClientIntegrity(lp.crc_hash, lp.A))
+    {
+        BASIC_LOG("[AuthChallenge] account %s tried to login from %s with an invalid client",
+            _login.c_str(), get_remote_address().c_str());
+        return false;
+    }
+
     Sha1Hash sha;
     sha.UpdateBigNumbers(&A, &B, NULL);
     sha.Finalize();
@@ -769,7 +808,7 @@ bool AuthSocket::_HandleLogonProof()
     ///- Check if SRP6 results match (password is correct), else send an error
     if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult && approvedBuild)
     {
-        BASIC_LOG("User '%s' successfully authenticated", _login.c_str());
+        BASIC_LOG("User '%s' successfully authenticated from %s", _login.c_str(), get_remote_address().c_str());
 
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -1330,4 +1369,35 @@ void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
     } while (result->NextRow());
 
     delete result;
+}
+
+bool AuthSocket::ValidateClientIntegrity(uint8* hash, uint8* salt)
+{
+    auto clientData = binaryLoader->fetchData(_os, _platform, _build);
+
+    if (!clientData)
+    {
+        DEBUG_LOG("Could not find client data for build %u (%u, %u)", _build, _os, _platform);
+        return false;
+    }
+
+    auto bytes = _checksumSalt.AsByteArray();
+    HmacHash hmac(bytes.data(), bytes.size());
+
+    for (auto binary : clientData->data)
+    {
+        hmac.UpdateData(binary.data(), binary.size());
+    }
+
+    hmac.Finalize();
+
+    Sha1Hash hasher;
+    hasher.UpdateData(salt, sizeof(AUTH_LOGON_PROOF_C::A));
+    hasher.UpdateData(hmac.GetDigest(), hmac.GetLength());
+    hasher.Finalize();
+
+    BigNumber hasherstr; hasherstr.SetBinary(hasher.GetDigest(), hasher.GetLength());
+    BigNumber hashstr; hashstr.SetBinary(hash, 20);
+    DEBUG_LOG("Ours: %s - Theirs: %s", hasherstr.AsHexStr(), hashstr.AsHexStr());
+    return memcmp(hasher.GetDigest(), hash, sizeof(AUTH_LOGON_PROOF_C::crc_hash)) == 0;
 }

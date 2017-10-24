@@ -27,6 +27,7 @@
 #include "Database/DatabaseEnv.h"
 #include "RealmList.h"
 
+#include "BinaryLoader.h"
 #include "Config/Config.h"
 #include "Log.h"
 #include "AuthSocket.h"
@@ -249,6 +250,12 @@ extern int main(int argc, char **argv)
         sLog.outError("No valid realms specified.");
         Log::WaitBeforeContinueIfNeed();
         return 1;
+    }
+
+    if (sConfig.GetBoolDefault("ValidateClient", false))
+    {
+        sLog.outBasic("Loading binaries for client validation...");
+        binaryLoader = std::make_unique<BinaryLoader>();
     }
 
     // cleanup query

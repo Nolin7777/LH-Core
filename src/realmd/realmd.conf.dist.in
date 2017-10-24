@@ -114,6 +114,11 @@ ConfVersion=2010062001
 #        Default: 0 (No verification required)
 #                 1 (Verification required)
 #
+#    ValidateClient
+#        Enables client binary integrity validation for supported clients
+#        Default: 0 (don't validate client)
+#                 1 (validate client)
+#
 ###################################################################################################################
 
 LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
@@ -137,3 +142,4 @@ WrongPass.MaxCount = 0
 WrongPass.BanTime = 600
 WrongPass.BanType = 0
 ReqEmailVerification = 0
+ValidateClient = 0

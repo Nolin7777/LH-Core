@@ -22,12 +22,13 @@ set (EXECUTABLE_SRCS
 	BufferedSocket.h
 	PatchHandler.h
 	RealmList.h
+	BinaryLoader.h
 	AuthSocket.cpp
 	BufferedSocket.cpp
 	Main.cpp
 	PatchHandler.cpp
 	RealmList.cpp
-
+	BinaryLoader.cpp
 )
 
 

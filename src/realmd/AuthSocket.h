@@ -92,6 +92,7 @@ class AuthSocket: public BufferedSocket
         BigNumber b, B;
         BigNumber K;
         BigNumber _reconnectProof;
+        BigNumber _checksumSalt;
 
         bool _authed, promptPin;
 
@@ -131,6 +132,8 @@ class AuthSocket: public BufferedSocket
         ACE_HANDLE patch_;
 
         void InitPatch();
+        bool ValidateClientIntegrity(uint8* hash, uint8* salt);
+
 };
 #endif
 /// @}

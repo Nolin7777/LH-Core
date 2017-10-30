@@ -45,7 +45,9 @@ enum LockFlag
     IP_LOCK         = 0x01,
     FIXED_PIN       = 0x02,
     TOTP            = 0x04,
-    ALWAYS_ENFORCE  = 0x08
+    ALWAYS_ENFORCE  = 0x08,
+GEO_COUNTRY     = 0x10,
+GEO_CITY        = 0x20
 };
 
 /// Handle login commands
@@ -101,10 +103,13 @@ class AuthSocket: public BufferedSocket
         std::string _login;
         std::string _safelogin;
         std::string securityInfo;
+        std::string _lastIP;
 
         BigNumber serverSecuritySalt;
         LockFlag lockFlags;
         uint32 gridSeed;
+        bool _geolocked;
+        uint32_t _geoUnlockPIN;
 
         static constexpr uint32 Win = 'Win';
         static constexpr uint32 OSX = 'OSX';

@@ -243,6 +243,18 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
+    // Ensure the table used for geolocking has some data in it, if enabled
+    if (sConfig.GetBoolDefault("GeoLocking", false))
+    {
+        auto result = std::unique_ptr<QueryResult>(LoginDatabase.Query("SELECT 1 FROM geoip LIMIT 1"));
+
+        if (!result)
+        {
+            sLog.outError("The geoip table cannot be empty when geolocking is enabled.");
+            return 1;
+        }
+    }
+
     ///- Get the list of realms for the server
     sRealmList.Initialize(sConfig.GetIntDefault("RealmsStateUpdateDelay", 20));
     if (sRealmList.size() == 0)
@@ -252,7 +264,7 @@ extern int main(int argc, char **argv)
         return 1;
     }
 
-    if (sConfig.GetBoolDefault("ValidateClient", false))
+    if (sConfig.GetIntDefault("ValidateClient", 0))
     {
         sLog.outBasic("Loading binaries for client validation...");
         binaryLoader = std::make_unique<BinaryLoader>();

@@ -16741,8 +16741,14 @@ void Player::Say(const std::string& text, const uint32 language)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_SAY, text, language);
-    float range = std::min(sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), GetYellRange());
-    SendMessageToSetInRange(&data, range, true);
+
+    if (m_session->GetAnticheat()->IsMuted(true, CHAT_MSG_SAY))
+        m_session->SendPacket(&data);
+    else
+    {
+        auto const range = std::min(sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), GetYellRange());
+        SendMessageToSetInRange(&data, range, true);
+    }
 }
 
 float Player::GetYellRange() const
@@ -16763,14 +16769,23 @@ void Player::Yell(const std::string& text, const uint32 language)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_YELL, text, language);
-    SendMessageToSetInRange(&data, GetYellRange(), true);
+
+    if (m_session->GetAnticheat()->IsMuted(true, CHAT_MSG_YELL))
+        m_session->SendPacket(&data);
+    else
+        SendMessageToSetInRange(&data, GetYellRange(), true);
 }
 
 void Player::TextEmote(const std::string& text)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL);
-    SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
+
+    if (m_session->GetAnticheat()->IsMuted(true, CHAT_MSG_EMOTE))
+        m_session->SendPacket(&data);
+    else
+        SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE),
+            true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
 void Player::PetSpellInitialize()

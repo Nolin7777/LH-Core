@@ -706,7 +706,11 @@ bool AuthSocket::_HandleLogonProof()
             _login.c_str(), get_remote_address().c_str(), _os, _platform, _build);
 
         if (validateMode == 2)
-            return false;
+        {
+            uint8 data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_VERSION_INVALID};
+            send((const char*)data, sizeof(data));
+            return true;
+        }
     }
 
     Sha1Hash sha;
@@ -1401,7 +1405,7 @@ bool AuthSocket::ValidateClientIntegrity(uint8* hash, uint8* salt)
 
     if (!clientData)
     {
-        DEBUG_LOG("Could not find client data for build %u (%u, %u)", _build, _os, _platform);
+        BASIC_LOG("Could not find client data for build %u (%u, %u) for account %s", _build, _os, _platform, _login.c_str());
         return false;
     }
 
@@ -1459,7 +1463,12 @@ bool AuthSocket::GeographicalLockCheck()
         _lastIP.c_str(), _lastIP.c_str())
         );
 
-    if (!result && !result_prev)
+    if ((result && !result_prev) || (!result && result_prev))
+    {
+        return true;
+    }
+
+    if (!result || !result_prev)
     {
         return false;
     }

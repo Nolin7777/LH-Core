@@ -36,16 +36,16 @@ BinaryLoader::BinaryLoader()
 
     const std::vector<std::string> macx86
     {
-        "MacOS/World of Warcraft", "Info.plist",
-        "Resources/Main.nib/objects.xib",
-        "Resources/wow.icns", "PkgInfo"
+        "wow", "Info.plist",
+        "objects.xib",
+        "wow.icns", "PkgInfo"
     };
 
     const std::vector<std::string> macppc
     {
-        "MacOS/World of Warcraft", "Info.plist",
-        "Resources/Main.nib/objects.xib",
-        "Resources/wow.icns", "PkgInfo"
+        "wow", "Info.plist",
+        "objects.xib",
+        "wow.icns", "PkgInfo"
     };
 
     const std::vector<uint16_t> builds
@@ -56,8 +56,8 @@ BinaryLoader::BinaryLoader()
     for (auto& build : builds)
     {
         loadClientData(build, winx86, 'Win', 'x86');
-        loadClientData(build, macppc, 'Mac', 'PPC');
-        loadClientData(build, macx86, 'Mac', 'x86');
+        loadClientData(build, macppc, 5198680, 7878710);
+        loadClientData(build, macx86, 5198680, 7878710);
     }
 }
 
@@ -67,7 +67,7 @@ const ClientData* BinaryLoader::fetchData(uint32_t os, uint32_t platform,
 {
     auto it = std::find_if(clientData.begin(), clientData.end(), [&](auto& data)
     {
-        return data.os == os && data.platform == platform && data.build == build;
+        return data.os == os &&  data.build == build;
     });
 
     return it != clientData.end() ? &(*it) : nullptr;

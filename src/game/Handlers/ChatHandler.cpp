@@ -201,9 +201,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             return;
     }
 
-    /** Enable various spam chat detections */
-    if (lang != LANG_ADDON && _anticheat->IsMuted(true, type))
-        return;
+    auto const muted = _anticheat->IsMuted(true, type);
 
     // Message handling
     switch (type)
@@ -252,7 +250,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         }
                     }
 
-                    chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang);
+                    chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang, muted);
 
                     if (lang != LANG_ADDON && chn->HasFlag(Channel::ChannelFlags::CHANNEL_FLAG_GENERAL))
                         sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), nullptr);

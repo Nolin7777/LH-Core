@@ -24,6 +24,7 @@
 #include "World.h"
 #include "SocialMgr.h"
 #include "MasterPlayer.h"
+#include "Anticheat.hpp"
 
 Channel::Channel(const std::string& name)
     : m_announce(true), m_moderate(false), m_name(name), m_flags(0), m_channelId(0),
@@ -583,6 +584,7 @@ void Channel::Say(ObjectGuid p, const char *what, uint32 lang, bool skipCheck)
 {
     if (!what)
         return;
+
     if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         lang = LANG_UNIVERSAL;
 
@@ -623,9 +625,9 @@ void Channel::Say(ObjectGuid p, const char *what, uint32 lang, bool skipCheck)
         data << what;
         data << uint8(plr ? plr->chatTag() : 0);
 
-        if (!skipCheck && plr &&
-            plr->GetSession()->GetAccountFlags() & ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS &&
-            plr->GetSession()->GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
+        if (!skipCheck && plr && (plr->GetSession()->GetAnticheat()->IsMuted(true, CHAT_MSG_CHANNEL) ||
+            (plr->GetSession()->GetAccountFlags() & ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS &&
+            plr->GetSession()->GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))))
             plr->GetSession()->SendPacket(&data);
         else
             SendToAll(&data, (!skipCheck && !m_players[p].IsModerator()) ? p : ObjectGuid());

@@ -279,7 +279,7 @@ class MANGOS_DLL_SPEC WorldSession
 {
     friend class CharacterHandler;
     public:
-        WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
+        WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale, const std::string &local_ip);
         ~WorldSession();
 
         bool PlayerLoading() const { return m_playerLoading; }
@@ -306,6 +306,7 @@ class MANGOS_DLL_SPEC WorldSession
         char const* GetPlayerName() const;
         void SetSecurity(AccountTypes security) { _security = security; }
         std::string const& GetRemoteAddress() const { return m_Address; }
+        std::string const& GetLocalAddress() const { return m_localIp; }
         std::string const& GetClientHash() const { return _clientHash; }
         void SetPlayer(Player *plr);
         void SetMasterPlayer(MasterPlayer *plr) { m_masterPlayer = plr; }
@@ -532,7 +533,6 @@ class MANGOS_DLL_SPEC WorldSession
 
         void SetAccountFlags(uint32 f) { _accountFlags = f; }
         uint32 GetAccountFlags() const { return _accountFlags; }
-        uint32      _accountFlags;
 
         uint32 m_idleTime;
 
@@ -915,9 +915,11 @@ class MANGOS_DLL_SPEC WorldSession
         ObjectGuid _clientMoverGuid;
         WorldSocket *m_Socket;
         std::string m_Address;
+        std::string m_localIp;
 
         AccountTypes _security;
         uint32 _accountId;
+        uint32 _accountFlags;
 
         // anticheat
         std::unique_ptr<SessionAnticheatInterface> _anticheat;

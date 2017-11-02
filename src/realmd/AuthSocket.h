@@ -104,6 +104,7 @@ class AuthSocket: public BufferedSocket
         std::string securityInfo;
         std::string _lastIP;
         std::string _email;
+        std::string _localIp;
 
         BigNumber serverSecuritySalt;
         LockFlag lockFlags;

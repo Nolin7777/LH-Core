@@ -583,7 +583,7 @@ bool AuthSocket::_HandleLogonChallenge()
                         _localizationName[i] = ch->country[4-i-1];
 
                     LoadAccountSecurityLevels(account_id);
-                    BASIC_LOG("[AuthChallenge] account %s (%s) is using '%c%c%c%c' locale (%u)", _login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
+                    BASIC_LOG("[AuthChallenge] account %s (%s) is using '%c%c%c%c' locale (%u) and local IP %u", _login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName), ch->ip);
 
                     _accountId = account_id;
 
@@ -819,7 +819,19 @@ bool AuthSocket::_HandleLogonProof()
     auto const approvedBuild = (_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX);
 
     ///- Check if SRP6 results match (password is correct), else send an error
+    // TEMP HACK! :)
+    bool lockout = false;
+
     if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult && approvedBuild)
+    {
+        if (GeographicalLockCheck())
+        {
+            lockout = true;
+            BASIC_LOG("Account %s (%u) has been geolocked (1)", _login.c_str(), _accountId);
+        }
+    }
+
+    if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult && approvedBuild && !lockout)
     {
                 // Geolocking checks - must be done after an otherwise successful login to prevent lockout attacks
         if (_geoUnlockPIN)

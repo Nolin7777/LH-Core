@@ -5,6 +5,7 @@
 #ifndef __ANTICHEAT_HPP_
 #define __ANTICHEAT_HPP_
 
+#include "WorldPacket.h"
 #include "Auth/BigNumber.h"
 
 #include <memory>
@@ -32,10 +33,10 @@ enum CheatAction
     // permanently ban the offending ip address
     CHEAT_ACTION_BAN_IP         = 0x10,
 
-    // mutes the offending account (NOT player) from whispers
+    // permanently mutes the offending account from whispers
     CHEAT_ACTION_MUTE_WHISPER   = 0x20,
 
-    // mutes the offending account (NOT player) from public channels
+    // permanently mutes the offending account from public channels
     CHEAT_ACTION_MUTE_PUB_CHANS = 0x40,
 };
 
@@ -64,10 +65,13 @@ class SessionAnticheatInterface
 
         virtual void CompleteCinematic() = 0;
 
-        virtual bool IsMuted(bool checkChatType, uint32 chatType) const = 0;
+        virtual bool IsMuted(uint32 chatType, const Player *target = nullptr) const = 0;
 
         virtual void NewPlayer() = 0;
         virtual void LeaveWorld() = 0;
+
+        // addon checksum verification
+        virtual bool ReadAddonInfo(WorldPacket *, WorldPacket &) = 0;
 
         // chat
         virtual void SendPlayerInfo(ChatHandler *) const = 0;
@@ -102,14 +106,12 @@ class AnticheatLibInterface
         virtual std::unique_ptr<SessionAnticheatInterface> NewSession(WorldSession *session, const BigNumber &K) = 0;
 
         // anti spam
-        virtual bool ValidateGuildName(const std::string &name) = 0;
+        virtual bool ValidateGuildName(const std::string &name) const = 0;
         virtual std::string NormalizeMessage(const std::string &message, uint32 mask) = 0;
         virtual void AddMessage(const std::string &msg, uint32 type, PlayerPointer from, PlayerPointer to) = 0;
-        virtual void MuteAccount(uint32 id) = 0;
-        virtual void UnmuteAccount(uint32 id) = 0;
 
         // GM .anticheat command handler
-        virtual bool ChatCommand(ChatHandler *handler, const Player *target, const std::string &args) = 0;
+        virtual bool ChatCommand(ChatHandler *handler, const std::string &args) = 0;
 };
 
 AnticheatLibInterface* GetAnticheatLib();
@@ -128,10 +130,13 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 
         virtual void CompleteCinematic() {}
 
-        virtual bool IsMuted(bool, uint32) const { return false; }
+        virtual bool IsMuted(uint32, const Player *) const { return false; }
 
         virtual void NewPlayer() {} 
         virtual void LeaveWorld() {};
+
+        // addon checksum verification
+        virtual bool ReadAddonInfo(WorldPacket *, WorldPacket &) { return false; }
 
         // chat
         virtual void SendPlayerInfo(ChatHandler *) const {}
@@ -179,11 +184,9 @@ class NullAnticheatLib sealed : public AnticheatLibInterface
         }
 
         // anti spam
-        virtual bool ValidateGuildName(const std::string &) { return false; }
+        virtual bool ValidateGuildName(const std::string &) const { return false; }
         virtual std::string NormalizeMessage(const std::string &message, uint32) { return message; }
         virtual void AddMessage(const std::string &, uint32, PlayerPointer, PlayerPointer) {}
-        virtual void MuteAccount(uint32) {}
-        virtual void UnmuteAccount(uint32) {}
 
         // GM .anticheat command handler
         virtual bool ChatCommand(ChatHandler *, const Player *, const std::string &) { return false; }

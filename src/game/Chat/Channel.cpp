@@ -625,9 +625,9 @@ void Channel::Say(ObjectGuid p, const char *what, uint32 lang, bool skipCheck)
         data << what;
         data << uint8(plr ? plr->chatTag() : 0);
 
-        if (!skipCheck && plr && (plr->GetSession()->GetAnticheat()->IsMuted(true, CHAT_MSG_CHANNEL) ||
-            (plr->GetSession()->GetAccountFlags() & ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS &&
-            plr->GetSession()->GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))))
+        if (!skipCheck && plr &&
+            plr->GetSession()->GetAnticheat()->IsMuted(CHAT_MSG_CHANNEL) &&
+            plr->GetSession()->GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
             plr->GetSession()->SendPacket(&data);
         else
             SendToAll(&data, (!skipCheck && !m_players[p].IsModerator()) ? p : ObjectGuid());

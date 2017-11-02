@@ -201,8 +201,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             return;
     }
 
-    auto const muted = _anticheat->IsMuted(true, type);
-
     // Message handling
     switch (type)
     {
@@ -250,7 +248,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         }
                     }
 
-                    chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang, muted);
+                    chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang);
 
                     if (lang != LANG_ADDON && chn->HasFlag(Channel::ChannelFlags::CHANNEL_FLAG_GENERAL))
                         sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), nullptr);

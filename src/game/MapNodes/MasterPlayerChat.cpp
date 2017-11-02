@@ -44,11 +44,7 @@ void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlaye
     if (language != LANG_ADDON)                             // if not addon data
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    Player::BuildPlayerChat(GetObjectGuid(), chatTag(), &data, CHAT_MSG_WHISPER, text, language);
-
-    if (!m_session->GetAnticheat()->IsMuted(true, CHAT_MSG_WHISPER))
-        receiver->GetSession()->SendPacket(&data);
+    WorldPacket data;
 
     // not send confirmation for addon messages
     if (language != LANG_ADDON)
@@ -57,6 +53,12 @@ void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlaye
         Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->chatTag(), &data, CHAT_MSG_WHISPER_INFORM, text, language);
         GetSession()->SendPacket(&data);
     }
+
+    data.Initialize(SMSG_MESSAGECHAT, 100);
+    Player::BuildPlayerChat(GetObjectGuid(), chatTag(), &data, CHAT_MSG_WHISPER, text, language);
+
+    if (!m_session->GetAnticheat()->IsMuted(CHAT_MSG_WHISPER, receiver->GetSession()->GetPlayer()))
+        receiver->GetSession()->SendPacket(&data);
 
     ALL_SESSION_SCRIPTS(receiver->GetSession(), OnWhispered(GetObjectGuid()));
 

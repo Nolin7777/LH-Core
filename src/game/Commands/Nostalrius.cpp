@@ -2170,15 +2170,7 @@ bool ChatHandler::HandleDebugMoveSplineCommand(char* args)
 
 bool ChatHandler::HandleAnticheatCommand(char* args)
 {
-    if (!m_session)
-        return false;
-
-    Player* player = nullptr;
-
-    if (!ExtractPlayerTarget(&args, &player))
-        player = m_session->GetPlayer();
-
-    return sAnticheatLib->ChatCommand(this, player, args);
+    return sAnticheatLib->ChatCommand(this, args);
 }
 
 bool ChatHandler::HandleListAddonsCommand(char* args)

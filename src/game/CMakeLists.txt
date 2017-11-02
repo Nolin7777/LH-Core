@@ -111,7 +111,6 @@ set (game_SRCS
 	Group/GroupReference.cpp
 	Guild/Guild.cpp
 	Guild/GuildMgr.cpp
-	Handlers/AddonHandler.cpp
 	Handlers/AuctionHouseHandler.cpp
 	Handlers/BattleGroundHandler.cpp
 	Handlers/ChannelHandler.cpp
@@ -315,7 +314,6 @@ set (game_SRCS
 	Group/GroupRefManager.h
 	Guild/Guild.h
 	Guild/GuildMgr.h
-	Handlers/AddonHandler.h
 	Handlers/NPCHandler.h
 	Handlers/LFGHandler.h
 	LFG/LFGMgr.h
@@ -455,6 +453,7 @@ if(USE_ANTICHEAT)
       Anticheat/module/libanticheat.hpp
       Anticheat/module/Config.cpp
       Anticheat/module/Config.hpp
+	  Anticheat/module/AddonHandler.cpp
       Anticheat/module/Antispam/Antispam.cpp
       Anticheat/module/Antispam/Antispam.hpp
       Anticheat/module/Movement/Movement.cpp

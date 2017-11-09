@@ -7,6 +7,9 @@
 
 #include "WorldPacket.h"
 #include "Auth/BigNumber.h"
+#include "Opcodes.h"
+#include "Chat.h"
+#include "Util.h"
 
 #include <memory>
 #include <string>
@@ -61,6 +64,8 @@ struct AreaEntry;
 class SessionAnticheatInterface
 {
     public:
+        virtual ~SessionAnticheatInterface() = default;
+
         virtual void Update(uint32 diff) = 0;
 
         virtual void CompleteCinematic() = 0;

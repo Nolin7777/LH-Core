@@ -15165,11 +15165,10 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff, bool &has_epic
             // was deleted from the inventory in the DB
             if (Item *item = sAuctionMgr.GetAItem(item_lowguid))
             {
-                std::stringstream oss;
-                oss << "Duplicate item (via AH) " << item_id << " GUID:" << item_lowguid << ", count: " << item->GetCount() << ", bag: " << bag_guid << ", slot: " << uint32(slot);
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_lowguid);
-                GetSession()->ProcessAnticheatAction("ItemCheck", oss.str().c_str(), CHEAT_ACTION_LOG);
-                DETAIL_LOG(oss.str().c_str());
+
+                GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemCheck", "Duplicate item (via AH) %u GUID: %u count: %u bag: %u slot: %u",
+                    item->GetEntry(), item->GetGUIDLow(), item->GetCount(), bag_guid, slot);
                 continue;
             }
 

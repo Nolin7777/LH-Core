@@ -194,7 +194,7 @@ class NullAnticheatLib sealed : public AnticheatLibInterface
         virtual void AddMessage(const std::string &, uint32, PlayerPointer, PlayerPointer) {}
 
         // GM .anticheat command handler
-        virtual bool ChatCommand(ChatHandler *, const Player *, const std::string &) { return false; }
+        virtual bool ChatCommand(ChatHandler *, const std::string &) { return false; }
 };
 #endif
 

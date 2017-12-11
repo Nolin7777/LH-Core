@@ -141,7 +141,7 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual void LeaveWorld() {};
 
         // addon checksum verification
-        virtual bool ReadAddonInfo(WorldPacket *, WorldPacket &) { return false; }
+        virtual bool ReadAddonInfo(WorldPacket *, WorldPacket &) { return true; }
 
         // chat
         virtual void SendPlayerInfo(ChatHandler *) const {}

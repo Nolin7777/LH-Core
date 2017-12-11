@@ -314,7 +314,6 @@ void Log::Initialize()
     logFiles[LOG_CHAT_SPAM]         = openLogFile("ChatSpamLogFile", nullptr, "a");
 
     timestampPrefix[LOG_DBERRFIX] = false;
-    consoleWrite[LOG_ANTICHEAT_DEBUG] = true;
     consoleWrite[LOG_ANTICHEAT_BASIC] = true;
 
     // Main log file settings

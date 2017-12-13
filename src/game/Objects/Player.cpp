@@ -16737,7 +16737,7 @@ void Player::Say(const std::string& text, const uint32 language)
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_SAY, text, language);
 
-    if (m_session->GetAnticheat()->IsMuted(CHAT_MSG_SAY))
+    if (m_session->GetAnticheat()->IsSilenced())
         m_session->SendPacket(&data);
     else
     {
@@ -16765,7 +16765,7 @@ void Player::Yell(const std::string& text, const uint32 language)
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_YELL, text, language);
 
-    if (m_session->GetAnticheat()->IsMuted(CHAT_MSG_YELL))
+    if (m_session->GetAnticheat()->IsSilenced())
         m_session->SendPacket(&data);
     else
         SendMessageToSetInRange(&data, GetYellRange(), true);
@@ -16776,7 +16776,7 @@ void Player::TextEmote(const std::string& text)
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL);
 
-    if (m_session->GetAnticheat()->IsMuted(CHAT_MSG_EMOTE))
+    if (m_session->GetAnticheat()->IsSilenced())
         m_session->SendPacket(&data);
     else
         SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE),

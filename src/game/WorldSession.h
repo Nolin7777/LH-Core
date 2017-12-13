@@ -202,8 +202,9 @@ enum PacketDumpType
 
 enum AccountFlags
 {
-    ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS     = 0x1,
-    ACCOUNT_FLAG_MUTED_FROM_WHISPERS            = 0x2,
+    ACCOUNT_FLAG_SILENCED       = 0x1,
+    ACCOUNT_FLAG_SHOW_ANTICHEAT = 0x2,
+    ACCOUNT_FLAG_SHOW_ANTISPAM  = 0x4,
 };
 
 //class to deal with packet processing

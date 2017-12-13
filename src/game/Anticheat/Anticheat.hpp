@@ -36,11 +36,8 @@ enum CheatAction
     // permanently ban the offending ip address
     CHEAT_ACTION_BAN_IP         = 0x10,
 
-    // permanently mutes the offending account from whispers
-    CHEAT_ACTION_MUTE_WHISPER   = 0x20,
-
-    // permanently mutes the offending account from public channels
-    CHEAT_ACTION_MUTE_PUB_CHANS = 0x40,
+    // permanently silences the offending account from whispers.
+    CHEAT_ACTION_SILENCE        = 0x20,
 };
 
 enum NormalizeFlags
@@ -70,7 +67,7 @@ class SessionAnticheatInterface
 
         virtual void CompleteCinematic() = 0;
 
-        virtual bool IsMuted(uint32 chatType, const Player *target = nullptr) const = 0;
+        virtual bool IsSilenced() const = 0;
 
         virtual void NewPlayer() = 0;
         virtual void LeaveWorld() = 0;
@@ -135,7 +132,7 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 
         virtual void CompleteCinematic() {}
 
-        virtual bool IsMuted(uint32, const Player *) const { return false; }
+        virtual bool IsSilenced() const { return false; }
 
         virtual void NewPlayer() {} 
         virtual void LeaveWorld() {};

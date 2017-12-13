@@ -57,7 +57,7 @@ void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlaye
     data.Initialize(SMSG_MESSAGECHAT, 100);
     Player::BuildPlayerChat(GetObjectGuid(), chatTag(), &data, CHAT_MSG_WHISPER, text, language);
 
-    if (!m_session->GetAnticheat()->IsMuted(CHAT_MSG_WHISPER, receiver->GetSession()->GetPlayer()))
+    if (this == receiver || !m_session->GetAnticheat()->IsSilenced())
         receiver->GetSession()->SendPacket(&data);
 
     ALL_SESSION_SCRIPTS(receiver->GetSession(), OnWhispered(GetObjectGuid()));

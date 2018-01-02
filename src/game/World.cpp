@@ -1993,10 +1993,40 @@ void World::SendGMText(int32 string_id, ...)
     MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld() || itr->second->GetSecurity() == SEC_PLAYER)
+        if (!itr->second)
             continue;
 
-        wt_do(itr->second->GetPlayer());
+        if (Player* player = itr->second->GetPlayer())
+        {
+            if (!player->IsInWorld() || itr->second->GetSecurity() == SEC_PLAYER)
+                continue;
+
+            wt_do(player);
+        }
+    }
+
+    va_end(ap);
+}
+
+void World::SendGMTextFlags(uint8 flags, int32 entry, ...)
+{
+    va_list ap;
+    va_start(ap, entry);
+
+    MaNGOS::WorldWorldTextBuilder wt_builder(entry, &ap);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
+    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (!itr->second)
+            continue;
+
+        if (Player* player = itr->second->GetPlayer())
+        {
+            if (!player->IsInWorld() || itr->second->GetSecurity() == SEC_PLAYER || (!(itr->second->GetAccountFlags() & flags)))
+                continue;
+
+            wt_do(player);
+        }
     }
 
     va_end(ap);

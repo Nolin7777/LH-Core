@@ -600,8 +600,29 @@ void WorldSession::ClearIncomingPacketsByType(PacketProcessing type)
 {
     ASSERT(type < PACKET_PROCESS_MAX_TYPE);
     WorldPacket* data = nullptr;
+
+    // Retain some packets in the queue that should not be discarded
+    std::list<WorldPacket*> retain;
+
     while (_recvQueue[type].next(data))
-        delete data;
+    {
+        // TODO: Extend this to be more generic and allow exclusion of many
+        // packet types based on pre-defined filters
+        if (type == PACKET_PROCESS_MOVEMENT)
+        {
+            switch (data->GetOpcode())
+            {
+                case CMSG_SET_ACTIVE_MOVER:
+                    retain.push_back(data);
+                    break;
+                default:
+                    delete data;
+            }
+        }
+    }
+
+    for (auto iter = retain.begin(); iter != retain.end(); ++iter)
+        _recvQueue[type].add(*iter);
 }
 
 void WorldSession::SetBot(PlayerBotEntry* b)

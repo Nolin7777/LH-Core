@@ -251,7 +251,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                     chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang);
 
                     if (lang != LANG_ADDON && chn->HasFlag(Channel::ChannelFlags::CHANNEL_FLAG_GENERAL))
-                        sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), nullptr);
+                        _anticheat->Channel(msg);
                 }
                 else // If it is not a global channel, forward to Node
                     ForwardPacketToMaster();
@@ -278,7 +278,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             if (lang != LANG_ADDON)
             {
                 sWorld.LogChat(this, "Say", msg);
-                sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), nullptr);
+                _anticheat->Say(msg);
             }
 
             break;
@@ -295,7 +295,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             if (lang != LANG_ADDON)
             {
                 sWorld.LogChat(this, "Emote", msg);
-                sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), nullptr);
+                _anticheat->Say(msg);
             }
 
             break;
@@ -313,7 +313,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             if (lang != LANG_ADDON)
             {
                 sWorld.LogChat(this, "Yell", msg);
-                sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), nullptr);
+                _anticheat->Yell(msg);
             }
         }
         break;
@@ -366,7 +366,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 {
                     sWorld.LogChat(this, "Whisp", msg, PlayerPointer(new PlayerWrapper<MasterPlayer>(player)));
                     if (!allowIgnoreAntispam)
-                        sAnticheatLib->AddMessage(msg, type, GetPlayerPointer(), PlayerPointer(new PlayerWrapper<MasterPlayer>(player)));
+                        _anticheat->Whisper(msg, toPlayer->GetObjectGuid());
                 }
             }
         }

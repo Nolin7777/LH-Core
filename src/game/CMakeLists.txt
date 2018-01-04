@@ -454,6 +454,8 @@ if(USE_ANTICHEAT)
 	  Anticheat/module/AddonHandler.cpp
       Anticheat/module/Antispam/Antispam.cpp
       Anticheat/module/Antispam/Antispam.hpp
+      Anticheat/module/Antispam/AntispamMgr.cpp
+      Anticheat/module/Antispam/AntispamMgr.hpp
       Anticheat/module/Movement/Movement.cpp
       Anticheat/module/Movement/Movement.hpp
       Anticheat/module/Warden/Warden.cpp

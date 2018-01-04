@@ -2265,7 +2265,7 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAnticheatCommand(char*)
 {
-    sAnticheatLib->Initialize();
+    sAnticheatLib->Reload();
     SendSysMessage(">> Anticheat data reloaded");
     return true;
 }

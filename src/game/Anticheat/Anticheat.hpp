@@ -109,6 +109,9 @@ class AnticheatLibInterface
 {
     public:
         // this function needs to support executing at any time
+        virtual void Reload() = 0;
+
+        // run only on startup
         virtual void Initialize() = 0;
 
         // create anticheat session for a new world session
@@ -191,6 +194,7 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 class NullAnticheatLib sealed : public AnticheatLibInterface
 {
     public:
+        virtual void Reload() {}
         virtual void Initialize() {}
 
         virtual std::unique_ptr<SessionAnticheatInterface> NewSession(WorldSession *session, const BigNumber &)

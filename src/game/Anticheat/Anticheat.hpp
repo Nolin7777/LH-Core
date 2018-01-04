@@ -36,21 +36,21 @@ enum CheatAction
     // permanently ban the offending ip address
     CHEAT_ACTION_BAN_IP         = 0x10,
 
-    // permanently silences the offending account from whispers.
+    // permanently silences the offending account from whispers, mail, say, channels, and yells
     CHEAT_ACTION_SILENCE        = 0x20,
 };
 
 enum NormalizeFlags
 {
-    NF_CUT_COLOR                = 0x001,
-    NF_REPLACE_WORDS            = 0x002,
-    NF_CUT_SPACE                = 0x004,
-    NF_CUT_CTRL                 = 0x008,
-    NF_CUT_PUNCT                = 0x010,
-    NF_CUT_NUMBERS              = 0x020,
-    NF_REPLACE_UNICODE          = 0x040,
-    NF_REMOVE_REPEATS           = 0x080,
-    NF_REMOVE_NON_LATIN         = 0x100
+    NF_CUT_COLOR            = 0x001,
+    NF_REPLACE_WORDS        = 0x002,
+    NF_CUT_SPACE            = 0x004,
+    NF_CUT_CTRL             = 0x008,
+    NF_CUT_PUNCT            = 0x010,
+    NF_CUT_NUMBERS          = 0x020,
+    NF_REPLACE_UNICODE      = 0x040,
+    NF_REMOVE_REPEATS       = 0x080,
+    NF_REMOVE_NON_LATIN     = 0x100
 };
 
 class WorldSession;
@@ -95,6 +95,13 @@ class SessionAnticheatInterface
 
         // warden
         virtual void WardenPacket(WorldPacket &packet) = 0;
+
+        // antispam
+        virtual void Whisper(const std::string &msg, const ObjectGuid &to) = 0;
+        virtual void Say(const std::string &msg) = 0;
+        virtual void Yell(const std::string &msg) = 0;
+        virtual void Channel(const std::string &msg) = 0;
+        virtual void Mail(const std::string &subject, const std::string &body, const ObjectGuid &to) = 0;
 };
 
 // interface to anticheat system
@@ -110,7 +117,6 @@ class AnticheatLibInterface
         // anti spam
         virtual bool ValidateGuildName(const std::string &name) const = 0;
         virtual std::string NormalizeMessage(const std::string &message, uint32 mask) = 0;
-        virtual void AddMessage(const std::string &msg, uint32 type, PlayerPointer from, PlayerPointer to) = 0;
 
         // GM .anticheat command handler
         virtual bool ChatCommand(ChatHandler *handler, const std::string &args) = 0;
@@ -170,6 +176,13 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 
         // warden
         virtual void WardenPacket(WorldPacket &) {}
+
+        // antispam
+        virtual void Whisper(const std::string &msg, const ObjectGuid &to) {}
+        virtual void Say(const std::string &msg) {}
+        virtual void Yell(const std::string &msg) {}
+        virtual void Channel(const std::string &msg) {}
+        virtual void Mail(const std::string &subject, const std::string &body, const ObjectGuid &to) {}
 };
 
 #ifdef USE_ANTICHEAT

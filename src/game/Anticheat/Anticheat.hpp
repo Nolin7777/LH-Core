@@ -119,7 +119,7 @@ class AnticheatLibInterface
 
         // anti spam
         virtual bool ValidateGuildName(const std::string &name) const = 0;
-        virtual std::string NormalizeMessage(const std::string &message, uint32 mask) = 0;
+        virtual std::string NormalizeString(const std::string &message, uint32 mask) = 0;
 
         // GM .anticheat command handler
         virtual bool ChatCommand(ChatHandler *handler, const std::string &args) = 0;

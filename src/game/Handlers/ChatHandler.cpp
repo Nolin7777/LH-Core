@@ -234,7 +234,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         if (sWorld.getConfig(CONFIG_BOOL_STRICT_LATIN_IN_GENERAL_CHANNELS))
                         {
                             // remove color, punct, ctrl, space
-                            auto const normMsg = sAnticheatLib->NormalizeMessage(msg, NF_CUT_PUNCT | NF_CUT_CTRL | NF_CUT_SPACE | NF_CUT_COLOR);
+                            auto const normMsg = sAnticheatLib->NormalizeString(msg, NF_CUT_PUNCT | NF_CUT_CTRL | NF_CUT_SPACE | NF_CUT_COLOR);
 
                             std::wstring w_normMsg;
                             if (Utf8toWStr(normMsg, w_normMsg))

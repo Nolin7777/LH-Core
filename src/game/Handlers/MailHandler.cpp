@@ -427,7 +427,8 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data)
     {
         if (m->state == MAIL_STATE_DELETED)
         {
-            _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "MailCheck", "Attempt to mark deleted mail as read");
+            // This occurs normally when using various addons. Just return
+            //_anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG, "MailCheck", "Attempt to mark deleted mail as read");
             return;
         }
 

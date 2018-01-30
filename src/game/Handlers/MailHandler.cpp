@@ -294,9 +294,6 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     if (loadedPlayer->GetSession()->GetAnticheat()->IsSilenced())
     {
         pl->SendMailResult(0, MAIL_SEND, MAIL_OK);
-
-        loadedPlayer->ModifyMoney(-int32(reqmoney));
-
         return;
     }
 

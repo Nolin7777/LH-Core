@@ -195,6 +195,8 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data)
 
     req->receiverPtr = sObjectMgr.GetPlayer(req->receiver);
 
+    _anticheat->Mail(req->subject, req->body, req->receiver);
+
     if (req->receiverPtr)
     {
         MasterPlayer* receiverMasterPlayer = req->receiverPtr->GetSession()->GetMasterPlayer();

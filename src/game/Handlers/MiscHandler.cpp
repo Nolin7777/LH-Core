@@ -986,8 +986,6 @@ void WorldSession::HandleCompleteCinematic(WorldPacket & /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Player is watching cinema");
     GetPlayer()->CinematicEnd();
-
-    _anticheat->CompleteCinematic();
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)

@@ -632,7 +632,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     //DEBUG_LOG("Player %s added to Map.",pCurrChar->GetName());
     pCurrChar->GetSocial()->SendFriendList();
-    pCurrChar->GetSocial()->SendIgnoreList();
+    //pCurrChar->GetSocial()->SendIgnoreList();
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
     if (alreadyOnline)

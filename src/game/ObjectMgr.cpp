@@ -3288,6 +3288,10 @@ void ObjectMgr::LoadPlayerInfo()
             if (!pInfo->displayId_m || !pInfo->displayId_f)
                 continue;
 
+            // skip expansion races if not playing with expansion
+            if (sWorld.getConfig(CONFIG_UINT32_EXPANSION) < EXPANSION_TBC && (race == RACE_BLOODELF || race == RACE_DRAENEI))
+                continue;
+
             // fatal error if no level 1 data
             if (!pInfo->levelInfo || pInfo->levelInfo[0].stats[0] == 0)
             {

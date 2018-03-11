@@ -7212,7 +7212,7 @@ bool ChatHandler::HandleModifyHolyCommand(char *args)
         return false;
     }
 
-    player->SetInt32Value(UNIT_FIELD_RESISTANCES_01, amount);
+    player->SetInt32Value(UNIT_FIELD_RESISTANCES, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_HOLY, player->GetName(), amount);
 
@@ -7247,7 +7247,7 @@ bool ChatHandler::HandleModifyFireCommand(char *args)
         return false;
     }
 
-    player->SetInt32Value(UNIT_FIELD_RESISTANCES_02, amount);
+    player->SetInt32Value(UNIT_FIELD_RESISTANCES + 0x002, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_FIRE, player->GetName(), amount);
 
@@ -7282,7 +7282,7 @@ bool ChatHandler::HandleModifyNatureCommand(char *args)
         return false;
     }
 
-    player->SetInt32Value(UNIT_FIELD_RESISTANCES_03, amount);
+    player->SetInt32Value(UNIT_FIELD_RESISTANCES + 0x004, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_NATURE, player->GetName(), amount);
 
@@ -7317,7 +7317,7 @@ bool ChatHandler::HandleModifyFrostCommand(char *args)
         return false;
     }
 
-    player->SetInt32Value(UNIT_FIELD_RESISTANCES_04, amount);
+    player->SetInt32Value(UNIT_FIELD_RESISTANCES + 0x006, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_FROST, player->GetName(), amount);
 
@@ -7352,7 +7352,7 @@ bool ChatHandler::HandleModifyShadowCommand(char *args)
         return false;
     }
 
-    player->SetInt32Value(UNIT_FIELD_RESISTANCES_05, amount);
+    player->SetInt32Value(UNIT_FIELD_RESISTANCES + 0x008, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_SHADOW, player->GetName(), amount);
 
@@ -7387,7 +7387,7 @@ bool ChatHandler::HandleModifyArcaneCommand(char *args)
         return false;
     }
 
-    player->SetInt32Value(UNIT_FIELD_RESISTANCES_06, amount);
+    player->SetInt32Value(UNIT_FIELD_RESISTANCES + 0x00A, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_ARCANE, player->GetName(), amount);
 
@@ -7678,7 +7678,8 @@ bool ChatHandler::HandleModifyOffSpeedCommand(char *args)
         return false;
     }
 
-    player->SetFloatValue(UNIT_FIELD_OFFHANDATTACKTIME, (float) amount);
+    // broken for now
+    //player->SetFloatValue(UNIT_FIELD_OFFHANDATTACKTIME, (float) amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_OHSPD, player->GetName(), amount);
 

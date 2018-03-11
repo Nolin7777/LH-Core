@@ -890,7 +890,7 @@ void Opcodes::BuildOpcodeList()
     // TBC
     /*0x343*/  StoreOpcode(SMSG_MOVE_SET_CAN_FLY,               "SMSG_MOVE_SET_CAN_FLY",          STATUS_NEVER,     PACKET_PROCESS_MOVEMENT,        &WorldSession::Handle_ServerSide );
     /*0x344*/  StoreOpcode(SMSG_MOVE_UNSET_CAN_FLY,             "SMSG_MOVE_UNSET_CAN_FLY",        STATUS_NEVER,     PACKET_PROCESS_MOVEMENT,        &WorldSession::Handle_ServerSide );
-    /*0x345*/  StoreOpcode(CMSG_MOVE_SET_CAN_FLY_ACK,           "CMSG_MOVE_SET_CAN_FLY_ACK",      STATUS_LOGGEDIN,  PACKET_PROCESS_MOVEMENT,        &WorldSession::Handle_NULL); // TODO HandleMoveSetCanFlyAckOpcode
+    /*0x345*/  StoreOpcode(CMSG_MOVE_SET_CAN_FLY_ACK,           "CMSG_MOVE_SET_CAN_FLY_ACK",      STATUS_LOGGEDIN,  PACKET_PROCESS_MOVEMENT,        &WorldSession::HandleMoveSetCanFlyAckOpcode); // Done
     /*0x346*/  StoreOpcode(CMSG_MOVE_SET_FLY, "CMSG_MOVE_SET_FLY",                            STATUS_LOGGEDIN, PACKET_PROCESS_MAP,   &WorldSession::HandleMovementOpcodes );
     /*0x347*/  StoreOpcode(CMSG_SOCKET_GEMS, "CMSG_SOCKET_GEMS",                             STATUS_LOGGEDIN, PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandleSocketOpcode
     /*0x348*/  StoreOpcode(CMSG_ARENA_TEAM_CREATE, "CMSG_ARENA_TEAM_CREATE",                       STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL );
@@ -937,7 +937,7 @@ void Opcodes::BuildOpcodeList()
     /*0x371*/  StoreOpcode(SMSG_LFG_PENDING_MATCH, "SMSG_LFG_PENDING_MATCH",                       STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
     /*0x372*/  StoreOpcode(SMSG_LFG_PENDING_MATCH_DONE, "SMSG_LFG_PENDING_MATCH_DONE",                  STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
     /*0x373*/  StoreOpcode(SMSG_TITLE_EARNED, "SMSG_TITLE_EARNED",                            STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
-    /*0x374*/  StoreOpcode(CMSG_SET_TITLE, "CMSG_SET_TITLE",                               STATUS_LOGGEDIN, PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandleSetTitleOpcode
+    /*0x374*/  StoreOpcode(CMSG_SET_TITLE, "CMSG_SET_TITLE",                               STATUS_LOGGEDIN, PACKET_PROCESS_MASTER_SAFE, &WorldSession::HandleSetTitleOpcode); // Done
     /*0x375*/  StoreOpcode(CMSG_CANCEL_MOUNT_AURA, "CMSG_CANCEL_MOUNT_AURA",                       STATUS_LOGGEDIN, PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandleCancelMountAuraOpcode
     /*0x376*/  StoreOpcode(SMSG_ARENA_ERROR, "SMSG_ARENA_ERROR",                             STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
     /*0x377*/  StoreOpcode(MSG_INSPECT_ARENA_TEAMS, "MSG_INSPECT_ARENA_TEAMS",                      STATUS_LOGGEDIN, PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandleInspectArenaTeamsOpcode

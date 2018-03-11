@@ -1047,43 +1047,43 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
         data << (uint8)pl->GetHonorMgr().GetHighestRank().rank;           // Highest Rank
 
                                                                           // Today Honorable and Dishonorable Kills
-        data << pl->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
+        data << pl->GetUInt32Value(PLAYER_FIELD_KILLS);
 
         // Yesterday Honorable Kills
-        data << pl->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
+        data << (uint16)0; //pl->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
 
         // Unknown (deprecated, yesterday dishonourable?)
         data << (uint16)0;
 
         // Last Week Honorable Kills
-        data << pl->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
+        data << (uint16)0; //pl->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
 
         // Unknown (deprecated, last week dishonourable?)
         data << (uint16)0;
 
         // This Week Honorable kills
-        data << pl->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
+        data << (uint16)0; //pl->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
 
         // Unknown (deprecated, this week dishonourable?)
         data << (uint16)0;
 
         // Lifetime Honorable Kills
-        data << pl->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+        data << pl->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
 
         // Lifetime Dishonorable Kills
-        data << pl->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+        data << (uint16)0; //pl->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
 
         // Yesterday Honor
         data << pl->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
 
         // Last Week Honor
-        data << pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
+        data << 0; //pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
 
         // This Week Honor
-        data << pl->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+        data << 0; //pl->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
 
         // Last Week Standing
-        data << pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
+        data << 0; // pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
         // Rank progress bar
         data << (uint8)pl->GetByteValue(PLAYER_FIELD_BYTES2, 0);
@@ -1233,7 +1233,6 @@ void WorldSession::HandleFarSightOpcode(WorldPacket & recv_data)
     }
 }
 
-/*
 void WorldSession::HandleSetTitleOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received opcode CMSG_SET_TITLE");
@@ -1251,7 +1250,7 @@ void WorldSession::HandleSetTitleOpcode(WorldPacket& recv_data)
         title = 0;
 
     GetPlayer()->SetUInt32Value(PLAYER_CHOSEN_TITLE, title);
-}*/
+}
 
 /*
 void WorldSession::HandleTimeSyncResp(WorldPacket& recv_data)
@@ -1283,6 +1282,22 @@ void WorldSession::HandleResetInstancesOpcode(WorldPacket & /*recv_data*/)
     }
     else
         _player->ResetInstances(INSTANCE_RESET_ALL);
+}
+
+void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
+{
+    // fly mode on/off
+    DEBUG_LOG("WORLD: Received opcode CMSG_MOVE_SET_CAN_FLY_ACK");
+    // recv_data.hexlike();
+
+    MovementInfo movementInfo;
+
+    recv_data >> Unused<uint64>();                          // guid
+    recv_data >> Unused<uint32>();                          // unk
+    recv_data >> movementInfo;
+    recv_data >> Unused<uint32>();                          // unk2
+
+    _player->m_movementInfo.SetMovementFlags(movementInfo.GetMovementFlags());
 }
 
 void WorldSession::HandleRequestPetInfoOpcode(WorldPacket & /*recv_data */)

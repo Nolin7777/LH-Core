@@ -159,22 +159,19 @@ enum MovementFlags
     MOVEFLAG_PITCH_UP           = 0x00000040,
     MOVEFLAG_PITCH_DOWN         = 0x00000080,
     MOVEFLAG_WALK_MODE          = 0x00000100,               // Walking
-    //MOVEFLAG_ONTRANSPORT        = 0x00000200, // ??
-    MOVEFLAG_LEVITATING         = 0x00000400, // ?? Semble ne pas fonctionner
-    MOVEFLAG_FIXED_Z            = 0x00000800, // Hauteur fixee. Sauter => Defiler sur toute la map
-    MOVEFLAG_ROOT               = 0x00001000, // Fix Nostalrius
+    MOVEFLAG_ONTRANSPORT        = 0x00000200,               // Used for flying on some creatures
+    MOVEFLAG_LEVITATING         = 0x00000400,
+    MOVEFLAG_ROOT               = 0x00000800,
+    MOVEFLAG_FALLING            = 0x00001000,
     MOVEFLAG_JUMPING            = 0x00002000,
     MOVEFLAG_FALLINGFAR         = 0x00004000,
-    // Fin TC
-    MOVEFLAG_SWIMMING           = 0x00200000, // Ok
-    MOVEFLAG_SPLINE_ENABLED     = 0x00400000, // Ok
-    // 0x00800000 = 'MOVEMENTFLAG_DESCENDING' pour TrinityCore
-    MOVEFLAG_CAN_FLY            = 0x00800000,               // [-ZERO] is it really need and correct value
-    MOVEFLAG_FLYING             = 0x01000000,               // [-ZERO] is it really need and correct value
-
-    MOVEFLAG_ONTRANSPORT        = 0x02000000,               // Used for flying on some creatures
+    MOVEFLAG_SWIMMING           = 0x00200000,               // appears with fly flag also
+    MOVEFLAG_ASCENDING          = 0x00400000,               // swim up also
+    MOVEFLAG_CAN_FLY            = 0x00800000,
+    MOVEFLAG_FLYING             = 0x01000000,
+    MOVEFLAG_FLYING2            = 0x02000000,               // Actual flying mode
     MOVEFLAG_SPLINE_ELEVATION   = 0x04000000,               // used for flight paths
-
+    MOVEFLAG_SPLINE_ENABLED     = 0x08000000,               // used for flight paths
     MOVEFLAG_WATERWALKING       = 0x10000000,               // prevent unit from falling through water
     MOVEFLAG_SAFE_FALL          = 0x20000000,               // active rogue safe fall spell (passive)
     MOVEFLAG_HOVER              = 0x40000000,

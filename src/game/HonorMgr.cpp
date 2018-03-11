@@ -809,25 +809,25 @@ void HonorMgr::Update()
     m_owner->SetUInt32Value(PLAYER_FIELD_BYTES2, honorBar);
 
     // TODAY
-    m_owner->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, todayHK);
-    m_owner->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 1, todayDK);
+    m_owner->SetUInt16Value(PLAYER_FIELD_KILLS, 0, todayHK);
+    m_owner->SetUInt16Value(PLAYER_FIELD_KILLS, 1, todayDK);
 
     // YESTERDAY
-    m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, yesterdayKills);
+    //m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, yesterdayKills);
     m_owner->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, uint32(yesterdayCP > 0.0f ? yesterdayCP : 0.0f));
 
     // THIS WEEK
-    m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS, thisWeekKills);
-    m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION, uint32(thisWeekCP > 0.0f ? thisWeekCP : 0.0f));
+    //m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS, thisWeekKills);
+    //m_owner->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION, uint32(thisWeekCP > 0.0f ? thisWeekCP : 0.0f));
 
     // LAST WEEK
-    m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS, m_lastWeekHK);
-    m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION, uint32(m_lastWeekCP > 0.0f ? m_lastWeekCP : 0.0f));
-    m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK, m_standing);
-
+    //m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS, m_lastWeekHK);
+    //m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION, uint32(m_lastWeekCP > 0.0f ? m_lastWeekCP : 0.0f));
+    //m_owner->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK, m_standing);
+    
     // LIFE TIME
-    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, m_totalHK);
-    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, m_totalDK);
+    m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, m_totalHK);
+    //m_owner->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, m_totalDK);
 }
 
 void HonorMgr::InitRankInfo(HonorRankInfo &prk)

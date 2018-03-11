@@ -5127,7 +5127,7 @@ void Spell::EffectAddComboPoints(SpellEffectIndex /*eff_idx*/)
         return;
 
     ((Player*)m_caster)->AddComboPoints(unitTarget, damage);
-    ((Player*)m_caster)->SetUInt64Value(PLAYER_FIELD_COMBO_TARGET, unitTarget->GetGUID());
+    //((Player*)m_caster)->SetUInt64Value(PLAYER_FIELD_COMBO_TARGET, unitTarget->GetGUID());
 }
 
 void Spell::EffectDuel(SpellEffectIndex eff_idx)

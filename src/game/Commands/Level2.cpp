@@ -3753,17 +3753,17 @@ bool ChatHandler::HandleHonorShow(char* /*args*/)
         target = m_session->GetPlayer();
 
     int8 highest_rank               = target->GetHonorMgr().GetHighestRank().visualRank;
-    uint32 dishonorable_kills       = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
-    uint32 honorable_kills          = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
-    uint32 today_honorable_kills    = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0);
-    uint32 today_dishonorable_kills = target->GetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 1);
-    uint32 yesterday_kills          = target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS);
+    uint32 dishonorable_kills       = 0; //target->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+    uint32 honorable_kills          = target->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
+    uint32 today_honorable_kills    = target->GetUInt16Value(PLAYER_FIELD_KILLS, 0);
+    uint32 today_dishonorable_kills = target->GetUInt16Value(PLAYER_FIELD_KILLS, 1);
+    uint32 yesterday_kills          = 0; //target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS);
     uint32 yesterday_honor          = target->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
-    uint32 this_week_kills          = target->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS);
-    uint32 this_week_honor          = target->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
-    uint32 last_week_kills          = target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS);
-    uint32 last_week_honor          = target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
-    uint32 last_week_standing       = target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
+    uint32 this_week_kills          = 0; //target->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS);
+    uint32 this_week_honor          = 0; //target->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+    uint32 last_week_kills          = 0; //target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_KILLS);
+    uint32 last_week_honor          = 0; //target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
+    uint32 last_week_standing       = 0; //target->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
     static int16 alliance_ranks[HONOR_RANK_COUNT] =
     {
@@ -3923,12 +3923,12 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
         target->SetByteValue(PLAYER_BYTES_3, 3, amount);
     }
     else if (hasStringAbbr(field, "todaykills"))
-        target->SetUInt16Value(PLAYER_FIELD_SESSION_KILLS, 0, (uint32)amount);
-    else if (hasStringAbbr(field, "yesterdaykills"))
-        target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, (uint32)amount);
+        target->SetUInt16Value(PLAYER_FIELD_KILLS, 0, (uint32)amount);
+    /*else if (hasStringAbbr(field, "yesterdaykills"))
+        target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_KILLS, (uint32)amount);*/
     else if (hasStringAbbr(field, "yesterdayhonor"))
         target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, (uint32)amount);
-    else if (hasStringAbbr(field, "thisweekkills"))
+    /*else if (hasStringAbbr(field, "thisweekkills"))
         target->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_KILLS, (uint32)amount);
     else if (hasStringAbbr(field, "thisweekhonor"))
         target->SetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION, (uint32)amount);
@@ -3939,9 +3939,9 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     else if (hasStringAbbr(field, "lastweekstanding"))
         target->SetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK, (uint32)amount);
     else if (hasStringAbbr(field, "lifetimedishonorablekills"))
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, (uint32)amount);
+        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS, (uint32)amount);*/
     else if (hasStringAbbr(field, "lifetimehonorablekills"))
-        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, (uint32)amount);
+        target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, (uint32)amount);
 
     PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, field, target->GetName(), hasStringAbbr(field, "rank") ? amount : (uint32)amount);
 

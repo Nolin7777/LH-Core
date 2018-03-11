@@ -4034,8 +4034,8 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
 
     // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
-    for (uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_LAST_3; i += MAX_QUEST_OFFSET)
-        updateVisualBits.SetBit(i);
+    /*for (uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_LAST_3; i += MAX_QUEST_OFFSET)
+        updateVisualBits.SetBit(i);*/
 
     //Players visible items are not inventory stuff
     //431) = 884 (0x374) = main weapon
@@ -18026,7 +18026,7 @@ void Player::SetComboPoints()
     Unit *combotarget = ObjectAccessor::GetUnit(*this, m_comboTargetGuid);
     if (combotarget)
     {
-        SetGuidValue(PLAYER_FIELD_COMBO_TARGET, combotarget->GetObjectGuid());
+        //SetGuidValue(PLAYER_FIELD_COMBO_TARGET, combotarget->GetObjectGuid());
         SetByteValue(PLAYER_FIELD_BYTES, 1, m_comboPoints);
     }
     /*else
@@ -19444,6 +19444,42 @@ bool Player::isTotalImmune()
     }
 
     return (immuneMask == SPELL_SCHOOL_MASK_ALL);
+}
+
+bool Player::HasTitle(uint32 bitIndex) const
+{
+    if (bitIndex > MAX_TITLE_INDEX)
+        return false;
+
+    uint32 fieldIndexOffset = bitIndex / 32;
+    uint32 flag = 1 << (bitIndex % 32);
+    return HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
+}
+
+void Player::SetTitle(CharTitlesEntry const* title, bool lost)
+{
+    uint32 fieldIndexOffset = title->bit_index / 32;
+    uint32 flag = 1 << (title->bit_index % 32);
+
+    if (lost)
+    {
+        if (!HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag))
+            return;
+
+        RemoveFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
+    }
+    else
+    {
+        if (HasFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag))
+            return;
+
+        SetFlag(PLAYER__FIELD_KNOWN_TITLES + fieldIndexOffset, flag);
+    }
+
+    WorldPacket data(SMSG_TITLE_EARNED, 4 + 4);
+    data << uint32(title->bit_index);
+    data << uint32(lost ? 0 : 1);                           // 1 - earned, 0 - lost
+    GetSession()->SendPacket(&data);
 }
 
 void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)

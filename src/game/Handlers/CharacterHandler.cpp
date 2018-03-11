@@ -430,6 +430,11 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
     if (!playerGuid.IsPlayer())
         return;
 
+    if (_accountFlags & ACCOUNT_FLAG_DEBUG_LOGIN)
+    {
+        sLog.outInfo("Account %u login opcode. guid: %u, m_guid: " UI64FMTD ", time: %u",
+            _accountId, playerGuid.GetCounter(), playerGuid.GetRawValue(), time(nullptr));
+    }
 
     DEBUG_LOG("WORLD: Recvd Player Logon Message");
 
@@ -480,6 +485,29 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     // If the character is online (ALT-F4 logout for example)
     Player *pCurrChar = sObjectAccessor.FindPlayer(playerGuid);
     MasterPlayer* pCurrMasterPlayer = sObjectAccessor.FindMasterPlayer(playerGuid);
+
+    if (_accountFlags & ACCOUNT_FLAG_DEBUG_LOGIN)
+    {
+        sLog.outInfo("Account %u login. pCurrChar exists: %d, pCurrMasterPlayer exists: %d. m_guid: " UI64FMTD " (low: %u), time: %u",
+            _accountId, pCurrChar != nullptr, pCurrMasterPlayer != nullptr, playerGuid.GetRawValue(), playerGuid.GetCounter(), time(nullptr));
+
+        sLog.outInfo("Account %u login. session exists: %d",
+            _accountId, sWorld.FindSession(_accountId) != nullptr);
+
+        if (pCurrChar && pCurrChar->GetSession())
+        {
+            sLog.outInfo("Account %u login. pCurrChar has existing session. connected: %d. Equal: %d",
+                _accountId, pCurrChar->GetSession()->IsConnected(), pCurrChar->GetSession() == this);
+        }
+
+        ObjectGuid diffGuid = ObjectGuid(HIGHGUID_PLAYER, playerGuid.GetCounter());
+        if (!pCurrChar && sObjectAccessor.FindPlayer(diffGuid))
+        {
+            sLog.outInfo("Account %u login. Could not find existing player with input guid, but found one with same low GUID",
+                _accountId);
+        }
+    }
+
     bool alreadyOnline = false;
     if (pCurrChar)
     {
@@ -493,6 +521,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         }
         pCurrChar->GetSession()->SetPlayer(NULL);
         pCurrChar->SetSession(this);
+
+        if (_accountFlags & ACCOUNT_FLAG_DEBUG_LOGIN)
+        {
+            sLog.outInfo("Account %u login. Current player session set to this session", _accountId);
+        }
+
         // Need to attach packet bcaster to the new socket
         pCurrChar->m_broadcaster->ChangeSocket(GetSocket());
         alreadyOnline = true;

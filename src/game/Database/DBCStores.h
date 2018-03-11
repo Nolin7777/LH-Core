@@ -31,6 +31,9 @@
 bool IsAcceptableClientBuild(uint32 build);
 std::string AcceptableClientBuildsListStr();
 
+typedef std::list<uint32> SimpleFactionsList;
+
+
 char const* GetPetName(uint32 petfamily, uint32 dbclang);
 uint32 GetTalentSpellCost(uint32 spellId);
 uint32 GetTalentSpellCost(TalentSpellPos const* pos);
@@ -39,6 +42,13 @@ TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
+
+enum ContentLevels
+{
+    CONTENT_1_60 = 0,
+    CONTENT_61_70
+};
+ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId);
 
 ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id);
 ChatChannelsEntry const* GetChannelEntryFor(const std::string& name);

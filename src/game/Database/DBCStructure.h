@@ -41,6 +41,28 @@
 #pragma pack(push,1)
 #endif
 
+struct AreaTableEntry
+{
+    uint32  ID;                                             // 0        m_ID
+    uint32  mapid;                                          // 1        m_ContinentID
+    uint32  zone;                                           // 2        m_ParentAreaID
+    uint32  exploreFlag;                                    // 3        m_AreaBit
+    uint32  flags;                                          // 4        m_flags
+                                                            // 5        m_SoundProviderPref
+                                                            // 6        m_SoundProviderPrefUnderwater
+                                                            // 7        m_AmbienceID
+                                                            // 8        m_ZoneMusic
+                                                            // 9        m_IntroSound
+    int32   area_level;                                     // 10       m_ExplorationLevel
+    char*   area_name[16];                                  // 11-26    m_AreaName_lang
+                                                            // 27 string flags
+    uint32  team;                                           // 28       m_factionGroupMask
+    uint32  LiquidTypeOverride;                             // 29       m_liquidTypeID override for water type
+                                                            // 30-32    uknown/unused
+                                                            // 33       m_minElevation
+                                                            // 34       m_ambient_multiplier
+};
+
 struct AreaTriggerEntry
 {
     uint32    id;                                           // 0
@@ -71,6 +93,20 @@ struct BankBagSlotPricesEntry
     uint32  price;                                          // 1        m_Cost
 };
 
+struct BattlemasterListEntry
+{
+    uint32  id;                                             // 0        m_ID
+    int32   mapid[8];                                       // 1-8      m_mapID[8]
+    uint32  type;                                           // 9        m_instanceType
+    uint32  minLevel;                                       // 10       m_minlevel
+    uint32  maxLevel;                                       // 11       m_maxlevel
+    uint32  maxplayersperteam;                              // 12
+    // 13-14 unused
+    char*       name[16];                                   // 15-30    m_name_lang
+    // 31 string flags
+    // 32 unused
+};
+
 /*struct Cfg_CategoriesEntry
 {
     uint32 Id1;                                             // 1        Unk id, diff from post-1.x
@@ -99,6 +135,17 @@ struct CharStartOutfitEntry
     //uint32 Unknown1;                                      // 38, unique values (index-like with gaps ordered in other way as ids)
     //uint32 Unknown2;                                      // 39
     //uint32 Unknown3;                                      // 40
+};
+
+struct CharTitlesEntry
+{
+    uint32  ID;                                             // 0,       m_ID
+    // uint32      unk1;                                    // 1        m_Condition_ID
+    char*   name[16];                                       // 2-17     m_name_lang
+    // 18 string flags
+    // char*       name2[16];                               // 19-34    m_name1_lang
+    // 35 string flags
+    uint32  bit_index;                                      // 36       m_mask_ID used in PLAYER_CHOSEN_TITLE and 1<<index in PLAYER__FIELD_KNOWN_TITLES
 };
 
 struct ChatChannelsEntry
@@ -368,14 +415,103 @@ struct GameObjectDisplayInfoEntry
                                                             // 2-11     m_Sound
 };
 
+struct GemPropertiesEntry
+{
+    uint32      ID;                                         //          m_id
+    uint32      spellitemenchantement;                      //          m_enchant_id
+    //          m_maxcount_inv
+    //          m_maxcount_item
+    uint32      color;                                      //          m_type
+};
+
 // All Gt* DBC store data for 100 levels, some by 100 per class/race
 #define GT_MAX_LEVEL    100
+
+
+struct GtCombatRatingsEntry
+{
+    float    ratio;
+};
+
+struct GtChanceToMeleeCritBaseEntry
+{
+    float    base;
+};
+
+struct GtChanceToMeleeCritEntry
+{
+    float    ratio;
+};
+
+struct GtChanceToSpellCritBaseEntry
+{
+    float    base;
+};
+
+struct GtChanceToSpellCritEntry
+{
+    float    ratio;
+};
+
+struct GtOCTRegenHPEntry
+{
+    float    ratio;
+};
+
+struct GtNPCManaCostScalerEntry
+{
+    float    ratio;
+};
+
+// struct GtOCTRegenMPEntry
+//{
+//    float    ratio;
+//};
+
+struct GtRegenHPPerSptEntry
+{
+    float    ratio;
+};
+
+struct GtRegenMPPerSptEntry
+{
+    float    ratio;
+};
+
+struct ItemEntry
+{
+    uint32  ID;                                             // 0        m_ID
+    uint32  DisplayId;                                      // 1        m_displayInfoID
+    uint32  InventoryType;                                  // 2        m_inventoryType
+    uint32  Sheath;                                         // 3        m_sheatheType
+};
 
 struct ItemBagFamilyEntry
 {
     uint32   ID;                                            // 0        m_ID
     //char*     name[8]                                     // 1-8      m_name_lang
     //                                                      // 9        name flags
+};
+
+struct ItemClassEntry
+{
+    uint32   ID;                                            // 0        m_ID
+    // uint32   unk1;                                       // 1
+    // uint32   unk2;                                       // 2        only weapon have 1 in field, other 0
+    char*    name[16];                                      // 3-19     m_name_lang
+    //                                                      // 20       name flags
+};
+
+#define MAX_EXTENDED_COST_ITEMS 5
+
+struct ItemExtendedCostEntry
+{
+    uint32      ID;                                         // 0        m_ID
+    uint32      reqhonorpoints;                             // 1        m_honorPoints
+    uint32      reqarenapoints;                             // 2        m_arenaPoints
+    uint32      reqitem[MAX_EXTENDED_COST_ITEMS];           // 3-7      m_itemID
+    uint32      reqitemcount[MAX_EXTENDED_COST_ITEMS];      // 8-12     m_itemCount
+    uint32      reqpersonalarenarating;                     // 13       m_requiredArenaRating
 };
 
 struct ItemDisplayInfoEntry
@@ -392,6 +528,16 @@ struct ItemRandomPropertiesEntry
                                                             // 5-6 unused, 0 only values, reserved for additional enchantments
     char*     nameSuffix[8];                                // 7-14     m_name_lang
                                                             // 15 string flags
+};
+
+struct ItemRandomSuffixEntry
+{
+    uint32    ID;                                           // 0        m_ID
+    char*     nameSuffix[16];                               // 1-16     m_name_lang
+    // 17 string flags
+    // 18       m_internalName
+    uint32    enchant_id[3];                                // 19-21    m_enchantment
+    uint32    prefix[3];                                    // 22-24    m_allocationPct
 };
 
 struct ItemSetEntry
@@ -432,11 +578,73 @@ struct MailTemplateEntry
                                                             // 9 string flags
 };
 
+/*
+struct MapEntry
+{
+    uint32  MapID;                                          // 0        m_ID
+    // char*       internalname;                            // 1        m_Directory
+    uint32  map_type;                                       // 2        m_InstanceType
+    // uint32 isPvP;                                        // 3        m_PVP 0 or 1 for battlegrounds (not arenas)
+    char*   name[16];                                       // 4-19     m_MapName_lang
+    // 20 string flags
+    // 21-23 unused (something PvPZone related - levels?)
+    // 24-26
+    uint32  linked_zone;                                    // 27       m_areaTableID
+    // char*     hordeIntro[16];                            // 28-43    m_MapDescription0_lang
+    // 44 string flags
+    // char*     allianceIntro[16];                         // 45-60    m_MapDescription1_lang
+    // 61 string flags
+    uint32  multimap_id;                                    // 62       m_LoadingScreenID (LoadingScreens.dbc)
+    // 63-64 not used
+    // float   BattlefieldMapIconScale;                     // 65       m_minimapIconScale
+    // chat*     unknownText1                               // 66-81 unknown empty text fields, possible normal Intro text.
+    // 82 text flags
+    // chat*     heroicIntroText                            // 83-98 heroic mode requirement text
+    // 99 text flags
+    // chat*     unknownText2                               // 100-115 unknown empty text fields
+    // 116 text flags
+    int32   ghost_entrance_map;                             // 117      m_corpseMapID map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
+    float   ghost_entrance_x;                               // 118      m_corpseX entrance x coordinate in ghost mode  (in most cases = normal entrance)
+    float   ghost_entrance_y;                               // 119      m_corpseY entrance y coordinate in ghost mode  (in most cases = normal entrance)
+    uint32 resetTimeRaid;                                   // 120
+    uint32 resetTimeHeroic;                                 // 121
+    // 122      all 0
+    // uint32  timeOfDayOverride;                           // 123      m_timeOfDayOverride
+    uint32  addon;                                          // 124      m_expansionID
+
+    // Helpers
+    uint32 Expansion() const { return addon; }
+
+    bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID; }
+    bool IsNonRaidDungeon() const { return map_type == MAP_INSTANCE; }
+    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
+    bool IsRaid() const { return map_type == MAP_RAID; }
+    bool IsBattleGround() const { return map_type == MAP_BATTLEGROUND; }
+    bool IsBattleArena() const { return map_type == MAP_ARENA; }
+    bool IsBattleGroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
+    bool SupportsHeroicMode() const { return resetTimeHeroic && !resetTimeRaid; }
+    bool HasResetTime() const { return resetTimeHeroic || resetTimeRaid; }
+
+    bool IsContinent() const
+    {
+        return MapID == 0 || MapID == 1 || MapID == 530;
+    }
+};*/
+
 struct QuestSortEntry
 {
     uint32      id;                                         // 0        m_ID
     //char*       name[8];                                  // 1-8      m_SortName_lang
                                                             // 9 string flags
+};
+
+struct RandomPropertiesPointsEntry
+{
+    // uint32  Id;                                          // 0        m_ID
+    uint32    itemLevel;                                    // 1        m_ItemLevel
+    uint32    EpicPropertiesPoints[5];                      // 2-6      m_Epic
+    uint32    RarePropertiesPoints[5];                      // 7-11     m_Superior
+    uint32    UncommonPropertiesPoints[5];                  // 12-16    m_Good
 };
 
 /*struct SkillLineCategoryEntry
@@ -563,10 +771,30 @@ struct SpellItemEnchantmentEntry
     uint32      slot;                                       // 23       m_flags
 };
 
+struct SpellItemEnchantmentConditionEntry
+{
+    uint32  ID;
+    uint8   Color[5];
+    uint8   Comparator[5];
+    uint8   CompareColor[5];
+    uint32  Value[5];
+};
+
 struct StableSlotPricesEntry
 {
     uint32 Slot;                                            //          m_ID
     uint32 Price;                                           //          m_cost
+};
+
+struct SummonPropertiesEntry
+{
+    uint32  Id;                                             // 0        m_id
+    uint32  Group;                                          // 1        m_control (enum SummonPropGroup)
+    uint32  FactionId;                                      // 2        m_faction
+    uint32  Title;                                          // 3        m_title (enum UnitNameSummonTitle)
+    uint32  Slot;                                           // 4,       m_slot if title = UNITNAME_SUMMON_TITLE_TOTEM, its actual slot (0-6).
+    //    Slot may have other uses, selection of pet type in some cases?
+    uint32  Flags;                                          // 5        m_flags (enum SummonPropFlags)
 };
 
 #define MAX_TALENT_RANK 5
@@ -632,6 +860,15 @@ struct TaxiPathNodeEntry
     uint32    delay;                                        // 8        m_delay
 };
 
+struct TotemCategoryEntry
+{
+    uint32    ID;                                           // 0        m_ID
+    // char*   name[16];                                    // 1-16     m_name_lang
+    // 17 string flags
+    uint32    categoryType;                                 // 18       m_totemCategoryType (one for specialization)
+    uint32    categoryMask;                                 // 19       m_totemCategoryMask (compatibility mask for same type: different for totems, compatible from high to low for rods)
+};
+
 struct WMOAreaTableEntry
 {
     uint32 Id;                                              // 0        m_ID index
@@ -651,14 +888,15 @@ struct WMOAreaTableEntry
 
 struct WorldMapAreaEntry
 {
-    //uint32  ID;                                           // 0        m_ID
+    // uint32  ID;                                          // 0        m_ID
     uint32  map_id;                                         // 1        m_mapID
     uint32  area_id;                                        // 2        m_areaID index (continent 0 areas ignored)
-    //char* internal_name                                   // 3        m_areaName
+    // char* internal_name                                  // 3        m_areaName
     float   y1;                                             // 4        m_locLeft
     float   y2;                                             // 5        m_locRight
     float   x1;                                             // 6        m_locTop
     float   x2;                                             // 7        m_locBottom
+    int32   virtual_map_id;                                 // 8        m_displayMapID -1 (map_id have correct map) other: virtual map where zone show (map_id - where zone in fact internally)
 };
 
 
@@ -700,6 +938,16 @@ struct WorldSafeLocsEntry
 #pragma pack(pop)
 #endif
 
+struct ItemCategorySpellPair
+{
+    uint32 spellId;
+    uint32 itemId;
+    ItemCategorySpellPair(uint32 _spellId, uint32 _itemId) : spellId(_spellId), itemId(_itemId) {}
+    bool operator <(ItemCategorySpellPair const& pair) const { return spellId == pair.spellId ? itemId < pair.itemId : spellId < pair.spellId; }
+};
+
+typedef std::set<ItemCategorySpellPair> ItemSpellCategorySet;
+typedef std::map<uint32, ItemSpellCategorySet > ItemSpellCategoryStore;
 typedef std::set<uint32> SpellCategorySet;
 typedef std::map<uint32,SpellCategorySet > SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;

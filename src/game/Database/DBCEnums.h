@@ -25,7 +25,7 @@
 // Client expected level limitation, like as used in DBC item max levels for "until max player level"
 // use as default max player level, must be fit max level for used client
 // also see MAX_LEVEL and STRONG_MAX_LEVEL define
-#define DEFAULT_MAX_LEVEL 60
+#define DEFAULT_MAX_LEVEL 70
 
 // client supported max level for player/pets/etc. Avoid overflow or client stability affected.
 // also see GT_MAX_LEVEL define
@@ -54,6 +54,35 @@ enum AreaFlags
     AREA_FLAG_ARENA                 = 0x00000080,           // arena, both instanced and world arenas
     AREA_FLAG_CAPITAL               = 0x00000100,           // main capital city flag
     AREA_FLAG_CITY                  = 0x00000200,           // only for one zone named "City" (where it located?)
+    AREA_FLAG_OUTLAND               = 0x00000400,           // outland zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
+    AREA_FLAG_SANCTUARY             = 0x00000800,           // sanctuary area (PvP disabled)
+    AREA_FLAG_NEED_FLY              = 0x00001000,           // only Netherwing Ledge, Socrethar's Seat, Tempest Keep, The Arcatraz, The Botanica, The Mechanar, Sorrow Wing Point, Dragonspine Ridge, Netherwing Mines, Dragonmaw Base Camp, Dragonmaw Skyway
+    AREA_FLAG_UNUSED1               = 0x00002000,           // not used now (no area/zones with this flag set in 2.4.2)
+    AREA_FLAG_OUTLAND2              = 0x00004000,           // outland zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
+    AREA_FLAG_PVP                   = 0x00008000,           // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
+    AREA_FLAG_ARENA_INSTANCE        = 0x00010000,           // used by instanced arenas only
+    AREA_FLAG_UNUSED2               = 0x00020000,           // not used now (no area/zones with this flag set in 2.4.2)
+    AREA_FLAG_UNK5                  = 0x00040000,           // just used for Amani Pass, Hatchet Hills
+    AREA_FLAG_LOWLEVEL              = 0x00100000,           // used for some starting areas with area_level <=15
+};
+
+enum Difficulty
+{
+    REGULAR_DIFFICULTY           = 0,
+
+    DUNGEON_DIFFICULTY_NORMAL    = 0,
+    DUNGEON_DIFFICULTY_HEROIC    = 1,
+};
+
+#define MAX_DIFFICULTY             2
+
+enum SpawnMask
+{
+    SPAWNMASK_REGULAR           = (1 << REGULAR_DIFFICULTY),// any any maps without spawn modes (continents/subway) or in minimal spawnmode
+
+    SPAWNMASK_DUNGEON_NORMAL    = (1 << DUNGEON_DIFFICULTY_NORMAL),
+    SPAWNMASK_DUNGEON_HEROIC    = (1 << DUNGEON_DIFFICULTY_HEROIC),
+    SPAWNMASK_DUNGEON_ALL       = (SPAWNMASK_DUNGEON_NORMAL | SPAWNMASK_DUNGEON_HEROIC)
 };
 
 enum FactionTemplateFlags
@@ -78,6 +107,7 @@ enum MapTypes
     MAP_INSTANCE        = 1,
     MAP_RAID            = 2,
     MAP_BATTLEGROUND    = 3,
+    MAP_ARENA           = 4
 };
 
 enum AbilytyLearnType
@@ -102,6 +132,17 @@ enum ItemEnchantmentType
     ITEM_ENCHANTMENT_TYPE_TOTEM        = 6
 };
 
+enum TotemCategoryType
+{
+    TOTEM_CATEGORY_TYPE_KNIFE   = 1,
+    TOTEM_CATEGORY_TYPE_TOTEM   = 2,
+    TOTEM_CATEGORY_TYPE_ROD     = 3,
+    TOTEM_CATEGORY_TYPE_PICK    = 21,
+    TOTEM_CATEGORY_TYPE_STONE   = 22,
+    TOTEM_CATEGORY_TYPE_HAMMER  = 23,
+    TOTEM_CATEGORY_TYPE_SPANNER = 24
+};
+
 enum SkillRaceClassInfoFlags
 {
     SKILL_FLAG_NO_SKILLUP_MESSAGE       = 0x2,
@@ -112,27 +153,70 @@ enum SkillRaceClassInfoFlags
     SKILL_FLAG_MONO_VALUE               = 0x400     // Skill always has value 1 - clientside display flag, real value can be different
 };
 
+// SummonProperties.dbc, col 0          == Id               (m_id)
+// SummonProperties.dbc, col 1          == Group            (m_control)
+enum SummonPropGroup
+{
+    SUMMON_PROP_GROUP_WILD              = 0,
+    SUMMON_PROP_GROUP_FRIENDLY          = 1,
+    SUMMON_PROP_GROUP_PETS              = 2,
+    SUMMON_PROP_GROUP_CONTROLLABLE      = 3,
+};
+
+// SummonProperties.dbc, col 2          == FactionId        (m_faction)
+// SummonProperties.dbc, col 3          == Title            (m_title)
+enum UnitNameSummonTitle
+{
+    UNITNAME_SUMMON_TITLE_NONE          = 0,                // no default title, different summons, 730 spells in 2.4.3
+    UNITNAME_SUMMON_TITLE_PET           = 1,                // 's Pet,           generic summons, 59 spells in 2.4.3
+    UNITNAME_SUMMON_TITLE_GUARDIAN      = 2,                // 's Guardian,      summon guardian, 311 spells in 2.4.3
+    // UNITNAME_SUMMON_TITLE_MINION      = 3,               // 's Minion,        summon army, 0 spells in 2.4.3
+    UNITNAME_SUMMON_TITLE_TOTEM         = 4,                // 's Totem,         summon totem, 148 spells in 2.4.3
+    UNITNAME_SUMMON_TITLE_COMPANION     = 5,                // 's Companion,     critter/minipet, 159 spells in 2.4.3
+};
+
+// SummonProperties.dbc, col 4          == Slot             (m_slot)
+// SummonProperties.dbc, col 5          == Flags            (m_flags)
+enum SummonPropFlags
+{
+    SUMMON_PROP_FLAG_NONE               = 0x0000,           // 1342 spells in 3.0.3
+    SUMMON_PROP_FLAG_UNK1               = 0x0001,           // 75 spells in 3.0.3, something unfriendly
+    SUMMON_PROP_FLAG_UNK2               = 0x0002,           // 616 spells in 3.0.3, something friendly
+    SUMMON_PROP_FLAG_UNK3               = 0x0004,           // 22 spells in 3.0.3, no idea...
+    SUMMON_PROP_FLAG_UNK4               = 0x0008,           // 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_UNK5               = 0x0010,           // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_CANT_BE_DISMISSED  = 0x0020,           // 0 spells in 3.0.3, unused
+    SUMMON_PROP_FLAG_UNK7               = 0x0040,           // 12 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK8               = 0x0080,           // 4 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK9               = 0x0100,           // 51 spells in 3.0.3, no idea, many quest related
+    SUMMON_PROP_FLAG_INHERIT_FACTION    = 0x0200,           // 51 spells in 3.0.3, something defensive (Faction inheriting is much guesswork)
+    SUMMON_PROP_FLAG_UNK11              = 0x0400,           // 3 spells, requires something near?
+    SUMMON_PROP_FLAG_UNK12              = 0x0800,           // 30 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK13              = 0x1000,           // 8 spells in 3.0.3, siege vehicle
+    SUMMON_PROP_FLAG_UNK14              = 0x2000,           // 2 spells in 3.0.3, escort?
+};
+
 // SpellEntry::Targets
 enum SpellCastTargetFlags
 {
     TARGET_FLAG_SELF            = 0x00000000,
-    TARGET_FLAG_UNUSED1         = 0x00000001,               // not used in any spells (can be set dynamically)
+    TARGET_FLAG_UNUSED1         = 0x00000001,               // not used in any spells as of 2.4.3 (can be set dynamically)
     TARGET_FLAG_UNIT            = 0x00000002,               // pguid
-    TARGET_FLAG_UNUSED2         = 0x00000004,               // not used in any spells (can be set dynamically)
-    TARGET_FLAG_UNUSED3         = 0x00000008,               // not used in any spells (can be set dynamically)
+    TARGET_FLAG_UNUSED2         = 0x00000004,               // not used in any spells as of 2.4.3 (can be set dynamically)
+    TARGET_FLAG_UNUSED3         = 0x00000008,               // not used in any spells as of 2.4.3 (can be set dynamically)
     TARGET_FLAG_ITEM            = 0x00000010,               // pguid
     TARGET_FLAG_SOURCE_LOCATION = 0x00000020,               // 3 float
     TARGET_FLAG_DEST_LOCATION   = 0x00000040,               // 3 float
     TARGET_FLAG_OBJECT_UNK      = 0x00000080,               // used in 7 spells only
-    TARGET_FLAG_UNIT_UNK        = 0x00000100,               // looks like self target (389 spells)
+    TARGET_FLAG_UNIT_TARGET     = 0x00000100,               // seems to mean "Use supplied target", used in conjuncture with NO_TARGET and script targets
     TARGET_FLAG_PVP_CORPSE      = 0x00000200,               // pguid
     TARGET_FLAG_UNIT_CORPSE     = 0x00000400,               // 10 spells (gathering professions)
-    TARGET_FLAG_OBJECT          = 0x00000800,               // pguid, 0 spells
+    TARGET_FLAG_OBJECT          = 0x00000800,               // pguid, 0 spells in 2.4.3
     TARGET_FLAG_TRADE_ITEM      = 0x00001000,               // pguid, 0 spells
     TARGET_FLAG_STRING          = 0x00002000,               // string, 0 spells
-    TARGET_FLAG_UNK1            = 0x00004000,               // 199 spells, opening object/lock
-    TARGET_FLAG_CORPSE          = 0x00008000,               // pguid, resurrection spells
-    TARGET_FLAG_UNK2            = 0x00010000,               // pguid, not used in any spells (can be set dynamically)
+    TARGET_FLAG_GAMEOBJECT_ITEM = 0x00004000,               // 199 spells, opening object/lock
+    TARGET_FLAG_CORPSE_ALLY     = 0x00008000,               // pguid, resurrection spells
+    TARGET_FLAG_UNK2            = 0x00010000,               // pguid, not used in any spells as of 2.4.3 (can be set dynamically)
 };
 
 enum SpellEffectIndex
@@ -143,6 +227,14 @@ enum SpellEffectIndex
 };
 
 #define MAX_EFFECT_INDEX 3
+
+enum SpellEffectIndexMask
+{
+    EFFECT_MASK_INDEX_0 = (1 << EFFECT_INDEX_0),
+    EFFECT_MASK_INDEX_1 = (1 << EFFECT_INDEX_1),
+    EFFECT_MASK_INDEX_2 = (1 << EFFECT_INDEX_2),
+    EFFECT_MASK_ALL = (EFFECT_MASK_INDEX_0 | EFFECT_MASK_INDEX_1 | EFFECT_MASK_INDEX_2)
+};
 
 enum SpellFamily
 {

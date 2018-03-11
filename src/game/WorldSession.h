@@ -898,7 +898,10 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleSelfResOpcode(WorldPacket& recv_data);
         void HandleRequestPetInfoOpcode(WorldPacket& recv_data);
 
+        void HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data);
         void HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data);
+        void HandleRealmSplitOpcode(WorldPacket& recv_data);
+        void HandleTimeSyncResp(WorldPacket& recv_data);
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);

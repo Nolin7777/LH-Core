@@ -1208,6 +1208,26 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     DEBUG_LOG("Received whois command from player %s for character %s", GetPlayer()->GetName(), charname.c_str());
 }
 
+void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)
+{
+    DEBUG_LOG("WORLD: Received opcode CMSG_REALM_SPLIT");
+
+    uint32 unk;
+    std::string split_date = "01/01/01";
+    recv_data >> unk;
+
+    WorldPacket data(SMSG_REALM_SPLIT, 4 + 4 + split_date.size() + 1);
+    data << unk;
+    data << uint32(0x00000000);                             // realm split state
+    // split states:
+    // 0x0 realm normal
+    // 0x1 realm split
+    // 0x2 realm split pending
+    data << split_date;
+    SendPacket(&data);
+    // DEBUG_LOG("response sent %u", unk);
+}
+
 void WorldSession::HandleFarSightOpcode(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_FAR_SIGHT");
@@ -1252,7 +1272,6 @@ void WorldSession::HandleSetTitleOpcode(WorldPacket& recv_data)
     GetPlayer()->SetUInt32Value(PLAYER_CHOSEN_TITLE, title);
 }
 
-/*
 void WorldSession::HandleTimeSyncResp(WorldPacket& recv_data)
 {
     uint32 counter, clientTicks;
@@ -1269,7 +1288,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recv_data)
     DEBUG_LOG(" WORLD: Opcode CMSG_TIME_SYNC_RESP -- Our ticks: %u, diff %u, latency %u", ourTicks, ourTicks - clientTicks, GetLatency());
 
     _player->m_timeSyncClient = clientTicks;
-}*/
+}
 
 void WorldSession::HandleResetInstancesOpcode(WorldPacket & /*recv_data*/)
 {
@@ -1283,6 +1302,51 @@ void WorldSession::HandleResetInstancesOpcode(WorldPacket & /*recv_data*/)
     else
         _player->ResetInstances(INSTANCE_RESET_ALL);
 }
+/*
+void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
+{
+    DEBUG_LOG("WORLD: Received opcode MSG_SET_DUNGEON_DIFFICULTY");
+
+    uint32 mode;
+    recv_data >> mode;
+
+    if (mode >= MAX_DIFFICULTY)
+    {
+        sLog.outError("WorldSession::HandleSetDungeonDifficultyOpcode: player %d sent an invalid instance mode %d!", _player->GetGUIDLow(), mode);
+        return;
+    }
+
+    if (Difficulty(mode) == _player->GetDifficulty())
+        return;
+
+    // cannot reset while in an instance
+    Map* map = _player->GetMap();
+    if (map && map->IsDungeon())
+    {
+        sLog.outError("WorldSession::HandleSetDungeonDifficultyOpcode: player %d tried to reset the instance while inside!", _player->GetGUIDLow());
+        return;
+    }
+
+    // Exception to set mode to normal for low-level players
+    if (_player->getLevel() < LEVELREQUIREMENT_HEROIC && mode > REGULAR_DIFFICULTY)
+        return;
+
+    if (Group* pGroup = _player->GetGroup())
+    {
+        if (pGroup->IsLeader(_player->GetObjectGuid()))
+        {
+            // the difficulty is set even if the instances can't be reset
+            //_player->SendDungeonDifficulty(true);
+            pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, _player);
+            pGroup->SetDifficulty(Difficulty(mode));
+        }
+    }
+    else
+    {
+        _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY);
+        _player->SetDifficulty(Difficulty(mode));
+    }
+}*/
 
 void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 {

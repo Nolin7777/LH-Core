@@ -879,9 +879,9 @@ void Opcodes::BuildOpcodeList()
     /*0x338*/  StoreOpcode(SMSG_CHARACTER_PROFILE,            "SMSG_CHARACTER_PROFILE",           STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x339*/  StoreOpcode(SMSG_CHARACTER_PROFILE_REALM_CONNECTED, "SMSG_CHARACTER_PROFILE_REALM_CONNECTED",  STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x33A*/  StoreOpcode(SMSG_DEFENSE_MESSAGE,              "SMSG_DEFENSE_MESSAGE",             STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
-    /*0x33B*/  StoreOpcode(SMSG_INSTANCE_DIFFICULTY,          "SMSG_INSTANCE_DIFFICULTY",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide); // TODO
+    /*0x33B*/  StoreOpcode(SMSG_INSTANCE_DIFFICULTY,          "SMSG_INSTANCE_DIFFICULTY",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide); // done
     /*0x33C*/  StoreOpcode(MSG_GM_RESETINSTANCELIMIT,         "MSG_GM_RESETINSTANCELIMIT",        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
-    /*0x33D*/  StoreOpcode(SMSG_MOTD,                         "SMSG_MOTD",                        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide); // TODO
+    /*0x33D*/  StoreOpcode(SMSG_MOTD,                         "SMSG_MOTD",                        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide); // TODO not critical
     /*0x33E*/  StoreOpcode(SMSG_MOVE_SET_FLIGHT,              "SMSG_MOVE_SET_FLIGHT_OBSOLETE",    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x33F*/  StoreOpcode(SMSG_MOVE_UNSET_FLIGHT,            "SMSG_MOVE_UNSET_FLIGHT_OBSOLETE",  STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x340*/  StoreOpcode(CMSG_MOVE_FLIGHT_ACK,              "CMSG_MOVE_FLIGHT_ACK_OBSOLETE",    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
@@ -961,12 +961,12 @@ void Opcodes::BuildOpcodeList()
     /*0x389*/  StoreOpcode(CMSG_SET_TAXI_BENCHMARK_MODE, "CMSG_SET_TAXI_BENCHMARK_MODE",                 STATUS_AUTHED,   PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandleSetTaxiBenchmarkOpcode
     /*0x38A*/  StoreOpcode(SMSG_JOINED_BATTLEGROUND_QUEUE, "SMSG_JOINED_BATTLEGROUND_QUEUE",               STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
     /*0x38B*/  StoreOpcode(SMSG_REALM_SPLIT, "SMSG_REALM_SPLIT",                             STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
-    /*0x38C*/  StoreOpcode(CMSG_REALM_SPLIT, "CMSG_REALM_SPLIT",                             STATUS_AUTHED,   PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandleRealmSplitOpcode
+    /*0x38C*/  StoreOpcode(CMSG_REALM_SPLIT, "CMSG_REALM_SPLIT",                             STATUS_AUTHED,   PACKET_PROCESS_MASTER_SAFE, &WorldSession::HandleRealmSplitOpcode); // Done
     /*0x38D*/  StoreOpcode(CMSG_MOVE_CHNG_TRANSPORT, "CMSG_MOVE_CHNG_TRANSPORT",                     STATUS_LOGGEDIN, PACKET_PROCESS_MAP,   &WorldSession::HandleMovementOpcodes );
     /*0x38E*/  StoreOpcode(MSG_PARTY_ASSIGNMENT, "MSG_PARTY_ASSIGNMENT",                         STATUS_LOGGEDIN, PACKET_PROCESS_MASTER_SAFE, &WorldSession::Handle_NULL); // TODO HandlePartyAssignmentOpcode
     /*0x38F*/  StoreOpcode(SMSG_OFFER_PETITION_ERROR, "SMSG_OFFER_PETITION_ERROR",                    STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
     /*0x390*/  StoreOpcode(SMSG_TIME_SYNC_REQ, "SMSG_TIME_SYNC_REQ",                           STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide );
-    /*0x391*/  StoreOpcode(CMSG_TIME_SYNC_RESP, "CMSG_TIME_SYNC_RESP",                          STATUS_LOGGEDIN, PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL); // TODO HandleTimeSyncResp
+    /*0x391*/  StoreOpcode(CMSG_TIME_SYNC_RESP, "CMSG_TIME_SYNC_RESP",                          STATUS_LOGGEDIN, PACKET_PROCESS_MAX_TYPE,      &WorldSession::HandleTimeSyncResp); // Done
     /*0x392*/  StoreOpcode(CMSG_SEND_LOCAL_EVENT, "CMSG_SEND_LOCAL_EVENT",                        STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL );
     /*0x393*/  StoreOpcode(CMSG_SEND_GENERAL_TRIGGER, "CMSG_SEND_GENERAL_TRIGGER",                    STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL );
     /*0x394*/  StoreOpcode(CMSG_SEND_COMBAT_TRIGGER, "CMSG_SEND_COMBAT_TRIGGER",                     STATUS_NEVER,    PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL );

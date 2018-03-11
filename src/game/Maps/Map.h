@@ -188,6 +188,11 @@ struct AreaEntry
     }
 };
 
+enum LevelRequirementVsMode
+{
+    LEVELREQUIREMENT_HEROIC = 70
+};
+
 #if defined( __GNUC__ )
 #pragma pack()
 #else
@@ -516,6 +521,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void AddCorpseToRemove(Corpse* corpse, ObjectGuid looter_guid);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask);
 
+        uint8 GetSpawnMode() const { return (i_spawnMode); }
+        Difficulty GetDifficulty() const { return Difficulty(GetSpawnMode()); }
+        bool IsRegularDifficulty() const { return GetDifficulty() == REGULAR_DIFFICULTY; }
+
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -612,6 +621,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool m_updateFinished;
         uint32 m_updateDiffMod;
         uint32 m_lastMvtSpellsUpdate;
+
+        uint8 i_spawnMode;
     private:
         time_t i_gridExpiry;
 

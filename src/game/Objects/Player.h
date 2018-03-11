@@ -1088,6 +1088,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
         uint32 GetTotalPlayedTime() { return m_Played_time[PLAYED_TIME_TOTAL]; }
         uint32 GetLevelPlayedTime() { return m_Played_time[PLAYED_TIME_LEVEL]; }
 
+        void ResetTimeSync();
+        void SendTimeSync();
+
         void SetDeathState(DeathState s);                   // overwrite Unit::SetDeathState
 
         float GetRestBonus() const { return m_rest_bonus; }
@@ -2441,6 +2444,11 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetJustBoarded(bool hasBoarded) { m_justBoarded = hasBoarded; }
         bool HasJustBoarded() { return m_justBoarded; }
 
+        uint32 m_timeSyncCounter;
+        uint32 m_timeSyncTimer;
+        uint32 m_timeSyncClient;
+        uint32 m_timeSyncServer;
+
     private:
         // internal common parts for CanStore/StoreItem functions
         InventoryResult _CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool swap, Item *pSrcItem ) const;
@@ -2518,6 +2526,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         HonorMgr  m_honorMgr;
 
         ReputationMgr  m_reputationMgr;
+
         ObjectGuid     m_selectedGobj; // For GM commands
 
         int32 m_cannotBeDetectedTimer;

@@ -1179,6 +1179,14 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     CheckDuelDistance(now);
 
+    if (m_timeSyncTimer > 0)
+    {
+        if (update_diff >= m_timeSyncTimer)
+            SendTimeSync();
+        else
+            m_timeSyncTimer -= update_diff;
+    }
+
     // Handle detect stealth units
     if (m_DetectInvTimer > 0)
     {
@@ -18116,6 +18124,11 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // tutorial stuff
     GetSession()->SendTutorialsData();
 
+    data.Initialize(SMSG_INSTANCE_DIFFICULTY, 4 + 4);
+    data << uint32(GetMap()->GetDifficulty());
+    data << uint32(0);
+    GetSession()->SendPacket(&data);
+
     SendInitialSpells();
 
     if (MasterPlayer* masterPlayer = GetSession()->GetMasterPlayer())
@@ -18147,6 +18160,9 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
 
     if (login)
         CastSpell(this, 836, true);                             // LOGINEFFECT
+
+    ResetTimeSync();
+    SendTimeSync();
 
     // set some aura effects that send packet to player client after add player to map
     // SendMessageToSet not send it to player not it map, only for aura that not changed anything at re-apply
@@ -19937,6 +19953,25 @@ void Player::BuildTeleportAckMsg(WorldPacket& data, float x, float y, float z, f
 bool Player::HasMovementFlag(MovementFlags f) const
 {
     return m_movementInfo.HasMovementFlag(f);
+}
+
+void Player::ResetTimeSync()
+{
+    m_timeSyncCounter = 0;
+    m_timeSyncTimer = 0;
+    m_timeSyncClient = 0;
+    m_timeSyncServer = WorldTimer::getMSTime();
+}
+
+void Player::SendTimeSync()
+{
+    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
+    data << uint32(m_timeSyncCounter++);
+    GetSession()->SendPacket(&data);
+
+    // Schedule next sync in 10 sec
+    m_timeSyncTimer = 10000;
+    m_timeSyncServer = WorldTimer::getMSTime();
 }
 
 void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)

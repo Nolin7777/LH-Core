@@ -74,7 +74,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     // get the destination map entry, not the current one, this will fix homebind and reset greeting
     MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(loc.mapid);
-
     Map* map = nullptr;
 
     // prevent crash at attempt landing to not existed battleground instance
@@ -144,6 +143,10 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
     GetPlayer()->SetSemaphoreTeleportFar(false);
 
+    // get the destination map entry, not the current one, this will fix homebind and reset greeting
+    MapEntry const* mEntry2 = sMapStore.LookupEntry(loc.mapid);
+    Map* pMap = nullptr;
+
     // battleground state prepare (in case join to BG), at relogin/tele player not invited
     // only add to bg group and object, if the player was invited (else he entered through command)
     if (_player->InBattleGround())
@@ -192,7 +195,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     // mount allow check
-    if (!mEntry->IsMountAllowed())
+    if (!pMap->IsMountAllowed())
         _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     // honorless target

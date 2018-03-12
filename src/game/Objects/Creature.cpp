@@ -2589,7 +2589,7 @@ void Creature::LogDeath(Unit* pKiller) const
     logStmt.addInt32(GetGUIDLow());
 
     const MapEntry* mapEntry = sMapStorage.LookupEntry<MapEntry>(GetMapId());
-    std::string result0 = mapEntry->name;
+    std::string result0 = mapEntry->name[sWorld.GetDefaultDbcLocale()];
 
     logStmt.addString(result0 + "." + GetName());
     logStmt.addInt32(GetCombatTime(true));
@@ -2661,7 +2661,7 @@ void Creature::LogLongCombat() const
     logStmt.addInt32(GetGUIDLow());
 
     const MapEntry* mapEntry = sMapStorage.LookupEntry<MapEntry>(GetMapId());
-    std::string result0 = mapEntry->name;
+    std::string result0 = mapEntry->name[sWorld.GetDefaultDbcLocale()];
 
     logStmt.addString(result0 + "." + GetName());
     logStmt.addInt32(GetCombatTime(true));
@@ -2683,7 +2683,7 @@ void Creature::LogScriptInfo(std::ostringstream &data) const
     logStmt.addInt32(GetGUIDLow());
 
     const MapEntry* mapEntry = sMapStorage.LookupEntry<MapEntry>(GetMapId());
-    std::string result0 = mapEntry->name;
+    std::string result0 = mapEntry->name[sWorld.GetDefaultDbcLocale()];
 
     logStmt.addString(result0 + "." + GetName());
     logStmt.addInt32(GetCombatTime(true));

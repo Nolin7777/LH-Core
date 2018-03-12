@@ -6232,7 +6232,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetTransport())
                         return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
-                    if (m_caster->GetMapId() != 531 && m_caster->GetTypeId() == TYPEID_PLAYER && !sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId())->IsMountAllowed() && !m_IsTriggeredSpell)
+                    MapEntry const* mEntry = sMapStore.LookupEntry(m_caster->GetMapId());
+                    Map* pMap = nullptr;
+
+                    if (m_caster->GetMapId() != 531 && m_caster->GetTypeId() == TYPEID_PLAYER && !pMap->IsMountAllowed() && !m_IsTriggeredSpell)
                         return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
                     if (m_caster->GetAreaId() == 35)
@@ -6441,8 +6444,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                         break;
                 }
 
+                MapEntry const* mEntry = sMapStore.LookupEntry(m_caster->GetMapId());
+                Map* pMap = nullptr;
+
                 // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells
-                if (!isAQ40Mount && m_caster->GetTypeId() == TYPEID_PLAYER && !sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId())->IsMountAllowed() && !m_IsTriggeredSpell) //[-ZERO] && !m_spellInfo->AreaId)
+                if (!isAQ40Mount && m_caster->GetTypeId() == TYPEID_PLAYER && !pMap->IsMountAllowed() && !m_IsTriggeredSpell) //[-ZERO] && !m_spellInfo->AreaId)
                     return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
                 if (m_caster->GetAreaId() == 35)

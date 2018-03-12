@@ -1372,7 +1372,7 @@ bool Map::CheckGridIntegrity(Creature* c, bool moved) const
 
 const char* Map::GetMapName() const
 {
-    return i_mapEntry ? i_mapEntry->name : "UNNAMEDMAP\x0";
+    return i_mapEntry ? i_mapEntry->name[sWorld.GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
 }
 
 void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellPair cellpair)
@@ -3419,4 +3419,15 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     Add(go);
     go->SetWorldMask(worldMask);
     return go;
+}
+
+bool Map::IsMountAllowed() const
+{
+    if (!IsDungeon())
+        return true;
+
+    if (InstanceTemplate const* data = ObjectMgr::GetInstanceTemplate(GetId()))
+        return data->mountAllowed;
+
+    return true;
 }

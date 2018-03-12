@@ -4773,12 +4773,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     // Prevent stacking of mounts
                     unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
-                    const MapEntry* mapEntry = sMapStorage.LookupEntry<MapEntry>(unitTarget->GetMapId());
-                    if (!mapEntry)
-                        return;
+                    MapEntry const* mEntry = sMapStore.LookupEntry(unitTarget->GetMapId());
+                    Map* pMap = nullptr;
 
                     // Two separate mount spells depending on if mounting is allowed or not
-                    if (!mapEntry->IsMountAllowed())
+                    if (!pMap->IsMountAllowed())
                         unitTarget->CastSpell(unitTarget, 25863, true, m_CastItem);
                     else
                         unitTarget->CastSpell(unitTarget, 26655, true, m_CastItem);

@@ -144,7 +144,7 @@ struct MapEntry
                                                             // char*       internalname;                            // 1        m_Directory
     uint32  mapType;                                        // 2        m_InstanceType
                                                             // uint32 isPvP;                                        // 3        m_PVP 0 or 1 for battlegrounds (not arenas)
-    char*   name;                                           // 4-19     m_MapName_lang
+    char*   name[16];                                       // 4-19     m_MapName_lang
                                                             // 20 string flags
                                                             // 21-23 unused (something PvPZone related - levels?)
                                                             // 24-26
@@ -181,7 +181,6 @@ struct MapEntry
     bool IsBattleGround() const { return mapType == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return mapType == MAP_ARENA; }
     bool IsBattleGroundOrArena() const { return mapType == MAP_BATTLEGROUND || mapType == MAP_ARENA; }
-    bool IsMountAllowed() const { return !IsDungeon() || id == 309 || id == 209 || id == 509 || id == 269; }
     bool SupportsHeroicMode() const { return resetTimeHeroic && !resetTimeRaid; }
     bool HasResetTime() const { return resetTimeHeroic || resetTimeRaid; }
 
@@ -388,6 +387,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool IsRaid() const { return i_mapEntry && i_mapEntry->IsRaid(); }
         bool IsBattleGround() const { return i_mapEntry && i_mapEntry->IsBattleGround(); }
         bool IsContinent() const { return i_mapEntry && i_mapEntry->IsContinent(); }
+        bool IsMountAllowed() const;
 
         // can't be NULL for loaded map
         MapPersistentState* GetPersistentState() const { return m_persistentState; }

@@ -179,7 +179,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
     if (!entry)
         return false;
 
-    const char *mapName = entry->name;
+    const char *mapName = entry->name[sWorld.GetDefaultDbcLocale()];
 
     if (entry->IsDungeon())
     {

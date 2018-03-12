@@ -1330,7 +1330,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         char const* name;
 
         if (MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapId))
-            name = mapEntry->name;
+            name = mapEntry->name[sWorld.GetDefaultDbcLocale()];
         else
         {
             sLog.outErrorDb("Table `battleground_template` for id %u associated with nonexistent map id %u.", bgTypeID, mapId);

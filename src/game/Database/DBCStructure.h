@@ -714,12 +714,12 @@ struct SkillLineEntry
 {
     uint32    id;                                           // 0        m_ID
     int32     categoryId;                                   // 1        m_categoryID
-    //uint32    skillCostID;                                // 2        m_skillCostsID
-    char*     name[8];                                      // 3-10     m_displayName_lang
-                                                            // 11 string flags
-    //char*     description[8];                             // 12-19    m_description_lang
-                                                            // 20 string flags
-    uint32    spellIcon;                                    // 21       m_spellIconID
+    // uint32    skillCostID;                               // 2        m_skillCostsID
+    char*     name[16];                                     // 3-18     m_displayName_lang
+    // 19 string flags
+    // char*     description[16];                           // 20-35    m_description_lang
+    // 36 string flags
+    uint32    spellIcon;                                    // 37       m_spellIconID
 };
 
 struct SkillLineAbilityEntry

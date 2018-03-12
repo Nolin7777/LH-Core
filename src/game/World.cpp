@@ -303,12 +303,12 @@ void World::AddSession_(WorldSession* s)
 
     if (!s->GetMasterSession())
     {
-        // Checked for 1.12.2
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4);
+        WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 4);
         packet << uint8(AUTH_OK);
         packet << uint32(0);                                    // BillingTimeRemaining
         packet << uint8(0);                                     // BillingPlanFlags
         packet << uint32(0);                                    // BillingTimeRested
+        packet << uint8(1);                                     // 0 - normal, 1 - TBC, must be set in database manually for each account
         s->SendPacket(&packet);
     }
 
@@ -348,11 +348,12 @@ void World::AddQueuedSession(WorldSession* sess)
 
     // [-ZERO] Possible wrong
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 4);
+    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 4);
     packet << uint8(AUTH_WAIT_QUEUE);
     packet << uint32(0);                                    // BillingTimeRemaining
     packet << uint8(0);                                     // BillingPlanFlags
     packet << uint32(0);                                    // BillingTimeRested
+    packet << uint8(1);                                     // 0 - normal, 1 - TBC, must be set in database manually for each account
     packet << uint32(GetQueuedSessionPos(sess));            // position in queue
     sess->SendPacket(&packet);
 

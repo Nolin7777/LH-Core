@@ -191,6 +191,7 @@ extern int main(int argc, char **argv)
         "        MM  MMM http://getmangos.com\n"
         "        MMMMMM\n\n");
     sLog.outString("Light's Hope : https://lightshope.org/");
+    sLog.outString("TBC Port");
     sLog.outString("Using configuration file %s.", cfg_file);
 
 #define STR(s) #s

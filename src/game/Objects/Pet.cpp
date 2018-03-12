@@ -1532,7 +1532,7 @@ void Pet::_LoadSpellCooldowns()
 
         WorldPacket data(SMSG_SPELL_COOLDOWN, (8 + size_t(m_pTmpCache->spellCooldown.size()) * 8));
         data << ObjectGuid(GetObjectGuid());
-        //[-ZERO] data << uint8(0x0);                                 // flags (0x1, 0x2)
+        data << uint8(0x0);                                 // flags (0x1, 0x2)
 
         for (PetSpellCDs::iterator it = m_pTmpCache->spellCooldown.begin(); it != m_pTmpCache->spellCooldown.end(); ++it)
         {

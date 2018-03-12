@@ -42,7 +42,7 @@ enum MeetingstoneFailedStatus
     MEETINGSTONE_FAIL_PARTYLEADER                           = 1,
     MEETINGSTONE_FAIL_FULL_GROUP                            = 2,
     MEETINGSTONE_FAIL_RAID_GROUP                            = 3,
-    //MEETINGSTONE_FAIL_NONE_UNK                              = 4 [-ZERO]
+    MEETINGSTONE_FAIL_NONE_UNK                              = 4 //[-ZERO]
 };
 
 #endif

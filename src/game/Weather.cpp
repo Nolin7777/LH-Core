@@ -321,16 +321,15 @@ uint32 Weather::GetSound()
             else
                 sound = WEATHER_SANDSTORMHEAVY;
             break;
+        case WEATHER_TYPE_BLACKRAIN:
+            return WEATHER_STATE_BLACKRAIN;
+            break;
+        case WEATHER_TYPE_THUNDERS:
+            return WEATHER_STATE_THUNDERS;
+            break;
         case WEATHER_TYPE_FINE:                                             //fine
         default:
             sound = WEATHER_NOSOUND;
             break;
     }
-    return sound;
-
-    /*[-ZERO] tbc [?]
-              case WEATHER_TYPE_BLACKRAIN:
-              return WEATHER_STATE_BLACKRAIN;
-          case WEATHER_TYPE_THUNDERS:
-              return WEATHER_STATE_THUNDERS; */
-}
+    return sound;}

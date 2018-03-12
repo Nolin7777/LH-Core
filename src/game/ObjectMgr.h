@@ -135,8 +135,17 @@ typedef std::unordered_map<uint32, BroadcastText> BroadcastTextLocaleMap;
 
 struct SoundEntriesEntry
 {
-    uint32          Id;
-    std::string     Name;
+    uint32    Id;                                           // 0        m_ID
+    // uint32    Type;                                      // 1        m_soundType
+    // char*     Name;                                         // 2        m_name
+    // char*     FileName[10];                              // 3-12     m_File[10]
+    // uint32    Unk13[10];                                 // 13-22    m_Freq[10]
+    // char*     Path;                                      // 23       m_DirectoryBase
+    // 24       m_volumeFloat
+    // 25       m_flags
+    // 26       m_minDistance
+    // 27       m_distanceCutoff
+    // 28       m_EAXDef
 };
 
 struct CreatureSpellsEntry
@@ -1234,7 +1243,8 @@ class ObjectMgr
         bool MoveCreData(uint32 guid, uint32 mapId, const Position& pos);
 
         // Sound Entries
-        void LoadSoundEntries();
+        // TODO
+        //void LoadSoundEntries();
         SoundEntriesEntry const* GetSoundEntry(uint32 id) const { return id < GetMaxSoundId() ? mSoundEntries[id] : nullptr; }
         uint32 GetMaxSoundId() const { return mSoundEntries.size(); }
 

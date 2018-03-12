@@ -6151,18 +6151,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_TARGET_IN_COMBAT;
 
                     // check if our map is dungeon
-                    const MapEntry *mapEntry = sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId());
-                    if (mapEntry && mapEntry->IsDungeon())
+                    uint32 mapId = m_caster->GetMapId();
+                    const MapEntry* map = sMapStore.LookupEntry(mapId);
+                    if (map->IsDungeon())
                     {
-                        if (m_caster->GetMap() != target->GetMap())
+                        InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(mapId);
+                        if (!instance)
                             return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
-                        if (mapEntry->levelMin > target->getLevel())
+                        if (instance->levelMin > target->getLevel())
                             return SPELL_FAILED_LOWLEVEL;
-                        if (mapEntry->levelMax && mapEntry->levelMax < target->getLevel())
+                        if (instance->levelMax && instance->levelMax < target->getLevel())
                             return SPELL_FAILED_HIGHLEVEL;
+
+                        /*Difficulty difficulty = m_caster->GetMap()->GetDifficulty();
+                        if (InstancePlayerBind* targetBind = target->GetBoundInstance(mapId, difficulty))
+                            if (InstancePlayerBind* casterBind = caster->GetBoundInstance(mapId, difficulty))
+                                if (targetBind->perm && targetBind->state != casterBind->state)
+                                    return SPELL_FAILED_TARGET_LOCKED_TO_RAID_INSTANCE;*/
                     }
-                    else if (m_caster->ToPlayer()->InBattleGround())
-                        return SPELL_FAILED_NOT_HERE;
                 }
                 break;
             }
@@ -6183,11 +6189,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                 const MapEntry *mapEntry = sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId());
                 if (mapEntry && mapEntry->IsDungeon())
                 {
+                    InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(m_caster->GetMapId());
                     if (m_caster->GetMap() != target->GetMap())
                         return SPELL_FAILED_TARGET_NOT_IN_INSTANCE;
-                    if (mapEntry->levelMin > target->getLevel())
+                    if (instance->levelMin > target->getLevel())
                         return SPELL_FAILED_LOWLEVEL;
-                    if (mapEntry->levelMax && mapEntry->levelMax < target->getLevel())
+                    if (instance->levelMax && instance->levelMax < target->getLevel())
                         return SPELL_FAILED_HIGHLEVEL;
                 }
                 else if (m_caster->ToPlayer()->InBattleGround())

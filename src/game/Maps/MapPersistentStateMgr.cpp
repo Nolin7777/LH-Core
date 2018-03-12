@@ -293,7 +293,7 @@ bool BattleGroundPersistentState::CanBeUnload() const
 
 //== DungeonResetScheduler functions ======================
 
-uint32 DungeonResetScheduler::GetMaxResetTimeFor(MapEntry const* temp)
+uint32 DungeonResetScheduler::GetMaxResetTimeFor(InstanceTemplate const* temp)
 {
     if (!temp)
         return 0;
@@ -301,7 +301,7 @@ uint32 DungeonResetScheduler::GetMaxResetTimeFor(MapEntry const* temp)
     return temp->resetDelay * DAY;
 }
 
-time_t DungeonResetScheduler::CalculateNextResetTime(MapEntry const* temp, time_t prevResetTime)
+time_t DungeonResetScheduler::CalculateNextResetTime(InstanceTemplate const* temp, time_t prevResetTime)
 {
     uint32 diff = sWorld.getConfig(CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR) * HOUR;
     uint32 period = GetMaxResetTimeFor(temp);
@@ -418,6 +418,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
 
     time_t now = time(nullptr);
     time_t today = (now / DAY) * DAY;
+    time_t nextWeek = today + (7 * DAY);
 
     // Reset times have already been updated and set in LoadResetTimes(). We just need to start
     // the initial reset events based on them. Since LoadResetTimes() is called before
@@ -451,41 +452,57 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
     }
 
     uint32 diff = sWorld.getConfig(CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR) * HOUR;
+
     // calculate new global reset times for expired instances and those that have never been reset yet
     // add the global reset times to the priority queue
-    for (auto itr = sMapStorage.begin<MapEntry>(); itr < sMapStorage.end<MapEntry>(); ++itr)
+    for (uint32 i = 0; i < sInstanceTemplate.GetMaxEntry(); i++)
     {
-        // only raid maps have a global reset time
-        if (!itr->IsDungeon() || !itr->resetDelay)
+        InstanceTemplate const* temp = ObjectMgr::GetInstanceTemplate(i);
+        if (!temp)
             continue;
 
-        uint32 period = GetMaxResetTimeFor(*itr);
-        time_t t = GetResetTimeFor(itr->id);
+        // only raid/heroic maps have a global reset time
+        MapEntry const* mapEntry = sMapStore.LookupEntry(temp->map);
+        if (!mapEntry || !mapEntry->IsDungeon() || !mapEntry->HasResetTime())
+            continue;
+
+        uint32 period = GetMaxResetTimeFor(temp);
+        time_t t = GetResetTimeFor(temp->map);
         if (!t)
         {
             // initialize the reset time
-            t = today + period + diff;
-            CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u','" UI64FMTD "')", itr->id, (uint64)t);
+            // generate time by config on first server launch
+            tm localTm = *localtime(&now);
+            localTm.tm_hour = sWorld.getConfig(CONFIG_UINT32_QUEST_DAILY_RESET_HOUR);
+            localTm.tm_min = 0;
+            localTm.tm_sec = 0;
+            if (period > DAY) // resets bigger than 1 day start on config day
+                localTm.tm_mday += ((7 - localTm.tm_wday + sWorld.getConfig(CONFIG_UINT32_ARENA_FIRST_RESET_DAY)) % 7);
+            else // resets day and less start on next day
+                localTm.tm_mday += 1;
+            localTm.tm_isdst = -1;
+            t = mktime(&localTm);
+            CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u','" UI64FMTD "')", temp->map, (uint64)t);
         }
 
-        if (t < now)
+        if (t < now || t > nextWeek)
         {
             // assume that expired instances have already been cleaned
             // calculate the next reset time
             t = (t / DAY) * DAY;
             t += ((today - t) / period + 1) * period + diff;
-            CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '" UI64FMTD "' WHERE mapid = '%u'", (uint64)t, itr->id);
+            CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '" UI64FMTD "' WHERE mapid = '%u'", (uint64)t, temp->map);
         }
 
-        SetResetTimeFor(itr->id, t);
+        SetResetTimeFor(temp->map, t);
 
         // schedule the global reset/warning
         ResetEventType type = RESET_EVENT_INFORM_1;
         for (; type < RESET_EVENT_INFORM_LAST; type = ResetEventType(type + 1))
-            if (t - resetEventTypeDelay[type] > now)
+            if (t > time_t(now + resetEventTypeDelay[type]))
                 break;
 
-        ScheduleReset(true, t - resetEventTypeDelay[type], DungeonResetEvent(type, itr->id, 0));
+        ScheduleReset(true, t - resetEventTypeDelay[type], DungeonResetEvent(type, temp->map, 0));
     }
 }
 
@@ -557,7 +574,7 @@ void DungeonResetScheduler::Update()
             {
                 // re-schedule the next/new global reset/warning
                 // calculate the next reset time
-                MapEntry const* instanceTemplate = sMapStorage.LookupEntry<MapEntry>(event.mapid);
+                InstanceTemplate const* instanceTemplate = ObjectMgr::GetInstanceTemplate(event.mapid);
                 MANGOS_ASSERT(instanceTemplate);
 
                 time_t next_reset = DungeonResetScheduler::CalculateNextResetTime(instanceTemplate, resetTime);
@@ -913,7 +930,8 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 
     if (!warn)
     {
         // this is called one minute before the reset time
-        if (!mapEntry->resetDelay)
+        InstanceTemplate const* temp = ObjectMgr::GetInstanceTemplate(mapid);
+        if (!temp->resetDelay)
         {
             sLog.outError("MapPersistentStateManager::ResetOrWarnAll: no instance template or reset delay for map %d", mapid);
             return;
@@ -943,7 +961,7 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 
         CharacterDatabase.CommitTransaction();
 
         // calculate the next reset time
-        time_t next_reset = DungeonResetScheduler::CalculateNextResetTime(mapEntry, now + timeLeft);
+        time_t next_reset = DungeonResetScheduler::CalculateNextResetTime(temp, now + timeLeft);
         // update it in the DB
         CharacterDatabase.PExecute("UPDATE instance_reset SET resettime = '" UI64FMTD "' WHERE mapid = '%u'", (uint64)next_reset, mapid);
         return;

@@ -153,7 +153,7 @@ struct ChatChannelsEntry
     uint32  ChannelID;                                      // 0        m_ID
     uint32  flags;                                          // 1        m_flags
                                                             // 2        m_factionGroup
-    char*   pattern[8];                                     // 3-10     m_name_lang
+    char*   pattern[16];                                    // 3-10     m_name_lang
                                                             // 11 string flags
     //char*       name[8];                                  // 12-19    m_shortcut_lang
                                                             // 20 string flag
@@ -166,7 +166,7 @@ struct ChrClassesEntry
     //uint32 flags;                                         // 2 unknown
     uint32  powerType;                                      // 3        m_DisplayPower
                                                             // 4        m_petNameToken
-    char const* name[8];                                    // 5-12     m_name_lang
+    char const* name[16];                                    // 5-12     m_name_lang
                                                             // 13 string flags
                                                             // 14       m_filename
     uint32  spellfamily;                                    // 15       m_spellClassSet
@@ -185,17 +185,19 @@ struct ChrRacesEntry
                                                             // 7        unused
     uint32      TeamID;                                     // 8        m_BaseLanguage (7-Alliance 1-Horde)
                                                             // 9        m_creatureType
-                                                            // 10       unused, all 836
-                                                            // 11       unused, all 1604
-                                                            // 12       m_ResSicknessSpellID
-                                                            // 13       m_SplashSoundID
-    uint32      startingTaxiMask;                           // 14
-                                                            // 15       m_clientFileString
-    uint32      CinematicSequence;                          // 16       m_cinematicSequenceID
-    char*       name[8];                                    // 17-24    m_name_lang used for DBC language detection/selection
-                                                            // 25 string flags
-                                                            // 26-27    m_facialHairCustomization[2]
-                                                            // 28       m_hairCustomization
+                                                            // 10       m_ResSicknessSpellID
+                                                            // 11       m_SplashSoundID
+                                                            // 12       m_clientFileString
+    uint32      CinematicSequence;                          // 13       m_cinematicSequenceID
+    char*       name[16];                                   // 14-29    m_name_lang used for DBC language detection/selection
+                                                            // 30 string flags
+                                                            // char*       nameFemale[16];                          // 31-46    m_name_female_lang
+                                                            // 47 string flags
+                                                            // char*       nameNeutralGender[16];                   // 48-63    m_name_male_lang
+                                                            // 64 string flags
+                                                            // 65-66    m_facialHairCustomization[2]
+                                                            // 67       m_hairCustomization
+    uint32      expansion;                                  // 68       m_required_expansion
 };
 
 /*struct CinematicCameraEntry
@@ -216,7 +218,7 @@ struct CinematicSequencesEntry
     //uint32      cinematicCamera;                          // 2        m_camera[8]
 };
 
-struct CreatureDisplayInfoEntry
+/*struct CreatureDisplayInfoEntry
 {
     uint32      Displayid;                                  // 0        m_ID
     uint32      ModelId;                                    // 1        m_modelID
@@ -228,6 +230,22 @@ struct CreatureDisplayInfoEntry
                                                             // 9        m_portraitTextureName
                                                             // 10       m_bloodID
                                                             // 11       m_NPCSoundID
+};*/
+
+struct CreatureDisplayInfoEntry
+{
+    uint32      Displayid;                                  // 0        m_ID
+    uint32      ModelId;                                    // 1        m_modelID
+                                                            // 2        m_soundID
+    uint32      ExtendedDisplayInfoID;                      // 3        m_extendedDisplayInfoID -> CreatureDisplayInfoExtraEntry::DisplayExtraId
+    float       scale;                                      // 4        m_creatureModelScale
+                                                            // 5        m_creatureModelAlpha
+                                                            // 6-8      m_textureVariation[3]
+                                                            // 9        m_portraitTextureName
+                                                            // 10       m_sizeClass
+                                                            // 11       m_bloodID
+                                                            // 12       m_NPCSoundID
+                                                            // 13       m_particleColorID
 };
 
 struct CreatureDisplayInfoExtraEntry
@@ -273,7 +291,7 @@ struct CreatureFamilyEntry
     uint32    maxScaleLevel;                                // 4 0/60
     uint32    skillLine[2];                                 // 5-6
     uint32    petFoodMask;                                  // 7
-    char*     Name[8];
+    char*     Name[16];
 };
 
 #define MAX_CREATURE_SPELL_DATA_SLOT 4
@@ -291,6 +309,18 @@ struct CreatureTypeEntry
     //char*   Name[8];                                      // 1-8      m_name_lang
                                                             // 9 string flags
     //uint32    no_expirience;                              // 10       m_flags
+};
+
+struct DungeonEncounterEntry
+{
+    uint32 Id;                                              // 0        m_ID
+    uint32 mapId;                                           // 1        m_mapID
+    uint32 Difficulty;                                      // 2        m_difficulty
+    uint32 encounterData;                                   // 3        m_orderIndex
+    uint32 encounterIndex;                                  // 4        m_Bit
+    char*  encounterName[16];                               // 5-20     m_name_lang
+    uint32 nameLangFlags;                                   // 21       m_name_lang_flags
+    uint32 spellIconID;                                     // 22       m_spellIconID
 };
 
 struct DurabilityCostsEntry
@@ -333,7 +363,7 @@ struct FactionEntry
     int32       BaseRepValue[4];                            // 10-13    m_reputationBase
     uint32      ReputationFlags[4];                         // 14-17    m_reputationFlags
     uint32      team;                                       // 18       m_parentFactionID
-    char*       name[8];                                    // 19-26    m_name_lang
+    char*       name[16];                                   // 19-26    m_name_lang
                                                             // 27 string flags
     //char*     description[8];                             // 28-35    m_description_lang
                                                             // 36 string flags
@@ -410,9 +440,15 @@ struct FactionTemplateEntry
 
 struct GameObjectDisplayInfoEntry
 {
-    uint32      Displayid;                                  // 0        m_ID
-    char* filename;                                         // 1        m_modelName
-                                                            // 2-11     m_Sound
+    uint32 Displayid;                                       // 0 m_ID
+    char* filename;                                         // 1 m_modelName
+    // uint32 unknown2[10];                                 // 2-11 m_Sound
+    float geoBoxMinX;                                       // 12 m_geoBoxMinX (use first value as interact dist, mostly in hacks way)
+    float geoBoxMinY;                                       // 13 m_geoBoxMinY
+    float geoBoxMinZ;                                       // 14 m_geoBoxMinZ
+    float geoBoxMaxX;                                       // 15 m_geoBoxMaxX
+    float geoBoxMaxY;                                       // 16 m_geoBoxMaxY
+    float geoBoxMaxZ;                                       // 17 m_geoBoxMaxZ
 };
 
 struct GemPropertiesEntry
@@ -523,11 +559,11 @@ struct ItemDisplayInfoEntry
 struct ItemRandomPropertiesEntry
 {
     uint32    ID;                                           // 0        m_ID
-    char*     internalName;                                 // 1        m_Name
+    char*     internalName;                                 // char*     internalName                               // 1        m_Name
     uint32    enchant_id[3];                                // 2-4      m_Enchantment
                                                             // 5-6 unused, 0 only values, reserved for additional enchantments
-    char*     nameSuffix[8];                                // 7-14     m_name_lang
-                                                            // 15 string flags
+    char*     nameSuffix[16];                               // 7-22     m_name_lang
+                                                            // 23 string flags
 };
 
 struct ItemRandomSuffixEntry
@@ -542,14 +578,14 @@ struct ItemRandomSuffixEntry
 
 struct ItemSetEntry
 {
-    //uint32    id                                          // 0        m_ID
-    char*     name[8];                                      // 1-8      m_name_lang
-                                                            // 9 string flags
-    //uint32    itemId[17];                                 // 10-26    m_itemID
-    uint32    spells[8];                                    // 27-34    m_setSpellID
-    uint32    items_to_triggerspell[8];                     // 35-42    m_setThreshold
-    uint32    required_skill_id;                            // 43       m_requiredSkill
-    uint32    required_skill_value;                         // 44       m_requiredSkillRank
+    // uint32    id                                         // 0        m_ID
+    char*     name[16];                                     // 1-16     m_name_lang
+    // 17 string flags
+    // uint32    itemId[17];                                // 18-34    m_itemID
+    uint32    spells[8];                                    // 35-42    m_setSpellID
+    uint32    items_to_triggerspell[8];                     // 43-50    m_setThreshold
+    uint32    required_skill_id;                            // 51       m_requiredSkill
+    uint32    required_skill_value;                         // 52       m_requiredSkillRank
 };
 
 struct LiquidTypeEntry
@@ -574,8 +610,9 @@ struct LockEntry
 struct MailTemplateEntry
 {
     uint32      ID;                                         // 0        m_ID
-    //char*       subject[8];                               // 1-8      m_subject_lang
-                                                            // 9 string flags
+    // char*       subject[16];                             // 1-16     m_subject_lang
+    // 17 string flags
+    char*       content[16];                                // 18-33    m_body_lang
 };
 
 /*

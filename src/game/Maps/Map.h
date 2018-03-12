@@ -83,6 +83,20 @@ namespace VMAP
 #pragma pack(push,1)
 #endif
 
+struct InstanceTemplate
+{
+    uint32 map;                                             // instance map
+    uint32 parent;                                          // non-continent parent instance (for instance with entrance in another instances)
+                                                            // or 0 (not related to continent 0 map id)
+    uint32 levelMin;
+    uint32 levelMax;
+    uint32 maxPlayers;
+    uint32 resetDelay;                                     // in days
+    uint32 script_id;
+    bool   mountAllowed;
+};
+
+/*
 struct MapEntry
 {
     uint32 id;
@@ -118,6 +132,59 @@ struct MapEntry
     bool IsMountAllowed() const { return !IsDungeon() || id == 309 || id == 209 || id == 509 || id == 269; }
     bool SupportsHeroicMode() const { return resetTimeHeroic && !resetTimeRaid; }
     bool HasResetTime() const { return resetTimeHeroic || resetTimeRaid; }
+    bool IsContinent() const
+    {
+        return id == 0 || id == 1 || id == 530;
+    }
+};*/
+
+struct MapEntry
+{
+    uint32  id;                                             // 0        m_ID
+                                                            // char*       internalname;                            // 1        m_Directory
+    uint32  mapType;                                        // 2        m_InstanceType
+                                                            // uint32 isPvP;                                        // 3        m_PVP 0 or 1 for battlegrounds (not arenas)
+    char*   name;                                           // 4-19     m_MapName_lang
+                                                            // 20 string flags
+                                                            // 21-23 unused (something PvPZone related - levels?)
+                                                            // 24-26
+    uint32  linkedZone;                                     // 27       m_areaTableID
+                                                            // char*     hordeIntro[16];                            // 28-43    m_MapDescription0_lang
+                                                            // 44 string flags
+                                                            // char*     allianceIntro[16];                         // 45-60    m_MapDescription1_lang
+                                                            // 61 string flags
+    uint32  multimap_id;                                    // 62       m_LoadingScreenID (LoadingScreens.dbc)
+                                                            // 63-64 not used
+                                                            // float   BattlefieldMapIconScale;                     // 65       m_minimapIconScale
+                                                            // chat*     unknownText1                               // 66-81 unknown empty text fields, possible normal Intro text.
+                                                            // 82 text flags
+                                                            // chat*     heroicIntroText                            // 83-98 heroic mode requirement text
+                                                            // 99 text flags
+                                                            // chat*     unknownText2                               // 100-115 unknown empty text fields
+                                                            // 116 text flags
+    int32   ghostEntranceMap;                               // 117      m_corpseMapID map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
+    float   ghostEntranceX;                                 // 118      m_corpseX entrance x coordinate in ghost mode  (in most cases = normal entrance)
+    float   ghostEntranceY;                                 // 119      m_corpseY entrance y coordinate in ghost mode  (in most cases = normal entrance)
+    uint32 resetTimeRaid;                                   // 120
+    uint32 resetTimeHeroic;                                 // 121
+                                                            // 122      all 0
+                                                            // uint32  timeOfDayOverride;                           // 123      m_timeOfDayOverride
+    uint32  addon;                                          // 124      m_expansionID
+
+                                                            // Helpers
+    uint32 Expansion() const { return addon; }
+
+    bool IsDungeon() const { return mapType == MAP_INSTANCE || mapType == MAP_RAID; }
+    bool IsNonRaidDungeon() const { return mapType == MAP_INSTANCE; }
+    bool Instanceable() const { return mapType == MAP_INSTANCE || mapType == MAP_RAID || mapType == MAP_BATTLEGROUND || mapType == MAP_ARENA; }
+    bool IsRaid() const { return mapType == MAP_RAID; }
+    bool IsBattleGround() const { return mapType == MAP_BATTLEGROUND; }
+    bool IsBattleArena() const { return mapType == MAP_ARENA; }
+    bool IsBattleGroundOrArena() const { return mapType == MAP_BATTLEGROUND || mapType == MAP_ARENA; }
+    bool IsMountAllowed() const { return !IsDungeon() || id == 309 || id == 209 || id == 509 || id == 269; }
+    bool SupportsHeroicMode() const { return resetTimeHeroic && !resetTimeRaid; }
+    bool HasResetTime() const { return resetTimeHeroic || resetTimeRaid; }
+
     bool IsContinent() const
     {
         return id == 0 || id == 1 || id == 530;

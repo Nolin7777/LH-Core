@@ -38,6 +38,7 @@
 #include "Map.h"
 
 struct MapEntry;
+struct InstanceTemplates;
 struct GameObjectData;
 struct CreatureData;
 
@@ -288,8 +289,8 @@ class DungeonResetScheduler
     public:                                                 // accessors
         time_t GetResetTimeFor(uint32 mapid) { return m_resetTimeByMapId[mapid]; }
 
-        static uint32 GetMaxResetTimeFor(MapEntry const* temp);
-        static time_t CalculateNextResetTime(MapEntry const* temp, time_t prevResetTime);
+        static uint32 GetMaxResetTimeFor(InstanceTemplate const* temp);
+        static time_t CalculateNextResetTime(InstanceTemplate const* temp, time_t prevResetTime);
     public:                                                 // modifiers
         void SetResetTimeFor(uint32 mapid, time_t t)
         {

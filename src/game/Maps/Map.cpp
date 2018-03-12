@@ -1679,10 +1679,11 @@ void Map::CreateInstanceData(bool load)
     if (i_data)
         return;
 
-    if (!i_mapEntry->scriptId)
-        return;
-
-    i_script_id = i_mapEntry->scriptId;
+    if (Instanceable())
+    {
+        if (InstanceTemplate const* mInstance = ObjectMgr::GetInstanceTemplate(GetId()))
+            i_script_id = mInstance->script_id;
+    }
 
     i_data = sScriptMgr.CreateInstanceData(this);
     if (!i_data)
@@ -2082,7 +2083,10 @@ void DungeonMap::SetResetSchedule(bool on)
 
 uint32 DungeonMap::GetMaxPlayers() const
 {
-    return i_mapEntry->maxPlayers;
+    InstanceTemplate const* iTemplate = ObjectMgr::GetInstanceTemplate(GetId());
+    if (!iTemplate)
+        return 0;
+    return iTemplate->maxPlayers;
 }
 
 DungeonPersistentState* DungeonMap::GetPersistanceState() const

@@ -862,8 +862,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
                 if (instance_map == targetMapEntry->id)
                     break;
 
-                MapEntry const* instance = sMapStorage.LookupEntry<MapEntry>(instance_map);
-                instance_map = instance && instance->IsDungeon() ? instance->parent : 0;
+                InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(instance_map);
+                instance_map = instance ? instance->parent : 0;
             }
             while (instance_map);
 

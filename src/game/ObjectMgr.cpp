@@ -4727,21 +4727,26 @@ struct SQLMapLoader : public SQLStorageLoaderBase<SQLMapLoader, SQLStorage>
     }
 };
 
+/*
 void ObjectMgr::LoadMapTemplate()
 {
     SQLMapLoader loader;
     loader.LoadProgressive(sMapStorage, sWorld.GetWowPatch());
 
-    for (auto itr = sMapStorage.begin<MapEntry>(); itr < sMapStorage.end<MapEntry>(); ++itr)
+    for (uint32 i = 0; i < sInstanceTemplate.GetMaxEntry(); ++i)
     {
-        if (itr->IsDungeon() && itr->parent > 0)
+        InstanceTemplate const* temp = GetInstanceTemplate(i);
+        if (!temp)
+            continue;
+
+        if (temp->IsDungeon() && temp->parent > 0)
         {
             // check existence
             MapEntry const* parentEntry = sMapStorage.LookupEntry<MapEntry>(itr->parent);
             if (!parentEntry)
             {
                 sLog.outErrorDb("ObjectMgr::LoadMapTemplate: bad parent map id %u for instance template %u template!",
-                    itr->parent, itr->id);
+                    temp->parent, itr->id);
                 const_cast<MapEntry*>(*itr)->parent = 0;
                 continue;
             }
@@ -4787,6 +4792,162 @@ void ObjectMgr::LoadMapTemplate()
     }
 
     sLog.outString(">> Loaded %u Map Template definitions", sMapStorage.GetRecordCount());
+    sLog.outString();
+}*/
+
+InstanceTemplate const* ObjectMgr::GetInstanceTemplate(uint32 map)
+{
+    return sInstanceTemplate.LookupEntry<InstanceTemplate>(map);
+}
+
+void ObjectMgr::LoadInstanceEncounters()
+{
+    m_DungeonEncounters.clear();         // need for reload case
+
+    QueryResult* result = WorldDatabase.Query("SELECT entry, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString(">> Loaded 0 Instance Encounters. DB table `instance_encounters` is empty.");
+        sLog.outString();
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        DungeonEncounterEntry const* dungeonEncounter = sDungeonEncounterStore.LookupEntry<DungeonEncounterEntry>(entry);
+
+        if (!dungeonEncounter)
+        {
+            sLog.outErrorDb("Table `instance_encounters` has an invalid encounter id %u, skipped!", entry);
+            continue;
+        }
+
+        uint8 creditType = fields[1].GetUInt8();
+        uint32 creditEntry = fields[2].GetUInt32();
+        switch (creditType)
+        {
+        case ENCOUNTER_CREDIT_KILL_CREATURE:
+        {
+            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creditEntry);
+            if (!cInfo)
+            {
+                sLog.outErrorDb("Table `instance_encounters` has an invalid creature (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                continue;
+            }
+            break;
+        }
+        /*case ENCOUNTER_CREDIT_CAST_SPELL:
+        {
+            if (!sSpellTemplate.LookupEntry<SpellEntry>(creditEntry))
+            {
+                // skip spells that aren't in dbc for now
+                // sLog.outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                continue;
+            }
+            break;
+        }*/
+        default:
+            sLog.outErrorDb("Table `instance_encounters` has an invalid credit type (%u) for encounter %u (%s), skipped!", creditType, entry, dungeonEncounter->encounterName[0]);
+            continue;
+        }
+        uint32 lastEncounterDungeon = fields[3].GetUInt32();
+
+        m_DungeonEncounters.insert(DungeonEncounterMap::value_type(creditEntry, new DungeonEncounter(dungeonEncounter, EncounterCreditType(creditType), creditEntry, lastEncounterDungeon)));
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString(">> Loaded " SIZEFMTD " Instance Encounters", m_DungeonEncounters.size());
+    sLog.outString();
+}
+
+struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader, SQLStorage>
+{
+    template<class D>
+    void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
+    {
+        dst = D(sScriptMgr.GetScriptId(src));
+    }
+};
+
+void ObjectMgr::LoadInstanceTemplate()
+{
+    SQLInstanceLoader loader;
+    loader.Load(sInstanceTemplate);
+    //loader.LoadProgressive(sInstanceTemplate, sWorld.GetWowPatch());
+
+    for (uint32 i = 0; i < sInstanceTemplate.GetMaxEntry(); ++i)
+    {
+        InstanceTemplate const* temp = GetInstanceTemplate(i);
+        if (!temp)
+            continue;
+
+        MapEntry const* mapEntry = sMapStore.LookupEntry(temp->map);
+        if (!mapEntry)
+        {
+            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", temp->map);
+            sInstanceTemplate.EraseEntry(i);
+            continue;
+        }
+
+        if (!mapEntry->Instanceable())
+        {
+            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: non-instanceable mapid %d for template!", temp->map);
+            sInstanceTemplate.EraseEntry(i);
+            continue;
+        }
+
+        if (temp->parent > 0)
+        {
+            // check existence
+            MapEntry const* parentEntry = sMapStore.LookupEntry(temp->parent);
+            if (!parentEntry)
+            {
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id %u for instance template %d template!",
+                    temp->parent, temp->map);
+                const_cast<InstanceTemplate*>(temp)->parent = 0;
+                continue;
+            }
+
+            if (parentEntry->IsContinent())
+            {
+                sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: parent point to continent map id %u for instance template %d template, ignored, need be set only for non-continent parents!",
+                    parentEntry->id, temp->map);
+                const_cast<InstanceTemplate*>(temp)->parent = 0;
+                continue;
+            }
+        }
+
+        if (mapEntry->HasResetTime())
+        {
+            if (temp->resetDelay == 0)
+            {
+                // use defaults from the DBC
+                if (mapEntry->SupportsHeroicMode())
+                {
+                    const_cast<InstanceTemplate*>(temp)->resetDelay = mapEntry->resetTimeHeroic / DAY;
+                }
+                else if (mapEntry->resetTimeRaid && mapEntry->mapType == MAP_RAID)
+                {
+                    const_cast<InstanceTemplate*>(temp)->resetDelay = mapEntry->resetTimeRaid / DAY;
+                }
+            }
+
+            // the reset_delay must be at least one day
+            const_cast<InstanceTemplate*>(temp)->resetDelay = std::max((uint32)1, (uint32)(temp->resetDelay * sWorld.getConfig(CONFIG_FLOAT_RATE_INSTANCE_RESET_TIME)));
+        }
+    }
+
+    sLog.outString(">> Loaded %u Instance Template definitions", sInstanceTemplate.GetRecordCount());
     sLog.outString();
 }
 

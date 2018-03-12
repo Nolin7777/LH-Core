@@ -155,8 +155,8 @@ void PlayerTaxi::InitTaxiNodes(uint32 race, uint32 level)
 {
     memset(m_taximask, 0, sizeof(m_taximask));
     // capital and taxi hub masks
-    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
-    m_taximask[0] = rEntry->startingTaxiMask;
+    /*ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
+    m_taximask[0] = rEntry->startingTaxiMask;*/
 }
 
 void PlayerTaxi::LoadTaxiMask(const char* data)

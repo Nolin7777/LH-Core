@@ -52,6 +52,7 @@
 #include "InstanceData.h"
 #include "CharacterDatabaseCache.h"
 #include "HardcodedEvents.h"
+#include "Map.h"
 
 #include <limits>
 
@@ -4891,7 +4892,7 @@ void ObjectMgr::LoadInstanceTemplate()
         if (!temp)
             continue;
 
-        MapEntry const* mapEntry = sMapStore.LookupEntry(temp->map);
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(temp->map);
         if (!mapEntry)
         {
             sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad mapid %d for template!", temp->map);
@@ -4909,7 +4910,7 @@ void ObjectMgr::LoadInstanceTemplate()
         if (temp->parent > 0)
         {
             // check existence
-            MapEntry const* parentEntry = sMapStore.LookupEntry(temp->parent);
+            MapEntry const* parentEntry = sMapStorage.LookupEntry<MapEntry>(temp->parent);
             if (!parentEntry)
             {
                 sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id %u for instance template %d template!",

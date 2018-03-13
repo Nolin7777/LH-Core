@@ -127,6 +127,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     uint32 serverId;
     uint32 BuiltNumberClient;
     uint32 id, security;
+    uint8 expansion;
     LocaleConstant locale;
     std::string account, os;
     BigNumber v, s, g, N, K;
@@ -136,7 +137,6 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> BuiltNumberClient;
     recvPacket >> serverId;
     recvPacket >> account;
-
     recvPacket >> clientSeed;
     recvPacket.read(digest, 20);
 
@@ -180,6 +180,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     Field* fields = result->Fetch();
+
+    //expansion = ((sWorld.getConfig(CONFIG_UINT32_EXPANSION) > fields[7].GetUInt8()) ? fields[7].GetUInt8() : sWorld.getConfig(CONFIG_UINT32_EXPANSION));
+    expansion = 1;
 
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -309,17 +312,17 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
-    ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), mutetime, locale), -1);
+    ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), expansion, mutetime, locale), -1);
 
     m_Crypt.SetKey(K.AsByteArray());
     m_Crypt.Init();
 
-    m_Session->SetUsername(account);
+    /*m_Session->SetUsername(account);
     m_Session->SetGameBuild(BuiltNumberClient);
     m_Session->SetAccountFlags(accFlags);
-    m_Session->SetOS(clientOs);
+    m_Session->SetOS(clientOs);*/
     m_Session->LoadTutorialsData();
-    m_Session->InitWarden(&K);
+    //m_Session->InitWarden(&K);
 
     // In case needed sometime the second arg is in microseconds 1 000 000 = 1 sec
     ACE_OS::sleep(ACE_Time_Value(0, 10000));
@@ -404,7 +407,7 @@ int WorldSocket::OnSocketOpen()
 int WorldSocket::SendStartupPacket()
 {
     // Send startup packet.
-    WorldPacket packet(SMSG_AUTH_CHALLENGE, 4);
+    WorldPacket packet(SMSG_AUTH_CHALLENGE, 40);
     packet << m_Seed;
 
     return SendPacket(packet);

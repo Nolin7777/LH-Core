@@ -36,6 +36,7 @@
 #include "Group.h"
 #include "InstanceData.h"
 #include "ProgressBar.h"
+#include "Map.h"
 
 INSTANTIATE_SINGLETON_1(MapPersistentStateManager);
 
@@ -462,7 +463,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
             continue;
 
         // only raid/heroic maps have a global reset time
-        MapEntry const* mapEntry = sMapStore.LookupEntry(temp->map);
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(temp->map);
         if (!mapEntry || !mapEntry->IsDungeon() || !mapEntry->HasResetTime())
             continue;
 

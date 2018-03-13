@@ -781,12 +781,18 @@ struct SpellRangeEntry
 struct SpellShapeshiftFormEntry
 {
     uint32 ID;                                              // 0        m_ID
-    //uint32 buttonPosition;                                // 1        m_bonusActionBar
-    //char*  Name[8];                                       // 2-9      m_name_lang
-    //uint32 NameFlags;                                     // 10 string flags
-    uint32 flags1;                                          // 11       m_flags
-    int32  creatureType;                                    // 12       m_creatureType <=0 humanoid, other normal creature types
-    //uint32 unk1;                                          // 13       m_attackIconID
+    // uint32 buttonPosition;                               // 1        m_bonusActionBar
+    // char*  Name[16];                                     // 2-17     m_name_lang
+    // uint32 NameFlags;                                    // 18 string flags
+    uint32 flags1;                                          // 19       m_flags
+    int32  creatureType;                                    // 20       m_creatureType <=0 humanoid, other normal creature types
+    // uint32 unk1;                                         // 21       m_attackIconID
+    uint32 attackSpeed;                                     // 22       m_combatRoundTime
+    uint32 modelID_A;                                       // 23       m_creatureDisplayID[4]
+    // uint32 modelID_H;                                    // 24 horde modelid (but all 0)
+    // uint32 unk3;                                         // 25 unused always 0
+    // uint32 unk4;                                         // 26 unused always 0
+    uint32 spellId[8];                                      // 27-34    m_presetSpellID[8]
 };
 
 struct SpellDurationEntry
@@ -795,7 +801,7 @@ struct SpellDurationEntry
     int32     Duration[3];                                  //          m_duration, m_durationPerLevel, m_maxDuration
 };
 
-struct SpellItemEnchantmentEntry
+/*struct SpellItemEnchantmentEntry
 {
     uint32      ID;                                         // 0        m_ID
     uint32      type[3];                                    // 1-3      m_effect[3]
@@ -806,6 +812,21 @@ struct SpellItemEnchantmentEntry
                                                             // 21 string flags
     uint32      aura_id;                                    // 22       m_itemVisual
     uint32      slot;                                       // 23       m_flags
+};*/
+
+struct SpellItemEnchantmentEntry
+{
+    uint32      ID;                                         // 0        m_ID
+    uint32      type[3];                                    // 1-3      m_effect[3]
+    uint32      amount[3];                                  // 4-6      m_effectPointsMin[3]
+                                                            // uint32      amount2[3]                               // 7-9      m_effectPointsMax[3]
+    uint32      spellid[3];                                 // 10-12    m_effectArg[3]
+    char*       description[16];                            // 13-28    m_name_lang[16]
+                                                            // uint32      descriptionFlags;                        // 29 string flags
+    uint32      aura_id;                                    // 30       m_itemVisual
+    uint32      slot;                                       // 31       m_flags
+    uint32      GemID;                                      // 32       m_src_itemID
+    uint32      EnchantmentCondition;                       // 33       m_condition_id
 };
 
 struct SpellItemEnchantmentConditionEntry
@@ -871,9 +892,9 @@ struct TaxiNodesEntry
     float     x;                                            // 2        m_x
     float     y;                                            // 3        m_y
     float     z;                                            // 4        m_z
-    char*     name[8];                                      // 5-12     m_Name_lang
-                                                            // 13 string flags
-    uint32    MountCreatureID[2];                           // 14-15    m_MountCreatureID[2] horde[14]-alliance[15]
+    char*     name[16];                                     // 5-21     m_Name_lang
+                                                            // 22 string flags
+    uint32    MountCreatureID[2];                           // 23-24    m_MountCreatureID[2]
 };
 
 struct TaxiPathEntry
@@ -886,7 +907,7 @@ struct TaxiPathEntry
 
 struct TaxiPathNodeEntry
 {
-                                                            // 0        m_ID
+    // 0        m_ID
     uint32    path;                                         // 1        m_PathID
     uint32    index;                                        // 2        m_NodeIndex
     uint32    mapid;                                        // 3        m_ContinentID
@@ -895,6 +916,8 @@ struct TaxiPathNodeEntry
     float     z;                                            // 6        m_LocZ
     uint32    actionFlag;                                   // 7        m_flags
     uint32    delay;                                        // 8        m_delay
+    uint32    arrivalEventID;                               // 9        m_arrivalEventID
+    uint32    departureEventID;                             // 10       m_departureEventID
 };
 
 struct TotemCategoryEntry

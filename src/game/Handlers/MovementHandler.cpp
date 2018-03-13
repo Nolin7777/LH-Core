@@ -39,7 +39,6 @@
 #include "MoveSpline.h"
 #include "MovementBroadcaster.h"
 
-
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recv_data*/)
 {
     DEBUG_LOG("WORLD: got MSG_MOVE_WORLDPORT_ACK.");
@@ -144,7 +143,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->SetSemaphoreTeleportFar(false);
 
     // get the destination map entry, not the current one, this will fix homebind and reset greeting
-    MapEntry const* mEntry2 = sMapStore.LookupEntry(loc.mapid);
     Map* pMap = nullptr;
 
     // battleground state prepare (in case join to BG), at relogin/tele player not invited

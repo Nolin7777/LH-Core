@@ -1260,11 +1260,11 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Game Object Templates...");     // must be after LoadPageTexts
     sObjectMgr.LoadGameobjectInfo();
 
-    if (!isMapServer)
+    /*if (!isMapServer)
     {
         sLog.outString("Loading Transport templates...");
         sTransportMgr->LoadTransportTemplates();
-    }
+    }*/
 
     sLog.outString("Loading Spell Chain Data...");
     sSpellMgr.LoadSpellChains();

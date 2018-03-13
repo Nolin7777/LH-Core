@@ -862,6 +862,15 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
         void SetResetSchedule(bool on);
         uint32 GetMaxPlayers() const;
 
+        bool Instanceable() const { return i_mapEntry && i_mapEntry->Instanceable(); }
+        bool IsDungeon() const { return i_mapEntry && i_mapEntry->IsDungeon(); }
+        bool IsRaid() const { return i_mapEntry && i_mapEntry->IsRaid(); }
+        bool IsRaidOrHeroicDungeon() const { return IsRaid() || GetDifficulty() > DUNGEON_DIFFICULTY_NORMAL; }
+        bool IsBattleGround() const { return i_mapEntry && i_mapEntry->IsBattleGround(); }
+        bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
+        bool IsBattleGroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattleGroundOrArena(); }
+        bool IsContinent() const { return i_mapEntry && i_mapEntry->IsContinent(); }
+
         // can't be NULL for loaded map
         DungeonPersistentState* GetPersistanceState() const;
 

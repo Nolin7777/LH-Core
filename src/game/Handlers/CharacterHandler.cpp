@@ -436,6 +436,12 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
             _accountId, playerGuid.GetCounter(), playerGuid.GetRawValue(), time(nullptr));
     }
 
+    if (playerGuid.GetRawValue() > playerGuid.GetCounter() && _accountFlags & ACCOUNT_FLAG_DEBUG_LOGIN)
+    {
+        sLog.outInfo("Account %u login opcode. Invalid GUID", _accountId);
+        return;
+    }
+
     DEBUG_LOG("WORLD: Recvd Player Logon Message");
 
     LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);

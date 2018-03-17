@@ -191,7 +191,8 @@ extern int main(int argc, char **argv)
         "        MM  MMM http://getmangos.com\n"
         "        MMMMMM\n\n");
     sLog.outString("Light's Hope : https://lightshope.org/");
-    sLog.outString("The Burning Crusade Edition");
+    sLog.outString("Expansion: The Burning Crusade");
+    sLog.outString("https://github.com/Kittnz/server/tree/tbc");
     sLog.outString("Using configuration file %s.", cfg_file);
 
 #define STR(s) #s

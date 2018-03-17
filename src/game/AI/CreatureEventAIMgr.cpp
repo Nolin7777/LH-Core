@@ -260,7 +260,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         case SPAWNED_EVENT_ALWAY:
                             break;
                         case SPAWNED_EVENT_MAP:
-                            if (!sMapStorage.LookupEntry<MapEntry>(temp.spawned.conditionValue1))
+                            if (!sMapStore.LookupEntry(temp.spawned.conditionValue1))
                                 sLog.outErrorDb("CreatureEventAI:  Creature %u are using spawned event(%u) with param1 = %u 'map specific' but map (param2: %u) does not exist. Event will never repeat.", temp.creature_id, i, temp.spawned.condition, temp.spawned.conditionValue1);
                             break;
                         case SPAWNED_EVENT_ZONE:

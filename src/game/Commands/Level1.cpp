@@ -297,7 +297,8 @@ bool ChatHandler::HandleGPSCommand(char* args)
     uint32 zone_id, area_id;
     obj->GetZoneAndAreaId(zone_id, area_id);
 
-    MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(obj->GetMapId());
+    MapEntry const* mapEntry = sMapStore.LookupEntry(obj->GetMapId());
+
     const auto *zoneEntry = AreaEntry::GetById(zone_id);
     const auto *areaEntry = AreaEntry::GetById(area_id);
 
@@ -2159,14 +2160,14 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
     // update to parent zone if exist (client map show only zones without parents)
     const auto *zoneEntry = !areaEntry->IsZone() ? AreaEntry::GetById(areaEntry->ZoneId) : areaEntry;
 
-    MapEntry const *mapEntry = sMapStorage.LookupEntry<MapEntry>(zoneEntry->MapId);
+    MapEntry const* mapEntry = sMapStore.LookupEntry(zoneEntry->MapId);
 
     std::string areaName = areaEntry->Name;
     sObjectMgr.GetAreaLocaleString(areaEntry->Id, GetSessionDbLocaleIndex(), &areaName);
     if (mapEntry->Instanceable())
     {
         PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->Id, areaName.c_str(),
-                        mapEntry->id, mapEntry->name);
+                        mapEntry->MapID, mapEntry->name);
         SetSentErrorMessage(true);
         return false;
     }
@@ -2174,12 +2175,12 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
     if (!Zone2MapCoordinates(x, y, zoneEntry->Id))
     {
         PSendSysMessage(LANG_INVALID_ZONE_MAP, areaEntry->Id, areaName.c_str(),
-                        mapEntry->id, mapEntry->name);
+                        mapEntry->MapID, mapEntry->name);
         SetSentErrorMessage(true);
         return false;
     }
 
-    return HandleGoHelper(_player, mapEntry->id, x, y);
+    return HandleGoHelper(_player, mapEntry->MapID, x, y);
 }
 
 //teleport to grid

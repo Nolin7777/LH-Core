@@ -55,21 +55,23 @@ MapManager::~MapManager()
     DeleteStateMachine();
 }
 
-void
-MapManager::Initialize()
+void MapManager::Initialize()
 {
     InitStateMachine();
     InitMaxInstanceId();
-    for (auto itr = sMapStorage.begin<MapEntry>(); itr < sMapStorage.end<MapEntry>(); ++itr)
+    
+    for (uint32 i = 1; i < sMapStore.GetNumRows(); ++i)
     {
+        MapEntry const* mEntry = sMapStore.LookupEntry(i);
+
         bool load = false;
-        if (itr->IsContinent() && sWorld.getConfig(CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS))
+        if (mEntry->IsContinent() && sWorld.getConfig(CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS))
             load = true;
-        if (itr->Instanceable() && sWorld.getConfig(CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES))
+        if (mEntry->Instanceable() && sWorld.getConfig(CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES))
             load = true;
         if (!load)
             continue;
-        TerrainInfo* terrain = sTerrainMgr.LoadTerrain(itr->id);
+        TerrainInfo* terrain = sTerrainMgr.LoadTerrain(mEntry->MapID);
         terrain->AddRef(); // So it won't be deleted
         terrain->LoadAll();
     }
@@ -114,7 +116,7 @@ Map* MapManager::CreateMap(uint32 id, const WorldObject* obj)
 
     Map * m = NULL;
 
-    const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(id);
+    const MapEntry* entry = sMapStore.LookupEntry(id);
     if (!entry)
         return NULL;
 
@@ -175,7 +177,7 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 */
 bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
 {
-    const MapEntry *entry = sMapStorage.LookupEntry<MapEntry>(mapid);
+    const MapEntry *entry = sMapStore.LookupEntry(mapid);
     if (!entry)
         return false;
 
@@ -424,7 +426,7 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 
 bool MapManager::IsValidMAP(uint32 mapid)
 {
-    return sMapStorage.LookupEntry<MapEntry>(mapid);
+    return sMapStore.LookupEntry(mapid);
 }
 
 void MapManager::UnloadAll()
@@ -494,7 +496,7 @@ Map* MapManager::CreateInstance(uint32 id, Player * player)
     Map * pNewMap = NULL;
     uint32 NewInstanceId = 0;                                   // instanceId of the resulting map
     bool newlyGeneratedInstanceId = false;
-    const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(id);
+    const MapEntry* entry = sMapStore.LookupEntry(id);
 
     if (entry->IsBattleGround())
     {
@@ -552,7 +554,7 @@ Map* MapManager::CreateTestMap(uint32 mapid, bool instanced, float posX, float p
     }
 
     // make sure we have a valid map id
-    const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(mapid);
+    const MapEntry* entry = sMapStore.LookupEntry(mapid);
     if (!entry)
     {
         sLog.outError("CreateTestMap: no entry for map %d", mapid);
@@ -583,7 +585,7 @@ void MapManager::DeleteTestMap(Map* map)
 DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState *save)
 {
     // make sure we have a valid map id
-    const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(id);
+    const MapEntry* entry = sMapStore.LookupEntry(id);
     if (!entry)
     {
         sLog.outError("CreateDungeonMap: no entry for map %d", id);

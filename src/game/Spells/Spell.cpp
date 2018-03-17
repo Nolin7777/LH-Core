@@ -6152,7 +6152,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                     // check if our map is dungeon
                     uint32 mapId = m_caster->GetMapId();
-                    MapEntry const* map = sMapStorage.LookupEntry<MapEntry>(mapId);
+                    MapEntry const* map = sMapStore.LookupEntry(mapId);
                     if (map->IsDungeon())
                     {
                         InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(mapId);
@@ -6186,7 +6186,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // check if our map is dungeon
-                const MapEntry *mapEntry = sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId());
+                const MapEntry *mapEntry = sMapStore.LookupEntry(m_caster->GetMapId());
                 if (mapEntry && mapEntry->IsDungeon())
                 {
                     InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(m_caster->GetMapId());
@@ -6232,7 +6232,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetTransport())
                         return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
-                    MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId());
+                    MapEntry const* mEntry = sMapStore.LookupEntry(m_caster->GetMapId());
                     Map* pMap = nullptr;
 
                     if (m_caster->GetMapId() != 531 && m_caster->GetTypeId() == TYPEID_PLAYER && !pMap->IsMountAllowed() && !m_IsTriggeredSpell)
@@ -6444,7 +6444,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         break;
                 }
 
-                MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId());
+                MapEntry const* mEntry = sMapStore.LookupEntry(m_caster->GetMapId());
                 Map* pMap = nullptr;
 
                 // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells

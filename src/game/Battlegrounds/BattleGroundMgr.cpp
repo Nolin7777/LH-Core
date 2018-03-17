@@ -1329,7 +1329,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         uint32 mapId = GetBattleGrounMapIdByTypeId(bgTypeID);
         char const* name;
 
-        if (MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapId))
+        if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
             name = mapEntry->name[sWorld.GetDefaultDbcLocale()];
         else
         {

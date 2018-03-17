@@ -6377,7 +6377,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
         else
             timeleft = secsToTimeString(sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(itr->first) - time(nullptr));
 
-        if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
+        if (MapEntry const* entry = sMapStore.LookupEntry(itr->first))
         {
             PSendSysMessage("map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                             itr->first, entry->name, state->GetInstanceId(), itr->second.perm ? "yes" : "no",
@@ -6403,7 +6403,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
             else
                 timeleft = secsToTimeString(sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(itr->first) - time(nullptr));
 
-            if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
+            if (MapEntry const* entry = sMapStore.LookupEntry(itr->first))
             {
                 PSendSysMessage("map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                                 itr->first, entry->name, state->GetInstanceId(), itr->second.perm ? "yes" : "no",
@@ -6453,7 +6453,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
             DungeonPersistentState *save = itr->second.state;
             std::string timeleft = secsToTimeString(save->GetResetTime() - time(NULL), true);
 
-            if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
+            if (MapEntry const* entry = sMapStore.LookupEntry(itr->first))
             {
                 PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                                 itr->first, entry->name, save->GetInstanceId(), itr->second.perm ? "yes" : "no",

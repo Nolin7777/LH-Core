@@ -38,8 +38,8 @@ const char ItemPrototypedstfmt[] = "iiisiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
 const char PageTextfmt[] = "isi";
 const char InstanceTemplatesrcfmt[] = "iiiiiis";
 const char InstanceTemplatedstfmt[] = "iiiiiii";
-const char MapEntrysrcfmt[] = "iiiiiiiiiffss";
-const char MapEntrydstfmt[] = "iiiiiiiiiffsi";
+//const char MapEntrysrcfmt[] = "iiiiiiiiiffss";
+//const char MapEntrydstfmt[] = "iiiiiiiiiffsi";
 const char ConditionsSrcFmt[] = "iiiii";
 const char ConditionsDstFmt[] = "iiiii";
 const char AreaEntryfmt[] = "iiiiiisii";
@@ -54,7 +54,7 @@ SQLStorage sEquipmentStorageRaw(EquipmentInfoRawfmt, "entry", "creature_equip_te
 SQLStorage sItemStorage(ItemPrototypesrcfmt, ItemPrototypedstfmt, "entry", "item_template");
 SQLStorage sPageTextStore(PageTextfmt, "entry", "page_text");
 SQLStorage sInstanceTemplate(InstanceTemplatesrcfmt, InstanceTemplatedstfmt, "map", "instance_template");
-SQLStorage sMapStorage(MapEntrysrcfmt, MapEntrydstfmt, "entry", "map_template");
+//SQLStorage sMapStorage(MapEntrysrcfmt, MapEntrydstfmt, "entry", "map_template");
 SQLStorage sConditionStorage(ConditionsSrcFmt, ConditionsDstFmt, "condition_entry", "conditions");
 SQLStorage sAreaStorage(AreaEntryfmt, "entry", "area_template");
 SQLStorage sDungeonEncounterStore(DungeonEncounterFmt, "id", "instance_dungeon_encounters");

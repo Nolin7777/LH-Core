@@ -371,7 +371,7 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
 template<typename Do>
 void MapPersistentStateManager::DoForAllStatesWithMapId(uint32 mapId, uint32 instanceId, Do& _do)
 {
-    MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapId);
+    MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
     if (!mapEntry)
         return;
 

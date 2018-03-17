@@ -72,7 +72,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     // get the destination map entry, not the current one, this will fix homebind and reset greeting
-    MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(loc.mapid);
+    MapEntry const* mEntry = sMapStore.LookupEntry(loc.mapid);
     Map* map = nullptr;
 
     // prevent crash at attempt landing to not existed battleground instance
@@ -185,10 +185,10 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     if (mEntry->IsRaid())
     {
-        if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->id))
+        if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->MapID))
         {
             uint32 timeleft = uint32(timeReset - time(nullptr));
-            GetPlayer()->SendInstanceResetWarning(mEntry->id, timeleft);
+            GetPlayer()->SendInstanceResetWarning(mEntry->MapID, timeleft);
         }
     }
 

@@ -276,16 +276,16 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
     if (corpsemapid != _player->GetMapId())
     {
         // search entrance map for proper show entrance
-        if (MapEntry const* temp = sMapStorage.LookupEntry<MapEntry>(mapid))
+        if (MapEntry const* temp = sMapStore.LookupEntry(mapid))
         {
-            if (temp->IsDungeon() && temp->ghostEntranceMap >= 0)
+            if (temp->IsDungeon() && temp->ghost_entrance_map >= 0)
             {
                 // if corpse map have entrance
-                if (TerrainInfo const* entranceMap = sTerrainMgr.LoadTerrain(temp->ghostEntranceMap))
+                if (TerrainInfo const* entranceMap = sTerrainMgr.LoadTerrain(temp->ghost_entrance_map))
                 {
-                    mapid = temp->ghostEntranceMap;
-                    x = temp->ghostEntranceX;
-                    y = temp->ghostEntranceY;
+                    mapid = temp->ghost_entrance_map;
+                    x = temp->ghost_entrance_x;
+                    y = temp->ghost_entrance_y;
                     z = entranceMap->GetHeightStatic(x, y, MAX_HEIGHT);
                 }
             }

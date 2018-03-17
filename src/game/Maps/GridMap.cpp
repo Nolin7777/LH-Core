@@ -1140,7 +1140,7 @@ GridMap* TerrainInfo::LoadMapAndVMap(const uint32 x, const uint32 y)
             m_GridMaps[x][y] = map;
 
             // load VMAPs for current map/grid...
-            const MapEntry* i_mapEntry = sMapStorage.LookupEntry<MapEntry>(m_mapId);
+            const MapEntry* i_mapEntry = sMapStore.LookupEntry(m_mapId);
             const char* mapName = i_mapEntry ? i_mapEntry->name[sWorld.GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
 
             int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld.GetDataPath() + "vmaps").c_str(),  m_mapId, x, y);

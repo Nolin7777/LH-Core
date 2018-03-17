@@ -1,8 +1,5 @@
-/**
- * MaNGOS is a full featured server for World of Warcraft, supporting
- * the following clients: 1.12.x, 2.4.3, 3.3.5a, 4.3.4a and 5.4.8
- *
- * Copyright (C) 2005-2014  MaNGOS project <http://getmangos.eu>
+/*
+ * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * World of Warcraft, and all World of Warcraft or Warcraft art, images,
- * and lore are copyrighted by Blizzard Entertainment, Inc.
  */
 
-#ifndef MANGOS_H_AUTHCRYPT
-#define MANGOS_H_AUTHCRYPT
+#ifndef _AUTHCRYPT_H
+#define _AUTHCRYPT_H
 
-#include "Common.h"
+#include <Common.h>
 #include <vector>
 
 class BigNumber;
@@ -34,22 +28,11 @@ class AuthCrypt
 {
     public:
         AuthCrypt();
-        ~AuthCrypt();
 
-        const static size_t CRYPTED_SEND_LEN = 4;
-        const static size_t CRYPTED_RECV_LEN = 6;
-
-        void Init();
-
-        void SetKey(const std::vector<uint8>& key);
-        void SetKey(uint8* key, size_t len);
+        void Init(BigNumber* K);
 
         void DecryptRecv(uint8*, size_t);
         void EncryptSend(uint8*, size_t);
-
-        bool IsInitialized() { return _initialized; }
-
-        static void GenerateKey(uint8*, BigNumber*);
 
     private:
         std::vector<uint8> _key;
@@ -57,19 +40,14 @@ class AuthCrypt
         bool _initialized;
 };
 
-
 class NoCrypt
 {
     public:
-        NoCrypt() {}
+		NoCrypt(){}
 
-        void Init() {}
+		void Init(BigNumber* K){}
 
-        void SetKey(const std::vector<uint8>& key) {}
-        void SetKey(uint8* key, size_t len) {}
-
-        void DecryptRecv(uint8*, size_t) {}
-        void EncryptSend(uint8*, size_t) {}
+		void DecryptRecv(uint8*, size_t){}
+		void EncryptSend(uint8*, size_t){}
 };
-
 #endif

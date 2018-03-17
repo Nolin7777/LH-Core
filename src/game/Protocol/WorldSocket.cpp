@@ -314,8 +314,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // NOTE ATM the socket is single-threaded, have this in mind ...
     ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), mutetime, locale), -1);
 
-    m_Crypt.SetKey(K.AsByteArray());
-    m_Crypt.Init();
+    m_Crypt.Init(&K);
 
     /*m_Session->SetUsername(account);
     m_Session->SetGameBuild(BuiltNumberClient);

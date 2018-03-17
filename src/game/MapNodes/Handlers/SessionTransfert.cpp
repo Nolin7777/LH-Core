@@ -54,7 +54,7 @@ void NodeSession::HandleLoadSession(WorldPacket& pkt)
     PacketLoadSession_Header loadInfos;
     pkt.read((uint8*)&loadInfos, sizeof(loadInfos));
 
-    WorldSession* wsess = new WorldSession(loadInfos.accountId, NULL, loadInfos.sec, 1, loadInfos.muteTime, loadInfos.locale);
+    WorldSession* wsess = new WorldSession(loadInfos.accountId, NULL, loadInfos.sec, loadInfos.muteTime, loadInfos.locale);
     wsess->SetAccountFlags(loadInfos.accountFlags);
     wsess->SetAccountMaxLevel(loadInfos.accountMaxLevel);
     wsess->SetMasterSession(this);

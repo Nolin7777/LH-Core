@@ -6515,7 +6515,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     }
     else                                                    // in friendly area
     {
-        if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) && pvpInfo.endTimer == 0)
+        if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED) && pvpInfo.endTimer == 0)
             pvpInfo.endTimer = time(NULL);                     // start toggle-off
     }
 
@@ -6598,7 +6598,7 @@ void Player::CheckDuelDistance(time_t currTime)
 bool Player::IsOutdoorPvPActive()
 {
     return (isAlive() && !HasInvisibilityAura() && !HasStealthAura() &&
-            (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) || sWorld.IsPvPRealm()) && !IsTaxiFlying());
+            (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED) || sWorld.IsPvPRealm()) && !IsTaxiFlying());
 }
 
 void Player::DuelComplete(DuelCompleteType type)
@@ -14424,12 +14424,12 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 
     SetUInt32Value(PLAYER_FLAGS, fields[11].GetUInt32());
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED))
     {
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
         if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
             pvpInfo.endTimer = time(NULL);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED);
     }
 
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[45].GetInt32());
@@ -15859,9 +15859,9 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(GetUInt32Value(PLAYER_BYTES_2));
 
     // Nostalrius: fix retrait flag PvP a la deco reco.
-    uint32 playerFlags = GetUInt32Value(PLAYER_FLAGS) & ~(PLAYER_FLAGS_IN_PVP | PLAYER_FLAGS_PVP_TIMER);
+    uint32 playerFlags = GetUInt32Value(PLAYER_FLAGS) & ~(PLAYER_FLAGS_PVP_DESIRED | PLAYER_FLAGS_PVP_TIMER);
     if (IsPvP())
-        playerFlags |= PLAYER_FLAGS_IN_PVP;
+        playerFlags |= PLAYER_FLAGS_PVP_DESIRED;
     if (pvpInfo.endTimer)
         playerFlags |= PLAYER_FLAGS_PVP_TIMER;
     uberInsert.addUInt32(playerFlags);
@@ -16598,7 +16598,7 @@ void Player::UpdatePvPFlag(time_t currTime)
 {
     if (!IsPvP())
         return;
-    if (pvpInfo.endTimer == 0 || currTime < (pvpInfo.endTimer + 300) || pvpInfo.inHostileArea || HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+    if (pvpInfo.endTimer == 0 || currTime < (pvpInfo.endTimer + 300) || pvpInfo.inHostileArea || HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED))
         return;
 
     UpdatePvP(false);
@@ -17677,7 +17677,7 @@ void Player::UpdateHomebindTime(uint32 time)
             // hide reminder
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
-            data << uint32(ERR_RAID_GROUP_REQUIRED);            // error used only when timer = 0
+            data << uint32(ERR_RAID_GROUP_NONE);            // error used only when timer = 0
             GetSession()->SendPacket(&data);
         }
         // instance is valid, reset homebind timer
@@ -17700,7 +17700,7 @@ void Player::UpdateHomebindTime(uint32 time)
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
-        data << uint32(ERR_RAID_GROUP_REQUIRED);                // error used only when timer = 0
+        data << uint32(ERR_RAID_GROUP_NONE);                // error used only when timer = 0
         GetSession()->SendPacket(&data);
         DEBUG_LOG("PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName(), GetGUIDLow());
     }

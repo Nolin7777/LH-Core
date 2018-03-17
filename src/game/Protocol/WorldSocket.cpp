@@ -163,8 +163,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
 
-    QueryResult *result = LoginDatabase.PQuery("SELECT a.id, aa.gmLevel, a.sessionkey, a.last_ip, a.locked, a.v, a.s, a.mutetime, a.locale, a.os, a.flags, a.expansion, "
-        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate FROM account a LEFT JOIN account_access aa ON a.id = aa.id AND aa.RealmID IN (-1, %u) "
+    QueryResult *result = LoginDatabase.PQuery("SELECT a.id, aa.gmLevel, a.sessionkey, a.last_ip, a.locked, a.v, a.s, a.mutetime, a.locale, a.os, a.flags, "
+        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, a.expansion FROM account a LEFT JOIN account_access aa ON a.id = aa.id AND aa.RealmID IN (-1, %u) "
         "LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 WHERE a.username = '%s' ORDER BY aa.RealmID DESC LIMIT 1", realmID, safe_account.c_str());
 
     // Stop if the account is not found
@@ -181,7 +181,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     Field* fields = result->Fetch();
 
-    expansion = ((sWorld.getConfig(CONFIG_UINT32_EXPANSION) > fields[11].GetUInt8()) ? fields[11].GetUInt8() : sWorld.getConfig(CONFIG_UINT32_EXPANSION));
+    //expansion = ((sWorld.getConfig(CONFIG_UINT32_EXPANSION) > fields[12].GetUInt8()) ? fields[12].GetUInt8() : sWorld.getConfig(CONFIG_UINT32_EXPANSION));
+    expansion = 1;
 
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -315,10 +316,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     m_Crypt.Init(&K);
 
-    /*m_Session->SetUsername(account);
+    m_Session->SetUsername(account);
     m_Session->SetGameBuild(BuiltNumberClient);
     m_Session->SetAccountFlags(accFlags);
-    m_Session->SetOS(clientOs);*/
+    m_Session->SetOS(clientOs);
     m_Session->LoadTutorialsData();
     //m_Session->InitWarden(&K);
 

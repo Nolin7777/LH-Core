@@ -65,7 +65,8 @@ class NodeSession;
 class PlayerBroadcaster;
 
 #define PLAYER_MAX_SKILLS           127
-#define PLAYER_EXPLORED_ZONES_SIZE  64
+#define PLAYER_MAX_DAILY_QUESTS     25
+#define PLAYER_EXPLORED_ZONES_SIZE  128
 
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
@@ -190,7 +191,7 @@ struct ActionButton
     }
 };
 
-#define  MAX_ACTION_BUTTONS 120   // TBC 132 checked in 2.3.0
+#define  MAX_ACTION_BUTTONS 132   // TBC 132 checked in 2.3.0
 
 struct PlayerCreateInfoItem
 {
@@ -305,8 +306,11 @@ typedef std::list<Item*> ItemDurationList;
 
 enum RaidGroupError
 {
-    ERR_RAID_GROUP_REQUIRED = 1,
-    ERR_RAID_GROUP_FULL     = 2
+    ERR_RAID_GROUP_NONE = 0,
+    ERR_RAID_GROUP_LOWLEVEL = 1,
+    ERR_RAID_GROUP_ONLY = 2,
+    ERR_RAID_GROUP_FULL = 3,
+    ERR_RAID_GROUP_REQUIREMENTS_UNMATCH = 4
 };
 
 enum DrunkenState
@@ -331,7 +335,7 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK7                   = 0x00000040,       // admin?
     PLAYER_FLAGS_FFA_PVP                = 0x00000080,
     PLAYER_FLAGS_CONTESTED_PVP          = 0x00000100,       // Player has been involved in a PvP combat and will be attacked by contested guards
-    PLAYER_FLAGS_IN_PVP                 = 0x00000200,
+    PLAYER_FLAGS_PVP_DESIRED            = 0x00000200,       // Stores player's permanent PvP flag preference
     PLAYER_FLAGS_HIDE_HELM              = 0x00000400,
     PLAYER_FLAGS_HIDE_CLOAK             = 0x00000800,
     PLAYER_FLAGS_PARTIAL_PLAY_TIME      = 0x00001000,       // played long time
@@ -341,6 +345,7 @@ enum PlayerFlags
     PLAYER_FLAGS_SANCTUARY              = 0x00010000,       // player entered sanctuary
     PLAYER_FLAGS_TAXI_BENCHMARK         = 0x00020000,       // taxi benchmark mode (on/off) (2.0.1)
     PLAYER_FLAGS_PVP_TIMER              = 0x00040000,       // 3.0.2, pvp timer active (after you disable pvp manually)
+    PLAYER_FLAGS_COMMENTATOR            = 0x00080000,       // first appeared in TBC
 };
 
 // used for PLAYER__FIELD_KNOWN_TITLES field (uint64), (1<<bit_index) without (-1)
@@ -402,6 +407,10 @@ enum PlayerFieldByteFlags
 enum PlayerFieldByte2Flags
 {
     PLAYER_FIELD_BYTE2_NONE              = 0x00,
+    PLAYER_FIELD_BYTE2_DETECT_AMORE_0    = 0x02,            // SPELL_AURA_DETECT_AMORE, not used as value and maybe not relcted to, but used in code as base for mask apply
+    PLAYER_FIELD_BYTE2_DETECT_AMORE_1    = 0x04,            // SPELL_AURA_DETECT_AMORE value 1
+    PLAYER_FIELD_BYTE2_DETECT_AMORE_2    = 0x08,            // SPELL_AURA_DETECT_AMORE value 2
+    PLAYER_FIELD_BYTE2_DETECT_AMORE_3    = 0x10,            // SPELL_AURA_DETECT_AMORE value 3
     PLAYER_FIELD_BYTE2_STEALTH           = 0x20,
     PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW = 0x40
 };
@@ -547,26 +556,26 @@ enum InventoryPackSlots                                     // 16 slots
 enum BankItemSlots                                          // 28 slots
 {
     BANK_SLOT_ITEM_START        = 39,
-    BANK_SLOT_ITEM_END          = 63
+    BANK_SLOT_ITEM_END          = 67
 };
 
-enum BankBagSlots                                           // 6 slots
+enum BankBagSlots                                           // 7 slots
 {
-    BANK_SLOT_BAG_START         = 63,
-    BANK_SLOT_BAG_END           = 69
+    BANK_SLOT_BAG_START         = 67,
+    BANK_SLOT_BAG_END           = 74
 };
 
 enum BuyBackSlots                                           // 12 slots
 {
     // stored in m_buybackitems
-    BUYBACK_SLOT_START          = 69,
-    BUYBACK_SLOT_END            = 81
+    BUYBACK_SLOT_START          = 74,
+    BUYBACK_SLOT_END            = 86
 };
 
 enum KeyRingSlots                                           // 32 slots
 {
-    KEYRING_SLOT_START          = 81,
-    KEYRING_SLOT_END            = 97
+    KEYRING_SLOT_START          = 86,
+    KEYRING_SLOT_END            = 118
 };
 
 struct ItemPosCount
@@ -588,11 +597,14 @@ enum TradeSlots
 
 enum TransferAbortReason
 {
+    TRANSFER_ABORT_NONE                         = 0x00,
     TRANSFER_ABORT_MAX_PLAYERS                  = 0x01,     // Transfer Aborted: instance is full
     TRANSFER_ABORT_NOT_FOUND                    = 0x02,     // Transfer Aborted: instance not found
     TRANSFER_ABORT_TOO_MANY_INSTANCES           = 0x03,     // You have entered too many instances recently.
     TRANSFER_ABORT_SILENTLY                     = 0x04,     // no message shown; the same effect give values above 5
     TRANSFER_ABORT_ZONE_IN_COMBAT               = 0x05,     // Unable to zone in while an encounter is in progress.
+    TRANSFER_ABORT_INSUF_EXPAN_LVL              = 0x06,     // You must have TBC expansion installed to access this area.
+    TRANSFER_ABORT_DIFFICULTY                   = 0x07,     // <Normal,Heroic,Epic> difficulty mode is not available for %s.
 };
 
 enum InstanceResetWarningType
@@ -601,6 +613,18 @@ enum InstanceResetWarningType
     RAID_INSTANCE_WARNING_MIN       = 2,                    // WARNING! %s is scheduled to reset in %d minute(s)!
     RAID_INSTANCE_WARNING_MIN_SOON  = 3,                    // WARNING! %s is scheduled to reset in %d minute(s). Please exit the zone or you will be returned to your bind location!
     RAID_INSTANCE_WELCOME           = 4                     // Welcome to %s. This raid instance is scheduled to reset in %s.
+};
+
+// PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
+enum ArenaTeamInfoType
+{
+    ARENA_TEAM_ID               = 0,
+    ARENA_TEAM_MEMBER           = 1,                        // 0 - captain, 1 - member
+    ARENA_TEAM_GAMES_WEEK       = 2,
+    ARENA_TEAM_GAMES_SEASON     = 3,
+    ARENA_TEAM_WINS_SEASON      = 4,
+    ARENA_TEAM_PERSONAL_RATING  = 5,
+    ARENA_TEAM_END              = 6
 };
 
 enum RestType

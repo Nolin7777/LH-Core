@@ -154,8 +154,8 @@ void ReputationMgr::SendState(FactionState const* faction)
 
 void ReputationMgr::SendInitialReputations()
 {
-    WorldPacket data(SMSG_INITIALIZE_FACTIONS, (4 + 64 * 5));
-    data << uint32(0x00000040);
+    WorldPacket data(SMSG_INITIALIZE_FACTIONS, (4 + 128 * 5));
+    data << uint32(0x00000080);
 
     RepListID a = 0;
 
@@ -178,7 +178,7 @@ void ReputationMgr::SendInitialReputations()
     }
 
     // fill in absent fields
-    for (; a != 64; a++)
+    for (; a != 128; a++)
     {
         data << uint8(0x00);
         data << uint32(0x00000000);

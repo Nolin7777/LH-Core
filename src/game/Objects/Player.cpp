@@ -18149,9 +18149,13 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     SendInitialSpells();
 
+    data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
+    data << uint32(0);                                      // count, for(count) uint32;
+    GetSession()->SendPacket(&data);
+
     if (MasterPlayer* masterPlayer = GetSession()->GetMasterPlayer())
         masterPlayer->SendInitialActionButtons();
-
+        
     m_reputationMgr.SendInitialReputations();
     m_honorMgr.Update();
 
@@ -18206,7 +18210,7 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
     {
         WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
         data2 << GetPackGUID();
-        data2 << (uint32)2;
+        data2 << (uint32)0;
         SendObjectMessageToSet(&data2, true);
         GetCheatData()->OrderSent(&data2);
     }

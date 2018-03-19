@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.08 (64 bit)
 MySQL - 10.1.11-MariaDB : Database - nost_logs
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -22,7 +23,7 @@ DROP TABLE IF EXISTS `logs_anticheat`;
 
 CREATE TABLE `logs_anticheat` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `realm` int(10) unsigned NOT NULL,
   `account` int(10) unsigned NOT NULL,
   `ip` varchar(16) NOT NULL,

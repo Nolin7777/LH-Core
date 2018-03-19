@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.08 (64 bit)
 MySQL - 10.1.11-MariaDB : Database - nost_logon
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -237,7 +238,7 @@ CREATE TABLE `system_fingerprint_usage` (
   `account` int(10) unsigned NOT NULL,
   `ip` varchar(16) NOT NULL,
   `realm` int(10) unsigned NOT NULL,
-  `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `architecture` varchar(16) DEFAULT NULL,
   `cputype` varchar(64) DEFAULT NULL,
   `activecpus` int(10) unsigned DEFAULT NULL,

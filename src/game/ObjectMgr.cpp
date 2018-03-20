@@ -4728,69 +4728,6 @@ struct SQLMapLoader : public SQLStorageLoaderBase<SQLMapLoader, SQLStorage>
     }
 };
 
-/*void ObjectMgr::LoadMapTemplate()
-{
-    SQLMapLoader loader;
-    loader.LoadProgressive(sMapStorage, sWorld.GetWowPatch());
-
-    for (auto itr = sMapStorage.begin<MapEntry>(); itr < sMapStorage.end<MapEntry>(); ++itr)
-    {
-        if (itr->IsDungeon() && itr->parent > 0)
-        {
-            // check existence
-            MapEntry const* parentEntry = sMapStorage.LookupEntry<MapEntry>(itr->parent);
-            if (!parentEntry)
-            {
-                sLog.outErrorDb("ObjectMgr::LoadMapTemplate: bad parent map id %u for instance template %u template!",
-                    itr->parent, itr->id);
-                const_cast<MapEntry*>(*itr)->parent = 0;
-                continue;
-            }
-
-            if (parentEntry->IsContinent())
-            {
-                sLog.outErrorDb("ObjectMgr::LoadMapTemplate: parent point to continent map id %u for instance template %u template, ignored, need be set only for non-continent parents!",
-                    parentEntry->id, itr->id);
-                const_cast<MapEntry*>(*itr)->parent = 0;
-                continue;
-            }
-        }
-
-        // if ghost entrance coordinates provided, can't be not exist for instance without ground entrance
-        if (itr->ghostEntranceMap >= 0)
-        {
-            if (!MapManager::IsValidMapCoord(itr->ghostEntranceMap, itr->ghostEntranceX, itr->ghostEntranceY))
-            {
-                sLog.outErrorDb("ObjectMgr::LoadMapTemplate: ghost entrance coordinates invalid for instance template %u template, ignored, need be set only for non-continent parents!", itr->id);
-                sMapStorage.EraseEntry(itr->id);
-                continue;
-            }
-
-            MapEntry const* ghostEntry = sMapStorage.LookupEntry<MapEntry>(itr->ghostEntranceMap);
-            if (!ghostEntry)
-            {
-                sLog.outErrorDb("ObjectMgr::LoadMapTemplate: bad ghost entrance for instance template %u template!", itr->id);
-                sMapStorage.EraseEntry(itr->id);
-                continue;
-            }
-
-            if (!ghostEntry->IsContinent())
-            {
-                sLog.outErrorDb("ObjectMgr::LoadMapTemplate: ghost entrance not at continent map id %u for instance template %u template, ignored, need be set only for non-continent parents!", ghostEntry->id, itr->id);
-                sMapStorage.EraseEntry(itr->id);
-                continue;
-            }
-        }
-
-        // the reset_delay must be at least one day
-        if (itr->resetDelay)
-            const_cast<MapEntry*>(*itr)->resetDelay = std::max((uint32)1, (uint32)(itr->resetDelay * sWorld.getConfig(CONFIG_FLOAT_RATE_INSTANCE_RESET_TIME)));
-    }
-
-    sLog.outString(">> Loaded %u Map Template definitions", sMapStorage.GetRecordCount());
-    sLog.outString();
-}*/
-
 InstanceTemplate const* ObjectMgr::GetInstanceTemplate(uint32 map)
 {
     return sInstanceTemplate.LookupEntry<InstanceTemplate>(map);

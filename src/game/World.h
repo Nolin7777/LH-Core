@@ -666,6 +666,8 @@ class World
         uint32 const& GetGameDay() const { return m_gameDay; }
         /// Uptime (in secs)
         uint32 GetUptime() const { return uint32(m_gameTime - m_startTime); }
+        /// Next daily quests reset time
+        time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
 
         tm *GetLocalTimeByTime(time_t now) const { return localtime(&now); }
 
@@ -901,6 +903,11 @@ class World
 
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*,ACE_Thread_Mutex> cliCmdQueue;
+
+        // next daily quests reset time
+        time_t m_NextDailyQuestReset;
+        time_t m_NextWeeklyQuestReset;
+        time_t m_NextMonthlyQuestReset;
 
         //Player Queue
         Queue m_QueuedSessions;

@@ -42,7 +42,8 @@ void WorldSession::SendNameQueryOpcode(Player *p)
         return;
 
     // guess size
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 25 + 1 + 4 + 4 + 4));   // guess size
+    //                                          8 + 1 + 1 + 4 + 4 + 4
+    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 4 + 4 + 4 + 10));   // guess size
     data << ObjectGuid(p->GetObjectGuid());
     data << p->GetName();                                   // CString(48): played name
     data << uint8(0);                                       // CString(256): realm name for cross realm BG usage
@@ -60,7 +61,7 @@ void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
     {
         std::string name = pData->sName;
 
-        WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 1 + 4 + 4 + 4));
+        WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4 + 10));
         data << ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
         data << name;
         data << uint8(0);
@@ -105,7 +106,7 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
     }
 
     // guess size
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 1 + 4 + 4 + 4));
+    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4 + 10));
     data << ObjectGuid(HIGHGUID_PLAYER, lowguid);
     data << name;
     data << uint8(0);                                       // realm name for cross realm BG usage
@@ -191,6 +192,29 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
 
         data << uint8(ci->civilian);                       //wdbFeild14
         data << uint8(ci->RacialLeader);
+
+        /* TODO Fix SMSG_CREATURE_QUERY_RESPONSE with correct data from DB.
+        
+        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
+        data << uint32(entry);                              // creature entry
+        data << name;
+        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
+        data << subName;
+        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
+        data << uint32(ci->CreatureTypeFlags);              // flags
+        data << uint32(ci->CreatureType);                   // CreatureType.dbc
+        data << uint32(ci->Family);                         // CreatureFamily.dbc
+        data << uint32(ci->Rank);                           // Creature Rank (elite, boss, etc)
+        data << uint32(0);                                  // unknown        wdbFeild11
+        data << uint32(ci->PetSpellDataId);                 // Id from CreatureSpellData.dbc    wdbField12
+
+        for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
+            data << uint32(ci->ModelId[i]);
+
+        data << float(ci->HealthMultiplier);                 // health multiplier
+        data << float(ci->PowerMultiplier);                   // mana multiplier
+        data << uint8(ci->RacialLeader);*/
+
         SendPacket(&data);
         DEBUG_LOG("WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
@@ -212,11 +236,15 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recv_data)
     recv_data >> entryID;
     ObjectGuid guid;
     recv_data >> guid;
+    std::string IconName;
+    std::string CastBarCaption;
 
     const GameObjectInfo *info = ObjectMgr::GetGameObjectInfo(entryID);
     if (info)
     {
         std::string Name = info->name;
+        IconName = info->IconName;
+        CastBarCaption = info->castBarCaption;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -234,10 +262,12 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recv_data)
         data << uint32(info->type);
         data << uint32(info->displayId);
         data << Name;
-        data << uint8(0) << uint8(0) << uint8(0);   // name2, name3, name4
-        data << uint8(0);                           // one more name, client handles it a bit differently
-        data.append(info->raw.data, 24);            // these are read as int32
-        //data << float(info->size);                // [-ZERO] go size: not in Zero
+        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4
+        data << IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
+        data << CastBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
+        data << uint8(0);                                   // 2.0.3, string
+        data.append(info->raw.data, 24);
+        data << float(info->size);                          // go size
         SendPacket(&data);
         DEBUG_LOG("WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }
@@ -436,7 +466,8 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket & recv_data)
 
 void WorldSession::SendQueryTimeResponse()
 {
-    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4);
+    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4 + 4);
     data << uint32(time(NULL));
+    data << uint32(sWorld.GetNextDailyQuestsResetTime() - time(nullptr));
     SendPacket(&data);
 }

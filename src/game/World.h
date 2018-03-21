@@ -289,7 +289,11 @@ enum WowPatch
     WOW_PATCH_109  = 7,
     WOW_PATCH_110  = 8,
     WOW_PATCH_111  = 9,
-    WOW_PATCH_112  = 10
+    WOW_PATCH_112  = 10,
+    WOW_PATCH_220  = 11,
+    WOW_PATCH_221  = 12,
+    WOW_PATCH_223  = 13,
+    WOW_PATCH_224  = 14
 };
 
 enum

@@ -627,7 +627,7 @@ bool Map::ScriptCommand_SetEquipment(ScriptAction& step, Object* source, Object*
 
     if (step.script->setEquipment.resetDefault)
     {
-        pSource->LoadEquipment(pSource->GetCreatureInfo()->equipmentId, true);
+        pSource->LoadEquipment(pSource->GetCreatureInfo()->EquipmentTemplateId, true);
         return false;
     }
 

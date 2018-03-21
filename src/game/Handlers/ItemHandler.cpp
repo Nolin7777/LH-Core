@@ -428,12 +428,25 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         data << pProto->Material;
         data << pProto->Sheath;
         data << pProto->RandomProperty;
+        //data << pProto->RandomSuffix;
         data << pProto->Block;
         data << pProto->ItemSet;
         data << pProto->MaxDurability;
         data << pProto->Area;
         data << pProto->Map;                                // Added in 1.12.x & 2.0.1 client branch
         data << pProto->BagFamily;
+        /*data << pProto->TotemCategory;
+        for (int s = 0; s < MAX_ITEM_PROTO_SOCKETS; ++s)
+        {
+            data << pProto->Socket[s].Color;
+            data << pProto->Socket[s].Content;
+        }
+        data << uint32(pProto->socketBonus);
+        data << uint32(pProto->GemProperties);
+        data << int32(pProto->RequiredDisenchantSkill);
+        data << float(pProto->ArmorDamageModifier);
+        data << uint32(pProto->Duration);                   // added in 2.4.2.8209, duration (seconds)
+        */
         SendPacket(&data);
     }
     else

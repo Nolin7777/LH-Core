@@ -787,7 +787,7 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
     float total_value = GetModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetModifierValue(unitMod, TOTAL_PCT);
     float total_phys  = GetTotalAuraModValue(UNIT_MOD_DAMAGE_PHYSICAL);
-    float dmg_multiplier = GetCreatureInfo()->dmg_multiplier;
+    float dmg_multiplier = GetCreatureInfo()->DamageMultiplier;
 
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE);
@@ -803,9 +803,9 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
      * ie if AP is reduced to 0, attack will be reduced of 30%
      * We have to ignore creatures that don't have AP set in database (we would divide by 0)
      */
-    if (GetCreatureInfo()->attackpower)
+    if (GetCreatureInfo()->MeleeAttackPower)
     {
-        float databaseAttackPower = GetCreatureInfo()->attackpower;
+        float databaseAttackPower = GetCreatureInfo()->MeleeAttackPower;
         float attackPowerNow = GetTotalAttackPowerValue(attType);
         weapon_mindamage = weapon_mindamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
         weapon_maxdamage = weapon_maxdamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
@@ -972,7 +972,7 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     float total_value = GetModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetModifierValue(unitMod, TOTAL_PCT);
     float total_phys  = GetTotalAuraModValue(UNIT_MOD_DAMAGE_PHYSICAL);
-    float dmg_multiplier = getPetType() == HUNTER_PET ? 1.0f : GetCreatureInfo()->dmg_multiplier;
+    float dmg_multiplier = getPetType() == HUNTER_PET ? 1.0f : GetCreatureInfo()->DamageMultiplier;
 
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE);

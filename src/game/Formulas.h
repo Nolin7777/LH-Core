@@ -101,14 +101,14 @@ namespace MaNGOS
         {
             // Some objects and totems are marked as pets, need some aditional checks
             bool isPet = u->GetTypeId() == TYPEID_UNIT && u->IsPet() &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
-                ((Creature*)u)->GetCreatureInfo()->minhealth > 50;
+                ((Creature*)u)->GetCreatureInfo()->CreatureType != CREATURE_TYPE_CRITTER &&
+                ((Creature*)u)->GetCreatureInfo()->CreatureType != CREATURE_TYPE_NOT_SPECIFIED &&
+                ((Creature*)u)->GetCreatureInfo()->CreatureType != CREATURE_TYPE_TOTEM; //&&
+                //((Creature*)u)->GetCreatureInfo()->minhealth > 50;
 
             if (u->GetTypeId()==TYPEID_UNIT && (
                 (u->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
-                (((Creature*)u)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
+                (((Creature*)u)->GetCreatureInfo()->CreatureTypeFlags & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
                 u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
                 return 0;
 
@@ -131,14 +131,14 @@ namespace MaNGOS
         inline uint32 PetGain(Pet *pet, Unit *u)
         {
             bool isPet = u->GetTypeId() == TYPEID_UNIT && u->IsPet() &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
-                ((Creature*)u)->GetCreatureInfo()->minhealth > 50;
+                ((Creature*)u)->GetCreatureInfo()->CreatureType != CREATURE_TYPE_CRITTER &&
+                ((Creature*)u)->GetCreatureInfo()->CreatureType != CREATURE_TYPE_NOT_SPECIFIED &&
+                ((Creature*)u)->GetCreatureInfo()->CreatureType != CREATURE_TYPE_TOTEM; // &&
+                //((Creature*)u)->GetCreatureInfo()->minhealth > 50;
 
             if(u->GetTypeId()==TYPEID_UNIT && (
                 (u->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
-                (((Creature*)u)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
+                (((Creature*)u)->GetCreatureInfo()->CreatureTypeFlags & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
                 u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
                 return 0;
 

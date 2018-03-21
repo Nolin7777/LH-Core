@@ -735,7 +735,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         {
             creature->DeleteThreatList();
             if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
-                if (cinfo->lootid || cinfo->maxgold > 0)
+                if (cinfo->LootId || cinfo->MaxLootGold > 0)
                     creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
         // some critters required for quests
@@ -1078,14 +1078,14 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
             loot->clear();
             if (!(creature->AI() && creature->AI()->FillLoot(loot, looter)))
             {
-                if (uint32 lootid = creature->GetCreatureInfo()->lootid)
+                if (uint32 lootid = creature->GetCreatureInfo()->LootId)
                 {
                     loot->SetTeam(group_tap ? group_tap->GetTeam() : looter->GetTeam());
                     loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature);
                 }
             }
 
-            loot->generateMoneyLoot(creature->GetCreatureInfo()->mingold, creature->GetCreatureInfo()->maxgold);
+            loot->generateMoneyLoot(creature->GetCreatureInfo()->MinLootGold, creature->GetCreatureInfo()->MaxLootGold);
         }
 
         if (group_tap)
@@ -1211,7 +1211,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 
             creature->DeleteThreatList();
             if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
-                if (cinfo->lootid || cinfo->maxgold > 0)
+                if (cinfo->LootId || cinfo->MaxLootGold > 0)
                     creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
@@ -1245,7 +1245,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
                 playerKiller = player_tap;
 
             if (playerKiller)
-                creature->GetMap()->BindToInstanceOrRaid(playerKiller, creature->GetRespawnTimeEx(), creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
+                creature->GetMap()->BindToInstanceOrRaid(playerKiller, creature->GetRespawnTimeEx(), creature->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
         }
     }
 
@@ -2580,7 +2580,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     // check if attack comes from behind, nobody can parry or block if attacker is behind
     if (!from_behind)
     {
-        if (parry_chance > 0 && (pVictim->GetTypeId() == TYPEID_PLAYER || !(((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY)))
+        if (parry_chance > 0 && (pVictim->GetTypeId() == TYPEID_PLAYER || !(((Creature*)pVictim)->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_NO_PARRY)))
         {
             parry_chance -= skillBonus;
 
@@ -2625,7 +2625,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     // check if attack comes from behind, nobody can parry or block if attacker is behind
     if (!from_behind)
     {
-        if ((pVictim->GetTypeId() == TYPEID_PLAYER || !(((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
+        if ((pVictim->GetTypeId() == TYPEID_PLAYER || !(((Creature*)pVictim)->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_NO_BLOCK))
           && !(GetTypeId() == TYPEID_UNIT && GetMeleeDamageSchoolMask() != SPELL_SCHOOL_MASK_NORMAL))  // can't block elemental melee attacks from mobs
         {
             tmp = block_chance;
@@ -2662,10 +2662,10 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     }
 
     if ((GetTypeId() != TYPEID_PLAYER && !((Creature*)this)->IsPet()) &&
-        !(((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH) &&
+        !(((Creature*)this)->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_NO_CRUSH) &&
         !SpellCasted /*Only autoattack can be crashing blow*/)
     {
-        if ( ((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_ALWAYS_CRUSH )
+        if ( ((Creature*)this)->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_ALWAYS_CRUSH )
         {
             return MELEE_HIT_CRUSHING;
         }
@@ -2801,7 +2801,7 @@ bool Unit::IsSpellBlocked(Unit *pCaster, SpellEntry const *spellEntry, WeaponAtt
     // Check creatures flags_extra for disable block
     if (GetTypeId() == TYPEID_UNIT)
     {
-        if (((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
+        if (((Creature*)this)->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_NO_BLOCK)
             return false;
     }
 
@@ -2920,7 +2920,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     // Check creatures flags_extra for disable parry
     if (pVictim->GetTypeId() == TYPEID_UNIT)
     {
-        uint32 flagEx = ((Creature*)pVictim)->GetCreatureInfo()->flags_extra;
+        uint32 flagEx = ((Creature*)pVictim)->GetCreatureInfo()->ExtraFlags;
         if (flagEx & CREATURE_FLAG_EXTRA_NO_PARRY)
             canParry = false;
     }
@@ -4828,7 +4828,7 @@ void Unit::RemoveAurasAtReset(AuraRemoveMode mode /*= AURA_REMOVE_BY_DEFAULT*/)
     // @TODO: Some buffs should maybe not get removed ? Self casted buffs ? ...
     if (Creature* c = ToCreature())
         if (CreatureInfo const* info = c->GetCreatureInfo())
-            if (info->flags_extra & CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE)
+            if (info->ExtraFlags & CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE)
             {
                 RemoveAllNegativeAuras(mode);
                 return;
@@ -5415,7 +5415,7 @@ void Unit::SetInitCreaturePowerType()
         return;
 
     // a bit wrong, but have to follow the dirty database values
-    if (pCreature->GetCreatureInfo()->minmana > 0)
+    if (pCreature->GetCreatureInfo()->MinLevelMana > 0)
         SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_MANA);
     else
     {
@@ -6054,7 +6054,7 @@ void Unit::RestoreFaction()
         if (CreatureInfo const *cinfo = ((Creature*)this)->GetCreatureInfo())  // normal creature
         {
             FactionTemplateEntry const *faction = getFactionTemplateEntry();
-            setFaction((faction && faction->friendlyMask & 0x004) ? cinfo->faction_H : cinfo->faction_A);
+            setFaction((faction && faction->friendlyMask & 0x004) ? cinfo->FactionHorde : cinfo->FactionAlliance);
         }
     }
 }
@@ -6369,7 +6369,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
 
     // Creature damage
     if (GetTypeId() == TYPEID_UNIT && !((Creature*)this)->IsPet())
-        DoneTotalMod *= ((Creature*)this)->GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+        DoneTotalMod *= ((Creature*)this)->GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->Rank);
 
     AuraList const& mModDamagePercentDone = GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     for (AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
@@ -7366,7 +7366,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         OnEnterCombat(enemy, true);
 
         // Some bosses are set into combat with zone
-        if (GetMap()->IsDungeon() && (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE) && enemy && enemy->IsControlledByPlayer())
+        if (GetMap()->IsDungeon() && (pCreature->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_AGGRO_ZONE) && enemy && enemy->IsControlledByPlayer())
             pCreature->SetInCombatWithZone();
         if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
             if (spell->getState() == SPELL_STATE_CASTING)
@@ -7386,7 +7386,7 @@ void Unit::ClearInCombat()
     // Player's state will be cleared in Player::UpdateContestedPvP
     if (GetTypeId() != TYPEID_PLAYER)
     {
-        if (((Creature*)this)->GetCreatureInfo()->unit_flags & UNIT_FLAG_OOC_NOT_ATTACKABLE)
+        if (((Creature*)this)->GetCreatureInfo()->UnitFlags & UNIT_FLAG_OOC_NOT_ATTACKABLE)
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
 
         clearUnitState(UNIT_STAT_ATTACK_PLAYER);
@@ -7943,10 +7943,10 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
             switch (mtype)
             {
                 case MOVE_RUN:
-                    speed *= ((Creature*)this)->GetCreatureInfo()->speed_run;
+                    speed *= ((Creature*)this)->GetCreatureInfo()->SpeedRun;
                     break;
                 case MOVE_WALK:
-                    speed *= ((Creature*)this)->GetCreatureInfo()->speed_walk;
+                    speed *= ((Creature*)this)->GetCreatureInfo()->SpeedWalk;
                     break;
                 default:
                     break;
@@ -8127,7 +8127,7 @@ bool Unit::CanHaveThreatList() const
     if (creature->GetCharmerGuid().IsPlayer())
         return false;
 
-    if (creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_THREAT_LIST)
+    if (creature->GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_NO_THREAT_LIST)
         return false;
 
     return true;
@@ -8514,7 +8514,7 @@ bool Unit::isInvisibleForAlive() const
 /// returns true if creature can be seen by dead units
 bool Unit::isVisibleForDead() const
 {
-    if (GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_GHOST_VISIBLE)
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureInfo()->ExtraFlags & CREATURE_TYPEFLAGS_GHOST_VISIBLE)
         return true;
     return isSpiritService();
 }
@@ -8530,7 +8530,7 @@ uint32 Unit::GetCreatureType() const
             return CREATURE_TYPE_HUMANOID;
     }
     else
-        return ((Creature*)this)->GetCreatureInfo()->type;
+        return ((Creature*)this)->GetCreatureInfo()->CreatureType;
 }
 
 /*#######################################

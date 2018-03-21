@@ -62,12 +62,21 @@ void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
         std::string name = pData->sName;
 
         WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4 + 10));
+     // WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 +                1  + 4 + 4 + 4 + 10));
         data << ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
         data << name;
         data << uint8(0);
         data << uint32(pData->uiRace);
         data << uint32(pData->uiGender);
         data << uint32(pData->uiClass);
+        /*if (DeclinedName const* names = p->GetDeclinedNames())
+        {
+            data << uint8(1);                                   // is declined
+            for (int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
+                data << names->name[i];
+        }
+        else*/
+            data << uint8(0);                                   // is not declined
 
         SendPacket(&data);
     }
@@ -113,6 +122,14 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
     data << uint32(pRace);                                  // race
     data << uint32(pGender);                                // gender
     data << uint32(pClass);                                 // class
+    /*if (DeclinedName const* names = p->GetDeclinedNames())
+    {
+        data << uint8(1);                                   // is declined
+        for (int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
+            data << names->name[i];
+    }
+    else*/
+        data << uint8(0);                                   // is not declined
 
     session->SendPacket(&data);
     delete result;
@@ -178,11 +195,11 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         data << Name;
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << SubName;
-        data << uint32(ci->type_flags);                     // flags
-        data << uint32(ci->type); // Nostalrius : fix pets des chasseurs non consideres comme betes.
+        data << uint32(ci->CreatureTypeFlags);                     // flags
+        data << uint32(ci->CreatureType); // Nostalrius : fix pets des chasseurs non consideres comme betes.
 
-        data << uint32(ci->family);                         // CreatureFamily.dbc
-        data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
+        data << uint32(ci->Family);                         // CreatureFamily.dbc
+        data << uint32(ci->Rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(0);                                  // unknown        wdbFeild11
         data << uint32(ci->PetSpellDataId);                 // Id from CreatureSpellData.dbc    wdbField12
         if (unit)
@@ -190,30 +207,10 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         else
             data << uint32(Creature::ChooseDisplayId(ci));  // workaround, way to manage models must be fixed
 
-        data << uint8(ci->civilian);                       //wdbFeild14
-        data << uint8(ci->RacialLeader);
-
-        /* TODO Fix SMSG_CREATURE_QUERY_RESPONSE with correct data from DB.
-        
-        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
-        data << uint32(entry);                              // creature entry
-        data << name;
-        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
-        data << subName;
-        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
-        data << uint32(ci->CreatureTypeFlags);              // flags
-        data << uint32(ci->CreatureType);                   // CreatureType.dbc
-        data << uint32(ci->Family);                         // CreatureFamily.dbc
-        data << uint32(ci->Rank);                           // Creature Rank (elite, boss, etc)
-        data << uint32(0);                                  // unknown        wdbFeild11
-        data << uint32(ci->PetSpellDataId);                 // Id from CreatureSpellData.dbc    wdbField12
-
-        for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
-            data << uint32(ci->ModelId[i]);
-
+        //data << uint8(ci->civilian);                       //wdbFeild14
         data << float(ci->HealthMultiplier);                 // health multiplier
         data << float(ci->PowerMultiplier);                   // mana multiplier
-        data << uint8(ci->RacialLeader);*/
+        data << uint8(ci->RacialLeader);
 
         SendPacket(&data);
         DEBUG_LOG("WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");

@@ -3325,7 +3325,7 @@ void SpellMgr::LoadSpellScriptTarget()
                 }
                 if (const CreatureInfo* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(targetEntry))
                 {
-                    if (spellId == 30427 && !cInfo->SkinLootId)
+                    if (spellId == 30427 && !cInfo->SkinningLootId)
                     {
                         sLog.outErrorDb("Table `spell_script_target` has creature %u as a target of spellid 30427, but this creature has no skinlootid. Gas extraction will not work!", cInfo->Entry);
                         continue;

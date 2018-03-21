@@ -1611,7 +1611,7 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         {
             // Giant type creatures walk underwater
             if (isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim() ||
-                IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT)
+                IsCreature() && ToCreature()->GetCreatureInfo()->CreatureType == CREATURE_TYPE_GIANT)
                 return true;
             // La position renvoyee par le pathfinding est tout au fond de l'eau. On randomise ca un peu ...
             float ground = 0.0f;

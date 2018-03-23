@@ -50,6 +50,7 @@ void WorldSession::SendNameQueryOpcode(Player *p)
     data << uint32(p->getRace());
     data << uint32(p->getGender());
     data << uint32(p->getClass());
+    data << uint8(0); // TODO Name Declined 
 
     SendPacket(&data);
 }
@@ -68,6 +69,7 @@ void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
         data << uint32(pData->uiRace);
         data << uint32(pData->uiGender);
         data << uint32(pData->uiClass);
+        data << uint8(0); // TODO Name Declined 
 
         SendPacket(&data);
     }
@@ -113,6 +115,7 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
     data << uint32(pRace);                                  // race
     data << uint32(pGender);                                // gender
     data << uint32(pClass);                                 // class
+    data << uint8(0); // TODO Name Declined 
 
     session->SendPacket(&data);
     delete result;

@@ -1136,7 +1136,7 @@ char* const World::GetPatchName() const
         case WOW_PATCH_203:
             return "Patch 2.3: The Gods of Zul Aman";
         case WOW_PATCH_204:
-            return "Patch 2.4: Fury of the Sunwell ";
+            return "Patch 2.4: Fury of the Sunwell";
     }
 
     return "Invalid Patch!";

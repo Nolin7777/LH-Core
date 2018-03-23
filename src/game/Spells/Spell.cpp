@@ -1914,6 +1914,18 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
     }
 
+    // Add spell leeway to caster centered AoE when moving or jumping
+    switch (targetMode)
+    {
+        case TARGET_ALL_ENEMY_IN_AREA:
+        case TARGET_ALL_PARTY_AROUND_CASTER:
+        case TARGET_IN_FRONT_OF_CASTER:
+            radius += m_caster->GetLeewayBonusRadius();
+            break;
+        default:
+            break;
+    }
+
     uint32 unMaxTargets = m_spellInfo->MaxAffectedTargets;
 
     // custom target amount cases
@@ -4424,10 +4436,9 @@ void Spell::SendLogExecute()
 
     uint32 effectCount = 0;
 
-    /* for (std::vector<ExecuteLogInfo> effectInfo : m_executeLogInfo) */
-    for (std::vector<ExecuteLogInfo>::const_iterator it = m_executeLogInfo->begin(); it != m_executeLogInfo->end(); ++it)
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (it != m_executeLogInfo->end())
+        if (!m_executeLogInfo[i].empty())
             effectCount++;
     }
 
@@ -4444,9 +4455,9 @@ void Spell::SendLogExecute()
         data << uint32(m_spellInfo->Effect[i]);
         data << uint32(m_executeLogInfo[i].size());
 
-        for (std::vector<ExecuteLogInfo>::const_iterator it = m_executeLogInfo->begin(); it != m_executeLogInfo->end(); ++it)
+        for (uint32 j = 0; j < m_executeLogInfo[i].size(); ++j)
         {
-            ExecuteLogInfo info = *it;
+            ExecuteLogInfo info = m_executeLogInfo[i][j];
             switch (m_spellInfo->Effect[i])
             {
                 case SPELL_EFFECT_POWER_DRAIN:
@@ -5710,6 +5721,16 @@ SpellCastResult Spell::CheckCast(bool strict)
             return castResult;
     }
 
+    // All spells that require target to be below 20% have this.
+    if (m_spellInfo->TargetAuraState == AURA_STATE_HEALTHLESS_20_PERCENT)
+    {
+        if (!m_targets.getUnitTarget())
+            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
+        if (!m_targets.getUnitTarget()->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+            return SPELL_FAILED_BAD_TARGETS;
+    }   
+
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         // for effects of spells that have only one target
@@ -5717,12 +5738,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         {
             case SPELL_EFFECT_DUMMY:
             {
-                if (m_spellInfo->SpellIconID == 1648)       // Execute
-                {
-                    if (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetHealth() > m_targets.getUnitTarget()->GetMaxHealth() * 0.2)
-                        return SPELL_FAILED_BAD_TARGETS;
-                }
-                else if (m_spellInfo->SpellIconID == 156)   // Holy Shock
+                if (m_spellInfo->SpellIconID == 156)   // Holy Shock
                 {
                     // spell different for friends and enemies
                     // hart version required facing
@@ -5738,17 +5754,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
-                // Hammer of Wrath
-                if (m_spellInfo->SpellVisual == 7250)
-                {
-                    if (!m_targets.getUnitTarget())
-                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
-
-                    if (m_targets.getUnitTarget()->GetHealth() > m_targets.getUnitTarget()->GetMaxHealth() * 0.2)
-                        return SPELL_FAILED_BAD_TARGETS;
-                }
                 // Conflagrate
-                else if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CONFLAGRATE>())
+                if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_CONFLAGRATE>())
                 {
                     if (!m_targets.getUnitTarget())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
@@ -6226,6 +6233,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                 // Black Qiraji Battle Tank
                 if (m_spellInfo->Id == 26656)
                 {
+                    if (m_caster->IsMounted())
+                    {
+                        m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+
                     if (m_caster->IsInWater())
                         return SPELL_FAILED_ONLY_ABOVEWATER;
 
@@ -6817,6 +6830,9 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     //add radius of caster and ~5 yds "give" for non stricred (landing) check
     float range_mod = strict ? 1.25f : 6.25;
+
+    // Add leeway bonus if both units are moving
+    range_mod += m_caster->GetLeewayBonusRange(target);
 
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
     float max_range = GetSpellMaxRange(srange);

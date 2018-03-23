@@ -359,10 +359,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             return;
         m_auiEncounter[uiType] = uiData;
         if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR)) {
-            if (uiData == IN_PROGRESS) {
-                DoResetDoor(pGo->GetGUID());
-            }
-            else {
+            if (uiData != IN_PROGRESS) {
                 DoOpenDoor(pGo->GetGUID());
             }
         }
@@ -812,7 +809,7 @@ struct AI_QirajiMindslayer : public ScriptedAI {
             }
         }
         if (closestPlayer) {
-            DoCastSpellIfCan(closestPlayer, 26049, CAST_TRIGGERED | CAST_INTERRUPT_PREVIOUS);
+            DoCastSpellIfCan(closestPlayer, 26049, CF_TRIGGERED | CF_INTERRUPT_PREVIOUS);
         }
     }
 

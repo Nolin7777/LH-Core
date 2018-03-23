@@ -68,7 +68,13 @@ enum ConditionType
                                                             // If skill_value == 1, then true if player has not skill skill_id
     CONDITION_REPUTATION_RANK_MAX   = 30,                   // faction_id   max_rank
     CONDITION_HAS_FLAG              = 31,                   // field_id     flag
-    CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 = exact, 1: wp <= waypointId, 2: wp > waypointId  Use to check what waypoint was last reached  
+    CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 = exact, 1: wp <= waypointId, 2: wp > waypointId  Use to check what waypoint was last reached
+    CONDITION_MAP_ID                = 33,                   // map_id
+    CONDITION_INSTANCE_DATA_EQUAL   = 34,                   // index        data
+    CONDITION_INSTANCE_DATA_GREATER = 35,                   // index        data
+    CONDITION_INSTANCE_DATA_LESS    = 36,                   // index        data
+    CONDITION_LINE_OF_SIGHT         = 37,                   // 0            0
+
 };
 
 enum ConditionFlags
@@ -105,7 +111,8 @@ enum ConditionRequirement
     CONDITION_REQ_SOURCE_CREATURE,
     CONDITION_REQ_SOURCE_PLAYER,
     CONDITION_REQ_ANY_WORLDOBJECT,
-    CONDITION_REQ_MAP_OR_WORLDOBJECT
+    CONDITION_REQ_MAP_OR_WORLDOBJECT,
+    CONDITION_REQ_SOURCE_AND_TARGET,
 };
 
 class ConditionEntry

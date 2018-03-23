@@ -56,6 +56,9 @@
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2)
 
+#define LEEWAY_MIN_MOVE_SPEED       4.97f
+#define LEEWAY_BONUS_RANGE          2.66f
+
 enum TempSummonType
 {
     TEMPSUMMON_TIMED_OR_DEAD_DESPAWN          = 1,             // despawns after a specified time (out of combat) OR when the creature disappears
@@ -550,6 +553,10 @@ class MANGOS_DLL_SPEC Object
         bool IsDeleted() const { return _deleted; }
 
         // Convertions
+        inline bool IsWorldObject() const { return isType(TYPEMASK_WORLDOBJECT); }
+        WorldObject* ToWorldObject() { if (IsWorldObject()) return reinterpret_cast<WorldObject*>(this); else return nullptr; }
+        WorldObject const* ToWorldObject() const { if (IsWorldObject()) return reinterpret_cast<WorldObject const*>(this); else return nullptr; }
+
         inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
         Player* ToPlayer() { if (IsPlayer()) return reinterpret_cast<Player*>(this); else return nullptr; }
         Player const* ToPlayer() const { if (IsPlayer()) return reinterpret_cast<Player const*>(this); else return nullptr; }

@@ -1072,8 +1072,8 @@ void Aura::TriggerSpell()
 
     uint32 spellRandom;
 
-    // not in reactive state
-    if (m_modifier.m_amount == 0 && triggerTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+    // not in banished state
+    if (triggerTarget->hasUnitState(UNIT_STAT_ISOLATED))
         return;
 
     // specific code for cases with no trigger spell provided in field
@@ -5314,6 +5314,10 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                     pdamage = uint32(target->GetMaxHealth() * amount / 100);
             }
 
+            // Consecration: recalculate the damage on each tick
+            if (spellProto->IsFitToFamily<SPELLFAMILY_PALADIN, CF_PALADIN_CONSECRATION>())
+                pdamage = pCaster->SpellDamageBonusDone(target, GetSpellProto(), m_currentBasePoints, DOT, GetStackAmount());
+
             // SpellDamageBonus for magic spells
             if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
                 pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, pdamage, DOT, GetStackAmount());
@@ -7213,6 +7217,12 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
                     spellproto->SpellFamilyName == SPELLFAMILY_PRIEST)
                 return false;
             return true;
+        case SPELL_AURA_MOD_MELEE_HASTE:
+        case SPELL_AURA_MOD_DECREASE_SPEED:
+            // Attack and movement speed reduction
+            if (spellproto->EffectBasePoints[eff] >= 0)
+                return false;
+            return true;
         default:
             return false;
     }
@@ -7222,7 +7232,7 @@ void Aura::ComputeExclusive()
 {
     m_exclusive = false;
     //return;
-    if (GetHolder()->IsPassive() || !GetHolder()->IsPositive())
+    if (GetHolder()->IsPassive())
         return;
     m_exclusive = _IsExclusiveSpellAura(GetSpellProto(), GetEffIndex(), GetModifier()->m_auraname);
 }
@@ -7244,8 +7254,11 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 0;
 
     // Lui est mieux
-    if (other->GetModifier()->m_amount > GetModifier()->m_amount)
+    if (other->GetModifier()->m_amount > GetModifier()->m_amount && GetModifier()->m_amount >= 0)
         return 2;
+    else if (other->GetModifier()->m_amount < GetModifier()->m_amount && GetModifier()->m_amount < 0)
+        return 2;
+
     return 1;
 }
 

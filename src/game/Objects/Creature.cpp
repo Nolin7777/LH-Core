@@ -3124,6 +3124,13 @@ void Creature::OnLeaveCombat()
     UpdateCombatState(false);
     UpdateCombatWithZoneState(false);
 
+    // a delayed spell event could set the creature in combat again
+    auto itEvent = m_Events.GetEvents().begin();
+    for (; itEvent != m_Events.GetEvents().end(); ++itEvent)
+        if (SpellEvent* event = dynamic_cast<SpellEvent*>(itEvent->second))
+            if (event->GetSpell()->getState() != SPELL_STATE_FINISHED)
+                event->GetSpell()->cancel();
+
     if (_creatureGroup)
         _creatureGroup->OnLeaveCombat(this);
 
@@ -3400,6 +3407,19 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
     return target;
 }
 
+// Returns friendly unit with the most amount of hp missing from max hp
+Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent) const
+{
+    Unit* pUnit = nullptr;
+
+    MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
+    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
+
+    Cell::VisitGridObjects(this, searcher, fRange);
+
+    return pUnit;
+}
+
 // use this function to avoid having hostile creatures attack
 // friendlies and other mobs they shouldn't attack
 bool Creature::_IsTargetAcceptable(Unit const *target) const
@@ -3656,7 +3676,9 @@ bool Creature::HasWeapon() const
 void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
 {
     if (IsTemporarySummon())
-        ((TemporarySummon*)this)->UnSummon(msTimeToDespawn);
+        static_cast<TemporarySummon*>(this)->UnSummon(msTimeToDespawn);
+    else if (IsPet())
+        static_cast<Pet*>(this)->DelayedUnsummon(msTimeToDespawn, PET_SAVE_AS_DELETED);
     else
         ForcedDespawn(msTimeToDespawn);
 }

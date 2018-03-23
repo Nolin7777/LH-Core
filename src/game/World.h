@@ -279,17 +279,22 @@ enum eConfigUInt32Values
 
 enum WowPatch
 {
-    WOW_PATCH_102  = 0,
-    WOW_PATCH_103  = 1,
-    WOW_PATCH_104  = 2,
-    WOW_PATCH_105  = 3,
-    WOW_PATCH_106  = 4,
-    WOW_PATCH_107  = 5,
-    WOW_PATCH_108  = 6,
-    WOW_PATCH_109  = 7,
-    WOW_PATCH_110  = 8,
-    WOW_PATCH_111  = 9,
-    WOW_PATCH_112  = 10
+    WOW_PATCH_102 = 0,
+    WOW_PATCH_103 = 1,
+    WOW_PATCH_104 = 2,
+    WOW_PATCH_105 = 3,
+    WOW_PATCH_106 = 4,
+    WOW_PATCH_107 = 5,
+    WOW_PATCH_108 = 6,
+    WOW_PATCH_109 = 7,
+    WOW_PATCH_110 = 8,
+    WOW_PATCH_111 = 9,
+    WOW_PATCH_112 = 10,
+    WOW_PATCH_200 = 11,
+    WOW_PATCH_201 = 12,
+    WOW_PATCH_202 = 13,
+    WOW_PATCH_203 = 14,
+    WOW_PATCH_204 = 15
 };
 
 enum

@@ -55,6 +55,7 @@ struct FriendInfo
     uint32 Area;
     uint32 Level;
     uint32 Class;
+    std::string Note;
 
     FriendInfo()
     {

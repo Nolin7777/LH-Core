@@ -112,8 +112,9 @@ void PlayerSocial::SendFriendList()
 
     uint32 size = GetNumberOfSocialsWithFlag(SOCIAL_FLAG_FRIEND);
 
-    WorldPacket data(SMSG_FRIEND_LIST, (1 + size * 25)); // just can guess size
-    data << uint8(size);                                   // friends count
+    WorldPacket data(SMSG_FRIEND_LIST, (4 + 4 + size * 25)); // just can guess size
+    data << uint32(7);                                      // unk flag (0x1, 0x2, 0x4), 0x7 if it include ignore list
+    data << uint32(size);                                   // friends count
 
     for (PlayerSocialMap::iterator itr = m_playerSocialMap.begin(); itr != m_playerSocialMap.end(); ++itr)
     {
@@ -122,6 +123,8 @@ void PlayerSocial::SendFriendList()
             sSocialMgr.GetFriendInfo(plr, itr->first, itr->second);
 
             data << ObjectGuid(HIGHGUID_PLAYER, itr->first);// player guid
+            data << uint32(itr->second.Flags);                  // player flag (0x1-friend?, 0x2-ignored?, 0x4-muted?)
+            data << itr->second.Note;                           // string 
             data << uint8(itr->second.Status);              // online/offline/etc?
             if (itr->second.Status)                         // if online
             {

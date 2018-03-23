@@ -1127,14 +1127,6 @@ char* const World::GetPatchName() const
             return "Patch 1.11: Shadow of the Necropolis";
         case 10:
             return "Patch 1.12: Drums of War";
-        case 11:
-            return "Patch 2.0: Before the Storm";
-        case 12:
-            return "Patch 2.1: The Black Temple";
-        case 13:
-            return "Patch 2.3: The Gods of Zul’Aman";
-        case 14:
-            return "Patch 2.4: Fury of the Sunwell ";
     }
 
     return "Invalid Patch!";

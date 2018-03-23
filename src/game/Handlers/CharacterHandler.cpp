@@ -644,7 +644,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     else
         sObjectAccessor.AddObject(pCurrChar);
 
-    //DEBUG_LOG("Player %s added to Map.",pCurrChar->GetName());
+    DEBUG_LOG("Player %s added to Map.",pCurrChar->GetName());
     pCurrChar->GetSocial()->SendFriendList();
     //pCurrChar->GetSocial()->SendIgnoreList();
 

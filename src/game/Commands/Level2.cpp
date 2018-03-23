@@ -1630,17 +1630,21 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
     if (!ExtractOptUInt32(&args, incrtime, 0))
         return false;
 
+    uint32 extendedcost;
+    if (!ExtractOptUInt32(&args, extendedcost, 0))
+        return false;
+
     Creature* vendor = getSelectedCreature();
 
     uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
 
-    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, maxcount, incrtime, m_session->GetPlayer()))
+    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, maxcount, incrtime, extendedcost, 0, m_session->GetPlayer()))
     {
         SetSentErrorMessage(true);
         return false;
     }
 
-    sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime);
+    sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime, extendedcost);
 
     ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
 

@@ -1,5 +1,8 @@
 [![Build Status](https://travis-ci.org/lh-server/core.svg?branch=development)](https://travis-ci.org/lh-server/core)
 
+# Database
+https://github.com/brotalnia/database/blob/master/world_full_12_march_2018.7z
+
 # Bug reporting:
 Before opening any bug reports on the issue tracker, please read the guidelines [located here](https://github.com/LightsHope/server/blob/development/docs/).
 

@@ -8019,7 +8019,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
 
     DEBUG_LOG("Sending SMSG_INIT_WORLD_STATES to Map:%u, Zone: %u", mapid, zoneid);
 
-    uint32 count = 1; // count of world states in packet, 1 extra for the terminator
+    uint32 count = 0; // count of world states in packet, 1 extra for the terminator
 
     WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 4 + 2 + 8 * 8)); // guess
     data << uint32(mapid);                              // mapid
@@ -8085,7 +8085,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         count += BuildWarEffortWorldStates(data);
     }
 
-    data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
+    //data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
     data.put<uint16>(count_pos, count); // set actual world state amount
     GetSession()->SendPacket(&data);
 }

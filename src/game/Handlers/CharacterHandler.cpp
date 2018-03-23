@@ -650,7 +650,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
     if (alreadyOnline)
-        pCurrChar->SendInitWorldStates(pCurrChar->GetCachedZoneId());
+        pCurrChar->SendInitWorldStates(pCurrChar->GetCachedZoneId(), pCurrChar->GetCachedAreaId());
 
     static SqlStatementID updChars;
     static SqlStatementID updAccount;

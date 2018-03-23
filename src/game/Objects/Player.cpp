@@ -6468,7 +6468,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     if (m_zoneUpdateId != newZone)
     {
         sZoneScriptMgr.HandlePlayerLeaveZone(this, oldZoneId);
-        SendInitWorldStates(newZone);                       // only if really enters to new zone, not just area change, works strange...
+        SendInitWorldStates(newZone, newArea);                       // only if really enters to new zone, not just area change, works strange...
         sZoneScriptMgr.HandlePlayerEnterZone(this, newZone);
 
         if (sWorld.getConfig(CONFIG_BOOL_WEATHER))
@@ -7984,9 +7984,7 @@ static WorldStatePair def_world_states[] =
     { 0x0,    0x0 } // terminator
 };
 
-
-
-void Player::SendInitWorldStates(uint32 zoneid)
+void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
 {
     uint32 mapid = GetMapId();
 
@@ -7994,9 +7992,10 @@ void Player::SendInitWorldStates(uint32 zoneid)
 
     uint32 count = 1; // count of world states in packet, 1 extra for the terminator
 
-    WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 2 + 6));
+    WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 4 + 2 + 8 * 8)); // guess
     data << uint32(mapid);                              // mapid
     data << uint32(zoneid);                             // zone id
+    data << uint32(areaid);                                 // area id, new 2.1.0
     size_t count_pos = data.wpos();
     data << uint16(0);                                  // count of uint32 blocks, placeholder
 

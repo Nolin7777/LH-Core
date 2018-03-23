@@ -64,7 +64,6 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000,       // creature keeps positive auras at reset
     CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000,       // creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
     CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000,       // creature is immune to AoE
-    CREATURE_EXTRA_FLAG_CIVILIAN                     = 0x00010000,       // CreatureInfo->civilian substitute (for new expansions)
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -81,7 +80,7 @@ enum CreatureFlagsExtra
 // from `creature_template` table
 struct CreatureInfo
 {
-    /*uint32  Entry;
+    uint32  Entry;
     uint32  KillCredit[MAX_KILL_CREDIT];
     uint32  ModelId[MAX_CREATURE_MODEL];
     char*   Name;
@@ -147,87 +146,7 @@ struct CreatureInfo
     uint32  MechanicImmuneMask;
     uint32  SchoolImmuneMask;
     uint32  flags_extra;
-    uint32  ScriptID;*/
-
-    uint32  Entry;
-    char*   Name;
-    char*   SubName;
-    char*   IconName;
-    uint32  MinLevel;
-    uint32  MaxLevel;
-    uint32  HeroicEntry;
-    uint32  ModelId[MAX_CREATURE_MODEL];
-    uint32  FactionAlliance;
-    uint32  FactionHorde;
-    float   Scale;
-    uint32  Family;                                        // enum CreatureFamily values (optional)
-    uint32  CreatureType;                                  // enum CreatureType values
-    uint32  InhabitType;
-    uint32  RegenerateStats;
-    bool    RacialLeader;
-    uint32  NpcFlags;
-    uint32  UnitFlags;                                     // enum UnitFlags mask values
-    uint32  DynamicFlags;
-    uint32  ExtraFlags;
-    uint32  CreatureTypeFlags;                             // enum CreatureTypeFlags mask values
-    float   SpeedWalk;
-    float   SpeedRun;
-    uint32  Detection;                                     // Detection Range for Line of Sight aggro
-    uint32  CallForHelp;
-    uint32  Pursuit;
-    uint32  Leash;
-    uint32  Timeout;
-    uint32  UnitClass;                                     // enum Classes. Note only 4 classes are known for creatures.
-    uint32  Rank;
-    int32   Expansion;                                     // creature expansion, important for stats, CAN BE -1 as marker for some invalid cases.
-    float   HealthMultiplier;
-    float   PowerMultiplier;
-    float   DamageMultiplier;
-    float   DamageVariance;
-    float   ArmorMultiplier;
-    float   ExperienceMultiplier;
-    uint32  MinLevelHealth;
-    uint32  MaxLevelHealth;
-    uint32  MinLevelMana;
-    uint32  MaxLevelMana;
-    float   MinMeleeDmg;
-    float   MaxMeleeDmg;
-    float   MinRangedDmg;
-    float   MaxRangedDmg;
-    uint32  Armor;
-    uint32  MeleeAttackPower;
-    uint32  RangedAttackPower;
-    uint32  MeleeBaseAttackTime;
-    uint32  RangedBaseAttackTime;
-    uint32  DamageSchool;
-    uint32  MinLootGold;
-    uint32  MaxLootGold;
-    uint32  LootId;
-    uint32  PickpocketLootId;
-    uint32  SkinningLootId;
-    uint32  KillCredit[MAX_KILL_CREDIT];
-    uint32  MechanicImmuneMask;
-    uint32  SchoolImmuneMask;
-    int32   ResistanceHoly;
-    int32   ResistanceFire;
-    int32   ResistanceNature;
-    int32   ResistanceFrost;
-    int32   ResistanceShadow;
-    int32   ResistanceArcane;
-    uint32  PetSpellDataId;
-    uint32  MovementType;
-    uint32  TrainerType;
-    uint32  TrainerSpell;
-    uint32  TrainerClass;
-    uint32  TrainerRace;
-    uint32  TrainerTemplateId;
-    uint32  VendorTemplateId;
-    uint32  EquipmentTemplateId;
-    uint32  GossipMenuId;
-    char const* AIName;
     uint32  ScriptID;
-    uint32  spells[CREATURE_MAX_SPELLS];
-    uint32  spells_template;
 
     // helpers
     static HighGuid GetHighGuid()
@@ -239,9 +158,9 @@ struct CreatureInfo
 
     SkillType GetRequiredLootSkill() const
     {
-        if(CreatureTypeFlags & CREATURE_TYPEFLAGS_HERBLOOT)
+        if(type_flags & CREATURE_TYPEFLAGS_HERBLOOT)
             return SKILL_HERBALISM;
-        if(CreatureTypeFlags & CREATURE_TYPEFLAGS_MININGLOOT)
+        if(type_flags & CREATURE_TYPEFLAGS_MININGLOOT)
             return SKILL_MINING;
         return SKILL_SKINNING;
         // normal case
@@ -249,7 +168,7 @@ struct CreatureInfo
 
     bool isTameable() const
     {
-        return CreatureType == CREATURE_TYPE_BEAST && Family != 0 && CreatureTypeFlags & CREATURE_TYPEFLAGS_TAMEABLE;
+        return type == CREATURE_TYPE_BEAST && family != 0 && type_flags & CREATURE_TYPEFLAGS_TAMEABLE;
     }
 };
 
@@ -360,9 +279,7 @@ enum ChatType
     CHAT_TYPE_BOSS_EMOTE        = 3,
     CHAT_TYPE_WHISPER           = 4,
     CHAT_TYPE_BOSS_WHISPER      = 5,
-    CHAT_TYPE_ZONE_YELL         = 6,
-    CHAT_TYPE_ZONE_EMOTE        = 7,
-    CHAT_TYPE_MAX
+    CHAT_TYPE_ZONE_YELL         = 6
 };
 
 // Selection method used by SelectAttackingTarget
@@ -390,12 +307,6 @@ enum SelectFlags
     SELECT_FLAG_NOT_PLAYER          = 0x800,
 };
 
-enum RegenStatsFlags
-{
-    REGEN_FLAG_HEALTH = 0x001,
-    REGEN_FLAG_POWER = 0x002,
-};
-
 // Vendors
 struct VendorItem
 {
@@ -405,8 +316,6 @@ struct VendorItem
     uint32 item;
     uint32 maxcount;                                        // 0 for infinity item amount
     uint32 incrtime;                                        // time for restore items amount if maxcount != 0
-    uint32 ExtendedCost;                                    // index in ItemExtendedCost.dbc
-    uint16 conditionId;                                     // condition to check for this item
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -606,10 +515,10 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsDespawned() const { return getDeathState() ==  DEAD; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         bool IsRacialLeader() const { return GetCreatureInfo()->RacialLeader; }
-        bool IsCivilian() const { return GetCreatureInfo()->ExtraFlags & CREATURE_EXTRA_FLAG_CIVILIAN;}
-        bool IsTrigger() const { return GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_INVISIBLE; }
-        bool IsGuard() const { return GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_GUARD; }
-        bool IsImmuneToAoe() const { return IsTotem() || GetCreatureInfo()->ExtraFlags & CREATURE_FLAG_EXTRA_IMMUNE_AOE; }
+        bool IsCivilian() const { return GetCreatureInfo()->civilian; }
+        bool IsTrigger() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INVISIBLE; }
+        bool IsGuard() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
+        bool IsImmuneToAoe() const { return IsTotem() || GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_IMMUNE_AOE; }
 
         bool CanWalk() const override { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
         bool CanSwim() const override { return IsPet() || GetCreatureInfo()->InhabitType & INHABIT_WATER; }
@@ -642,7 +551,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
             if(IsPet())
                 return false;
 
-            uint32 rank = GetCreatureInfo()->Rank;
+            uint32 rank = GetCreatureInfo()->rank;
             return rank != CREATURE_ELITE_NORMAL && rank != CREATURE_ELITE_RARE;
         }
 
@@ -651,7 +560,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
             if(IsPet())
                 return false;
 
-            return GetCreatureInfo()->Rank == CREATURE_ELITE_WORLDBOSS;
+            return GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS;
         }
 
         uint32 GetLevelForTarget(Unit const* target) const override; // overwrite Unit::GetLevelForTarget for boss level support

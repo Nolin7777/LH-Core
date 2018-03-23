@@ -1136,7 +1136,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
         }
     }
 
-    if (m_creature->GetCreatureInfo()->CreatureTypeFlags & CREATURE_FLAG_EXTRA_NO_AGGRO || m_creature->IsNeutralToAll())
+    if (m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO || m_creature->IsNeutralToAll())
         return;
 
     // Check this now to prevent calling expensive functions (isInAccessablePlaceFor / IsWithinLOSInMap)

@@ -143,7 +143,7 @@ enum
 /*
 [SQL]
 -- ScriptName
-UPDATE creature_template SET ScriptName="npc_etendard" WHERE Entry IN
+UPDATE creature_template SET ScriptName="npc_etendard" WHERE entry IN
 (
 -- Alliance Alterac
 14752,
@@ -156,13 +156,13 @@ UPDATE creature_template SET ScriptName="npc_etendard" WHERE Entry IN
 );
 -- Ajout des sorts
 -- Alliance Alterac
-UPDATE creature_template SET spell1=23574 WHERE Entry = 14752;
+UPDATE creature_template SET spell1=23574 WHERE entry = 14752;
 -- Alliance
-UPDATE creature_template SET spell1=23033 WHERE Entry = 14465;
+UPDATE creature_template SET spell1=23033 WHERE entry = 14465;
 -- Horde Alterac
 -- Horde
-UPDATE creature_template SET spell1=23576 WHERE Entry = 14751;
-UPDATE creature_template SET spell1=23036 WHERE Entry = 14466;
+UPDATE creature_template SET spell1=23576 WHERE entry = 14751;
+UPDATE creature_template SET spell1=23036 WHERE entry = 14466;
 */
 struct npc_etendardAI : NullCreatureAI
 {

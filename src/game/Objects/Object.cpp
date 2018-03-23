@@ -432,6 +432,8 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
             *data << float(unit->GetSpeed(MOVE_RUN_BACK));
             *data << float(unit->GetSpeed(MOVE_SWIM));
             *data << float(unit->GetSpeed(MOVE_SWIM_BACK));
+            *data << float(unit->GetSpeed(MOVE_FLIGHT));
+            *data << float(unit->GetSpeed(MOVE_FLIGHT_BACK));
             *data << float(unit->GetSpeed(MOVE_TURN_RATE));
             // Send current movement informations
             if (unit->m_movementInfo.moveFlags & MOVEFLAG_SPLINE_ENABLED)

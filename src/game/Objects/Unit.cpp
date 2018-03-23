@@ -77,6 +77,8 @@ float baseMoveSpeed[MAX_MOVE_TYPE] =
     4.722222f,                                              // MOVE_SWIM
     2.5f,                                                   // MOVE_SWIM_BACK
     3.141594f,                                              // MOVE_TURN_RATE
+    7.0f,                                                   // MOVE_FLIGHT
+    4.5f,                                                   // MOVE_FLIGHT_BACK
 };
 
 
@@ -7924,6 +7926,24 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
         }
         case MOVE_SWIM_BACK:
             return;
+        case MOVE_FLIGHT:
+        {
+            if (IsMounted()) // Use on mount auras
+            {
+                main_speed_mod = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED);
+                stack_bonus = GetTotalAuraMultiplier(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_STACKING);
+                non_stack_bonus = (100.0f + GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING)) / 100.0f;
+            }
+            else             // Use not mount (shapeshift for example) auras (should stack)
+            {
+                main_speed_mod = GetTotalAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED);
+                stack_bonus = GetTotalAuraMultiplier(SPELL_AURA_MOD_FLIGHT_SPEED_STACKING);
+                non_stack_bonus = (100.0f + GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING)) / 100.0f;
+            }
+            break;
+        }
+        case MOVE_FLIGHT_BACK:
+            return;
         default:
             sLog.outError("Unit::UpdateSpeed: Unsupported move type (%d)", mtype);
             return;
@@ -7937,6 +7957,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
     {
         case MOVE_RUN:
         case MOVE_SWIM:
+        case MOVE_FLIGHT:
         {
             // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
             // TODO: possible affect only on MOVE_RUN

@@ -463,9 +463,11 @@ enum UnitMoveType
     MOVE_SWIM           = 3,
     MOVE_SWIM_BACK      = 4,
     MOVE_TURN_RATE      = 5,
+    MOVE_FLIGHT         = 6,
+    MOVE_FLIGHT_BACK    = 7,
 };
 
-#define MAX_MOVE_TYPE 6
+#define MAX_MOVE_TYPE 8
 
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 

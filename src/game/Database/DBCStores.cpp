@@ -123,7 +123,7 @@ DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
 SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
 
-//DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
+DBCStorage <SoundEntriesEntry> sSoundEntriesStore(SoundEntriesfmt);
 
 DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
 DBCStorage <SpellItemEnchantmentConditionEntry> sSpellItemEnchantmentConditionStore(SpellItemEnchantmentConditionfmt);
@@ -833,10 +833,10 @@ uint32 GetCreatureModelRace(uint32 model_id)
 }
 
 // script support functions
-//MANGOS_DLL_SPEC DBCStorage <SoundEntriesEntry>    const* GetSoundEntriesStore()
-//{
-//    return &sSoundEntriesStore;
-//}
+MANGOS_DLL_SPEC DBCStorage <SoundEntriesEntry>    const* GetSoundEntriesStore()
+{
+    return &sSoundEntriesStore;
+}
 MANGOS_DLL_SPEC DBCStorage <SpellRangeEntry>    const* GetSpellRangeStore()
 {
     return &sSpellRangeStore;

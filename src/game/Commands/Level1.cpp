@@ -1624,7 +1624,7 @@ bool ChatHandler::HandleLookupSoundCommand(char* args)
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
     // TODO
-    /*for (uint32 id = 0; id < sObjectMgr.GetMaxSoundId(); ++id)
+    for (uint32 id = 0; id < sObjectMgr.GetMaxSoundId(); ++id)
     {
         SoundEntriesEntry const *soundEntry = sObjectMgr.GetSoundEntry(id);
         if (soundEntry)
@@ -1647,7 +1647,7 @@ bool ChatHandler::HandleLookupSoundCommand(char* args)
 
             counter++;
         }
-    }*/
+    }
 
     if (counter == 0)
         SendSysMessage(LANG_COMMAND_SOUND_NOT_FOUND);

@@ -7473,7 +7473,7 @@ void ObjectMgr::LoadGameObjectForQuests()
     sLog.outString(">> Loaded %u GameObjects for quests", count);
 }
 
-/*
+
 void ObjectMgr::LoadSoundEntries()
 {
     sLog.outString("Loading sounds ...");
@@ -7519,7 +7519,7 @@ void ObjectMgr::LoadSoundEntries()
 
     sLog.outString();
     sLog.outString(">> Loaded %u sound entries.", maxSoundEntry);
-}*/
+}
 
 void ObjectMgr::LoadBroadcastTexts()
 {

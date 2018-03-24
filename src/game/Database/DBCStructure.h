@@ -663,7 +663,7 @@ struct MapEntry
 
     bool IsContinent() const
     {
-        return MapID == 0 || MapID == 1/* || MapID == 530*/;
+        return MapID == 0 || MapID == 1 || MapID == 530;
     }
 };
 

@@ -18241,7 +18241,7 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
     {
         WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
         data2 << GetPackGUID();
-        data2 << (uint32)0;
+        data2 << (uint32)2;
         SendObjectMessageToSet(&data2, true);
         GetCheatData()->OrderSent(&data2);
     }

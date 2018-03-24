@@ -60,7 +60,7 @@ void MapManager::Initialize()
     InitStateMachine();
     InitMaxInstanceId();
     
-    /*for (uint32 i = 1; i <= sMapStore.GetNumRows(); ++i)
+    for (uint32 i = 1; i <= sMapStore.GetNumRows(); ++i)
     {
         MapEntry const* mEntry = sMapStore.LookupEntry(i);
 
@@ -74,7 +74,7 @@ void MapManager::Initialize()
         TerrainInfo* terrain = sTerrainMgr.LoadTerrain(mEntry->MapID);
         terrain->AddRef(); // So it won't be deleted
         terrain->LoadAll();
-    }*/
+    }
 }
 
 void MapManager::InitStateMachine()

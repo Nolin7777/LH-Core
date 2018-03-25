@@ -181,9 +181,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         data << Name;
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << SubName;
+        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
         data << uint32(ci->type_flags);                     // flags
         data << uint32(ci->type); // Nostalrius : fix pets des chasseurs non consideres comme betes.
-
         data << uint32(ci->family);                         // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(0);                                  // unknown        wdbFeild11
@@ -193,7 +193,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         else
             data << uint32(Creature::ChooseDisplayId(ci));  // workaround, way to manage models must be fixed
 
-        data << uint8(ci->civilian);                       //wdbFeild14
+        //data << uint8(ci->civilian);                       //wdbFeild14
+        data << float(ci->HealthMultiplier);                 // health multiplier
+        data << float(ci->PowerMultiplier);                   // mana multiplier
         data << uint8(ci->RacialLeader);
 
         /* TODO Fix SMSG_CREATURE_QUERY_RESPONSE with correct data from DB.

@@ -147,6 +147,9 @@ struct CreatureInfo
     uint32  SchoolImmuneMask;
     uint32  flags_extra;
     uint32  ScriptID;
+    uint32  IconName;
+    float   HealthMultiplier;
+    float   PowerMultiplier;
 
     // helpers
     static HighGuid GetHighGuid()

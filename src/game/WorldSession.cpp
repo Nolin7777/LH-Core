@@ -289,18 +289,6 @@ void WorldSession::LogUnprocessedTail(WorldPacket *packet)
 
 bool WorldSession::ForcePlayerLogoutDelay()
 {
-    if (_accountFlags & ACCOUNT_FLAG_DEBUG_LOGIN)
-    {
-        sLog.outInfo("Account %u logout delay, time: %u", _accountId, time(nullptr));
-
-        if (_player)
-        {
-            const ObjectGuid& guid = _player->GetObjectGuid();
-            sLog.outInfo("Account %u logout delay. in world: %d, character: %s, m_guid : " UI64FMTD ", guid : %u",
-                _accountId, _player->IsInWorld(), _player->GetName(), guid.GetRawValue(), guid.GetCounter());
-        }
-    }
-
     if (!sWorld.IsStopped() && GetPlayer() && GetPlayer()->FindMap() && GetPlayer()->IsInWorld() && sPlayerBotMgr.ForceLogoutDelay())
     {
         sLog.out(LOG_CHAR, "Account: %d (IP: %s) Lost socket for character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
@@ -671,24 +659,6 @@ void WorldSession::LogoutPlayer(bool Save)
     m_playerLogout = true;
     m_playerSave = Save;
     bool doBanPlayer = false;
-
-    if (_accountFlags & ACCOUNT_FLAG_DEBUG_LOGIN)
-    {
-        sLog.outInfo("Account %u logout. Connected: %d (disc timer: %u). Has player: %d, time: %u",
-            _accountId, m_connected, m_disconnectTimer, _player != nullptr, time(nullptr));
-
-        if (_player)
-        {
-            sLog.outInfo("Account %u logout. Player session equal: %d",
-                _accountId, _player->GetSession() == this);
-        }
-
-        if (m_masterPlayer)
-        {
-            sLog.outInfo("Account %u logout. Has masterPlayer. Master player session equal: %d",
-                _accountId, m_masterPlayer->GetSession() == this);
-        }
-    }
 
     if (_player)
     {

@@ -247,13 +247,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     }
 
     // prevent character creating Expansion race without Expansion account
-    if (raceEntry->expansion > Expansion())
+    /*if (raceEntry->expansion > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION;
         sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->expansion, race_);
         SendPacket(&data);
         return;
-    }
+    }*/
 
     // prevent character creating with invalid name
     if (!normalizePlayerName(name))
@@ -600,7 +600,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         DEBUG_LOG("WORLD: Sent motd (SMSG_MOTD)");
     }
 
-    if (Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId()))
+    /*if (Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId()))
     {
         WorldPacket data(SMSG_GUILD_EVENT, (1 + 1 + guild->GetMOTD().size() + 1));
         data << uint8(GE_MOTD);
@@ -610,7 +610,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         DEBUG_LOG("WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
 
         guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
-    }
+    }*/
 
     if (!pCurrChar->isAlive())
         pCurrChar->SendCorpseReclaimDelay(true);

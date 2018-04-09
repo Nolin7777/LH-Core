@@ -446,7 +446,7 @@ void npc_doctorAI::PatientDied(Location* Point)
                     pPlayer->FailQuest(QUEST_TRIAGE_A);
                 else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
                     pPlayer->FailQuest(QUEST_TRIAGE_H);
-                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);                
+                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
                 Reset();
                 return;
             }
@@ -456,7 +456,7 @@ void npc_doctorAI::PatientDied(Location* Point)
         else
         {
             // If no player or player abandon quest in progress
-            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);        
+            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
             Reset();
         }
     }
@@ -555,7 +555,7 @@ bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, const Quest* p
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
     {
-        pPlayer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pPlayer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pCreature->AI()))
             pDocAI->BeginEvent(pPlayer);
     }
@@ -566,7 +566,7 @@ bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, const Quest* p
 bool QuestRewarded_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
-        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     return true;
 }
@@ -1661,7 +1661,7 @@ struct npc_cannonball_runnerAI : ScriptedPetAI
             m_creature->SetOrientation(m_creature->GetOwner()->GetOrientation());
 
         m_creature->addUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE); // TODO
 
         npc_cannonball_runnerAI::Reset();
     }

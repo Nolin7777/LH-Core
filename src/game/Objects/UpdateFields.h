@@ -36,39 +36,38 @@ enum EObjectFields
 
 enum EItemFields
 {
-    ITEM_FIELD_OWNER                           = OBJECT_END + 0x00, // Size:2
-    ITEM_FIELD_CONTAINED                       = OBJECT_END + 0x02, // Size:2
-    ITEM_FIELD_CREATOR                         = OBJECT_END + 0x04, // Size:2
-    ITEM_FIELD_GIFTCREATOR                     = OBJECT_END + 0x06, // Size:2
-    ITEM_FIELD_STACK_COUNT                     = OBJECT_END + 0x08, // Size:1
-    ITEM_FIELD_DURATION                        = OBJECT_END + 0x09, // Size:1
-    ITEM_FIELD_SPELL_CHARGES                   = OBJECT_END + 0x0A, // Size:5
-    ITEM_FIELD_SPELL_CHARGES_01                = OBJECT_END + 0x0B,
-    ITEM_FIELD_SPELL_CHARGES_02                = OBJECT_END + 0x0C,
-    ITEM_FIELD_SPELL_CHARGES_03                = OBJECT_END + 0x0D,
-    ITEM_FIELD_SPELL_CHARGES_04                = OBJECT_END + 0x0E,
-    ITEM_FIELD_FLAGS                           = OBJECT_END + 0x0F, // Size:1
-    ITEM_FIELD_ENCHANTMENT                     = OBJECT_END + 0x10, // count=21
-    ITEM_FIELD_PROPERTY_SEED                   = OBJECT_END + 0x25, // Size:1
-    ITEM_FIELD_RANDOM_PROPERTIES_ID            = OBJECT_END + 0x26, // Size:1
-    ITEM_FIELD_ITEM_TEXT_ID                    = OBJECT_END + 0x27, // Size:1
-    ITEM_FIELD_DURABILITY                      = OBJECT_END + 0x28, // Size:1
-    ITEM_FIELD_MAXDURABILITY                   = OBJECT_END + 0x29, // Size:1
-    ITEM_END                                   = OBJECT_END + 0x2A,
+    ITEM_FIELD_OWNER                          = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
+    ITEM_FIELD_CONTAINED                      = OBJECT_END + 0x0002, // Size: 2, Type: LONG, Flags: PUBLIC
+    ITEM_FIELD_CREATOR                        = OBJECT_END + 0x0004, // Size: 2, Type: LONG, Flags: PUBLIC
+    ITEM_FIELD_GIFTCREATOR                    = OBJECT_END + 0x0006, // Size: 2, Type: LONG, Flags: PUBLIC
+    ITEM_FIELD_STACK_COUNT                    = OBJECT_END + 0x0008, // Size: 1, Type: INT, Flags: OWNER_ONLY, UNK2
+    ITEM_FIELD_DURATION                       = OBJECT_END + 0x0009, // Size: 1, Type: INT, Flags: OWNER_ONLY, UNK2
+    ITEM_FIELD_SPELL_CHARGES                  = OBJECT_END + 0x000A, // Size: 5, Type: INT, Flags: OWNER_ONLY, UNK2
+    ITEM_FIELD_SPELL_CHARGES_01               = OBJECT_END + 0x000B,
+    ITEM_FIELD_SPELL_CHARGES_02               = OBJECT_END + 0x000C,
+    ITEM_FIELD_SPELL_CHARGES_03               = OBJECT_END + 0x000D,
+    ITEM_FIELD_SPELL_CHARGES_04               = OBJECT_END + 0x000E,
+    ITEM_FIELD_FLAGS                          = OBJECT_END + 0x000F, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_ENCHANTMENT                    = OBJECT_END + 0x0010, // Size: 33, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_PROPERTY_SEED                  = OBJECT_END + 0x0031, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_RANDOM_PROPERTIES_ID           = OBJECT_END + 0x0032, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_ITEM_TEXT_ID                   = OBJECT_END + 0x0033, // Size: 1, Type: INT, Flags: OWNER_ONLY
+    ITEM_FIELD_DURABILITY                     = OBJECT_END + 0x0034, // Size: 1, Type: INT, Flags: OWNER_ONLY, UNK2
+    ITEM_FIELD_MAXDURABILITY                  = OBJECT_END + 0x0035, // Size: 1, Type: INT, Flags: OWNER_ONLY, UNK2
+    ITEM_END                                  = OBJECT_END + 0x0036,
 };
 
 enum EContainerFields
 {
-    CONTAINER_FIELD_NUM_SLOTS                  = ITEM_END + 0x00, // Size:1
-    CONTAINER_ALIGN_PAD                        = ITEM_END + 0x01, // Size:1
-    CONTAINER_FIELD_SLOT_1                     = ITEM_END + 0x02, // count=56
-    CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x38,
-    CONTAINER_END                              = ITEM_END + 0x3A,
+    CONTAINER_FIELD_NUM_SLOTS = ITEM_END + 0x0000, // Size: 1, Type: INT, Flags: PUBLIC
+    CONTAINER_ALIGN_PAD = ITEM_END + 0x0001, // Size: 1, Type: BYTES, Flags: NONE
+    CONTAINER_FIELD_SLOT_1 = ITEM_END + 0x0002, // Size: 72, Type: LONG, Flags: PUBLIC
+    CONTAINER_END = ITEM_END + 0x004A,
 };
 
 enum EUnitFields
 {
-        UNIT_FIELD_CHARM                          = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
+    UNIT_FIELD_CHARM                          = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
     UNIT_FIELD_SUMMON                         = OBJECT_END + 0x0002, // Size: 2, Type: LONG, Flags: PUBLIC
     UNIT_FIELD_CHARMEDBY                      = OBJECT_END + 0x0004, // Size: 2, Type: LONG, Flags: PUBLIC
     UNIT_FIELD_SUMMONEDBY                     = OBJECT_END + 0x0006, // Size: 2, Type: LONG, Flags: PUBLIC
@@ -405,23 +404,23 @@ enum EUnitFields
 
 enum EGameObjectFields
 {
-    OBJECT_FIELD_CREATED_BY                    = OBJECT_END + 0x00,
-    GAMEOBJECT_DISPLAYID                       = OBJECT_END + 0x02,
-    GAMEOBJECT_FLAGS                           = OBJECT_END + 0x03,
-    GAMEOBJECT_ROTATION                        = OBJECT_END + 0x04,
-    GAMEOBJECT_STATE                           = OBJECT_END + 0x08,
-    GAMEOBJECT_POS_X                           = OBJECT_END + 0x09,
-    GAMEOBJECT_POS_Y                           = OBJECT_END + 0x0A,
-    GAMEOBJECT_POS_Z                           = OBJECT_END + 0x0B,
-    GAMEOBJECT_FACING                          = OBJECT_END + 0x0C,
-    GAMEOBJECT_DYN_FLAGS                       = OBJECT_END + 0x0D,
-    GAMEOBJECT_FACTION                         = OBJECT_END + 0x0E,
-    GAMEOBJECT_TYPE_ID                         = OBJECT_END + 0x0F,
-    GAMEOBJECT_LEVEL                           = OBJECT_END + 0x10,
-    GAMEOBJECT_ARTKIT                          = OBJECT_END + 0x11,
-    GAMEOBJECT_ANIMPROGRESS                    = OBJECT_END + 0x12,
-    GAMEOBJECT_PADDING                         = OBJECT_END + 0x13,
-    GAMEOBJECT_END                             = OBJECT_END + 0x14,
+    OBJECT_FIELD_CREATED_BY                   = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
+    GAMEOBJECT_DISPLAYID                      = OBJECT_END + 0x0002, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_FLAGS                          = OBJECT_END + 0x0003, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_ROTATION                       = OBJECT_END + 0x0004, // Size: 4, Type: FLOAT, Flags: PUBLIC
+    GAMEOBJECT_STATE                          = OBJECT_END + 0x0008, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_POS_X                          = OBJECT_END + 0x0009, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    GAMEOBJECT_POS_Y                          = OBJECT_END + 0x000A, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    GAMEOBJECT_POS_Z                          = OBJECT_END + 0x000B, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    GAMEOBJECT_FACING                         = OBJECT_END + 0x000C, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    GAMEOBJECT_DYN_FLAGS                      = OBJECT_END + 0x000D, // Size: 1, Type: INT, Flags: DYNAMIC
+    GAMEOBJECT_FACTION                        = OBJECT_END + 0x000E, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_TYPE_ID                        = OBJECT_END + 0x000F, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_LEVEL                          = OBJECT_END + 0x0010, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_ARTKIT                         = OBJECT_END + 0x0011, // Size: 1, Type: INT, Flags: PUBLIC
+    GAMEOBJECT_ANIMPROGRESS                   = OBJECT_END + 0x0012, // Size: 1, Type: INT, Flags: DYNAMIC
+    GAMEOBJECT_PADDING                        = OBJECT_END + 0x0013, // Size: 1, Type: INT, Flags: NONE
+    GAMEOBJECT_END                            = OBJECT_END + 0x0014,
 };
 
 enum EDynamicObjectFields
@@ -440,19 +439,20 @@ enum EDynamicObjectFields
 
 enum ECorpseFields
 {
-    CORPSE_FIELD_OWNER                         = OBJECT_END + 0x00,
-    CORPSE_FIELD_FACING                        = OBJECT_END + 0x02,
-    CORPSE_FIELD_POS_X                         = OBJECT_END + 0x03,
-    CORPSE_FIELD_POS_Y                         = OBJECT_END + 0x04,
-    CORPSE_FIELD_POS_Z                         = OBJECT_END + 0x05,
-    CORPSE_FIELD_DISPLAY_ID                    = OBJECT_END + 0x06,
-    CORPSE_FIELD_ITEM                          = OBJECT_END + 0x07, // 19
-    CORPSE_FIELD_BYTES_1                       = OBJECT_END + 0x1A,
-    CORPSE_FIELD_BYTES_2                       = OBJECT_END + 0x1B,
-    CORPSE_FIELD_GUILD                         = OBJECT_END + 0x1C,
-    CORPSE_FIELD_FLAGS                         = OBJECT_END + 0x1D,
-    CORPSE_FIELD_DYNAMIC_FLAGS                 = OBJECT_END + 0x1E,
-    CORPSE_FIELD_PAD                           = OBJECT_END + 0x1F,
-    CORPSE_END                                 = OBJECT_END + 0x20,
+    CORPSE_FIELD_OWNER                        = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
+    CORPSE_FIELD_PARTY                        = OBJECT_END + 0x0002, // Size: 2, Type: LONG, Flags: PUBLIC
+    CORPSE_FIELD_FACING                       = OBJECT_END + 0x0004, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    CORPSE_FIELD_POS_X                        = OBJECT_END + 0x0005, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    CORPSE_FIELD_POS_Y                        = OBJECT_END + 0x0006, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    CORPSE_FIELD_POS_Z                        = OBJECT_END + 0x0007, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    CORPSE_FIELD_DISPLAY_ID                   = OBJECT_END + 0x0008, // Size: 1, Type: INT, Flags: PUBLIC
+    CORPSE_FIELD_ITEM                         = OBJECT_END + 0x0009, // Size: 19, Type: INT, Flags: PUBLIC
+    CORPSE_FIELD_BYTES_1                      = OBJECT_END + 0x001C, // Size: 1, Type: BYTES, Flags: PUBLIC
+    CORPSE_FIELD_BYTES_2                      = OBJECT_END + 0x001D, // Size: 1, Type: BYTES, Flags: PUBLIC
+    CORPSE_FIELD_GUILD                        = OBJECT_END + 0x001E, // Size: 1, Type: INT, Flags: PUBLIC
+    CORPSE_FIELD_FLAGS                        = OBJECT_END + 0x001F, // Size: 1, Type: INT, Flags: PUBLIC
+    CORPSE_FIELD_DYNAMIC_FLAGS                = OBJECT_END + 0x0020, // Size: 1, Type: INT, Flags: DYNAMIC
+    CORPSE_FIELD_PAD                          = OBJECT_END + 0x0021, // Size: 1, Type: INT, Flags: NONE
+    CORPSE_END                                = OBJECT_END + 0x0022,
 };
 #endif

@@ -404,7 +404,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     {
         SetByteValue(UNIT_FIELD_BYTES_1, 1, m_pTmpCache->loyalty);
 
-        SetUInt32Value(UNIT_FIELD_FLAGS, m_pTmpCache->renamed ? UNIT_FLAG_PET_ABANDON : UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
+        SetByteFlag(UNIT_FIELD_BYTES_2, 2, m_pTmpCache->renamed ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
 
         SetTP(m_pTmpCache->trainpoint);
 
@@ -415,10 +415,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     if (getPetType() != MINI_PET)
     {
-        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         else
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     }
 
     // Save pet for resurrection by spirit healer.
@@ -535,7 +535,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         m_pTmpCache->trainpoint = m_TrainingPoints;
         m_pTmpCache->slot = mode;
         m_pTmpCache->name = m_name;
-        m_pTmpCache->renamed = uint32(HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME) ? 0 : 1);
+        m_pTmpCache->renamed = uint32(HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ? 0 : 1);
         m_pTmpCache->curhealth = curhealth;
         m_pTmpCache->curmana = curmana;
         m_pTmpCache->curhappiness = GetPower(POWER_HAPPINESS);
@@ -561,7 +561,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         savePet.addInt32(m_TrainingPoints);
         savePet.addUInt32(uint32(mode));
         savePet.addString(m_name);
-        savePet.addUInt32(uint32(HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME) ? 0 : 1));
+        savePet.addUInt32(uint32(HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ? 0 : 1));
         savePet.addUInt32((curhealth < 1 ? 1 : curhealth));
         savePet.addUInt32(curmana);
         savePet.addUInt32(GetPower(POWER_HAPPINESS));
@@ -1239,8 +1239,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_FOCUS);
         SetSheath(SHEATH_STATE_MELEE);
         SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
-        SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
-
+        SetByteValue(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
 
         SetUInt32Value(UNIT_MOD_CAST_SPEED, creature->GetUInt32Value(UNIT_MOD_CAST_SPEED));
         SetLoyaltyLevel(REBELLIOUS);
@@ -1278,7 +1277,9 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
 
             // this enables popup window (pet abandon, cancel), original value set in CreateBaseAtCreature
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_ABANDON);
+            //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_ABANDON);
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
             break;
         case GUARDIAN_PET:
         default:
@@ -1429,10 +1430,10 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     if (getPetType() != MINI_PET)
     {
-        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         else
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     }
 
     for (int i = 0; i < 6; ++i)

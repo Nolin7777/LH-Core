@@ -112,7 +112,7 @@ Unit::Unit()
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
-    m_updateFlag = (UPDATEFLAG_ALL | UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION);
+    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION);
 
     m_attackTimer[BASE_ATTACK]   = 0;
     m_attackTimer[OFF_ATTACK]    = 0;
@@ -3684,7 +3684,7 @@ Spell* Unit::FindCurrentSpellBySpellId(uint32 spell_id) const
 
 void Unit::SetInFront(Unit const* target)
 {
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE))
+    //if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE)) // TODO
         SetOrientation(GetAngle(target));
 }
 
@@ -5538,9 +5538,9 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
                 return *repRank;
     }
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
     {
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
         {
             if (selfPlayerOwner && targetPlayerOwner)
             {
@@ -7388,7 +7388,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
 
         pCreature->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
         // should probably be removed for the attacked (+ it's party/group) only, not global
-        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1);
 
         OnEnterCombat(enemy, true);
 
@@ -7413,8 +7413,8 @@ void Unit::ClearInCombat()
     // Player's state will be cleared in Player::UpdateContestedPvP
     if (GetTypeId() != TYPEID_PLAYER)
     {
-        if (((Creature*)this)->GetCreatureInfo()->unit_flags & UNIT_FLAG_OOC_NOT_ATTACKABLE)
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        if (((Creature*)this)->GetCreatureInfo()->unit_flags & UNIT_FLAG_NOT_ATTACKABLE_1)
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1);
 
         clearUnitState(UNIT_STAT_ATTACK_PLAYER);
     }
@@ -7446,7 +7446,7 @@ bool Unit::isTargetableForAttack(bool inverseAlive /*=false*/) const
         return false;
 
     // to be removed if unit by any reason enter combat
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1))
         return false;
 
     // inversealive is needed for some spells which need to be casted at dead targets (aoe)
@@ -7481,7 +7481,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellEntry const* bySpell, W
         return false;
 
     // CvC case - can attack each other only when one of them is hostile
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
         return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
 
     // PvP, PvC, CvP case
@@ -7490,8 +7490,8 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellEntry const* bySpell, W
             || target->GetReactionTo(this) > REP_NEUTRAL)
         return false;
 
-    Player const* playerAffectingAttacker = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) ? GetAffectingPlayer() : NULL;
-    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) ? target->GetAffectingPlayer() : NULL;
+    Player const* playerAffectingAttacker = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1) ? GetAffectingPlayer() : NULL;
+    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1) ? target->GetAffectingPlayer() : NULL;
 
     // Not all neutral creatures can be attacked
     if (GetReactionTo(target) == REP_NEUTRAL &&
@@ -8085,6 +8085,8 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
             {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
             {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
             {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
+            {MSG_MOVE_SET_FLIGHT_SPEED,     SMSG_FORCE_FLIGHT_SPEED_CHANGE },
+            {MSG_MOVE_SET_FLIGHT_BACK_SPEED , SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE },
         };
 
         if (forced)
@@ -8094,6 +8096,8 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
                 WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 18);
                 dataForMe << GetPackGUID();
                 dataForMe << uint32(0);
+                if (mtype == MOVE_RUN)
+                    dataForMe << uint8(0);                           // new 2.1.0
                 dataForMe << float(GetSpeed(mtype));
                 me->GetSession()->SendPacket(&dataForMe);
                 me->GetCheatData()->OrderSent(&dataForMe);
@@ -10965,7 +10969,7 @@ bool Unit::isAttackableByAOE(bool requireDeadTarget) const
         return false;
 
     if (HasFlag(UNIT_FIELD_FLAGS,
-                UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE))
+                UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NOT_ATTACKABLE_1))
         return false;
 
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->isGameMaster())

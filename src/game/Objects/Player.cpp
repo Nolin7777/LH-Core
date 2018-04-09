@@ -694,7 +694,7 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
         SetByteValue(UNIT_FIELD_BYTES_1, 1, 0xEE);
 
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_UNK5 | UNIT_BYTE2_FLAG_PVP);
-    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);               // fix cast time showed in spell tooltip on client
 
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, -1);  // -1 is default value
@@ -3055,12 +3055,12 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // cleanup unit flags (will be re-applied if need at aura load).
     RemoveFlag(UNIT_FIELD_FLAGS,
                UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1 |
-               UNIT_FLAG_OOC_NOT_ATTACKABLE | UNIT_FLAG_PASSIVE  | UNIT_FLAG_LOOTING          |
+               UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_PASSIVE  | UNIT_FLAG_LOOTING          |
                UNIT_FLAG_PET_IN_COMBAT  | UNIT_FLAG_SILENCED     | UNIT_FLAG_PACIFIED         |
                UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
                UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
-               UNIT_FLAG_SKINNABLE      | UNIT_FLAG_AURAS_VISIBLE        | UNIT_FLAG_TAXI_FLIGHT);
-    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);    // must be set
+               UNIT_FLAG_SKINNABLE      | UNIT_FLAG_TAXI_FLIGHT);
+    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);    // must be set
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_FLAGS_FFA_PVP);
@@ -3087,6 +3087,159 @@ void Player::InitStatsForLevel(bool reapplyMods)
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
 }
+
+/*void Player::InitStatsForLevel(bool reapplyMods)
+{
+    if (reapplyMods)                                        // reapply stats values only on .reset stats (level) command
+        _RemoveAllStatBonuses();
+
+    PlayerClassLevelInfo classInfo;
+
+    uint32 level = getLevel();
+    uint32 plClass = getClass();
+    sObjectMgr.GetPlayerClassLevelInfo(plClass, level, &classInfo);
+
+    PlayerLevelInfo info;
+    sObjectMgr.GetPlayerLevelInfo(getRace(), plClass, level, &info);
+
+    SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
+    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr.GetXPForLevel(level));
+
+    // reset before any aura state sources (health set/aura apply)
+    SetUInt32Value(UNIT_FIELD_AURASTATE, 0);
+
+    UpdateSkillsForLevel();
+
+    // set default cast time multiplier
+    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
+
+    // save base values (bonuses already included in stored stats
+    for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
+        SetCreateStat(Stats(i), info.stats[i]);
+
+    for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
+        SetStat(Stats(i), info.stats[i]);
+
+    SetCreateHealth(classInfo.basehealth);
+
+    // set create powers
+    SetCreateMana(classInfo.basemana);
+
+    SetArmor(int32(m_createStats[STAT_AGILITY] * 2));
+
+    InitStatBuffMods();
+
+    // reset rating fields values
+    for (uint16 index = PLAYER_FIELD_COMBAT_RATING_1; index < PLAYER_FIELD_COMBAT_RATING_1 + MAX_COMBAT_RATING; ++index)
+        SetUInt32Value(index, 0);
+
+    SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 0);
+    for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + i, 0);
+        SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, 0);
+        SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + i, 1.00f);
+    }
+
+    // reset attack power, damage and attack speed fields
+    SetFloatValue(UNIT_FIELD_BASEATTACKTIME, 2000.0f);
+    SetFloatValue(UNIT_FIELD_BASEATTACKTIME + 1, 2000.0f);  // offhand attack time
+    SetFloatValue(UNIT_FIELD_RANGEDATTACKTIME, 2000.0f);
+
+    SetFloatValue(UNIT_FIELD_MINDAMAGE, 0.0f);
+    SetFloatValue(UNIT_FIELD_MAXDAMAGE, 0.0f);
+    SetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE, 0.0f);
+    SetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE, 0.0f);
+    SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, 0.0f);
+    SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, 0.0f);
+
+    SetInt32Value(UNIT_FIELD_ATTACK_POWER, 0);
+    SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, 0);
+    SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, 0.0f);
+    SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER, 0);
+    SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0);
+    SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, 0.0f);
+
+    // Base crit values (will be recalculated in UpdateAllStats() at loading and in _ApplyAllStatBonuses() at reset
+    SetFloatValue(PLAYER_CRIT_PERCENTAGE, 0.0f);
+    SetFloatValue(PLAYER_OFFHAND_CRIT_PERCENTAGE, 0.0f);
+    SetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE, 0.0f);
+
+    // Init spell schools (will be recalculated in UpdateAllStats() at loading and in _ApplyAllStatBonuses() at reset
+    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + i, 0.0f);
+
+    SetFloatValue(PLAYER_PARRY_PERCENTAGE, 0.0f);
+    SetFloatValue(PLAYER_BLOCK_PERCENTAGE, 0.0f);
+    SetUInt32Value(PLAYER_SHIELD_BLOCK, 0);
+
+    // Dodge percentage
+    SetFloatValue(PLAYER_DODGE_PERCENTAGE, 0.0f);
+
+    // set armor (resistance 0) to original value (create_agility*2)
+    SetArmor(int32(m_createStats[STAT_AGILITY] * 2));
+    SetResistanceBuffMods(SpellSchools(0), true, 0.0f);
+    SetResistanceBuffMods(SpellSchools(0), false, 0.0f);
+    // set other resistance to original value (0)
+    for (int i = 1; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        SetResistance(SpellSchools(i), 0);
+        SetResistanceBuffMods(SpellSchools(i), true, 0.0f);
+        SetResistanceBuffMods(SpellSchools(i), false, 0.0f);
+    }
+
+    SetUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, 0);
+    SetUInt32Value(PLAYER_FIELD_MOD_TARGET_PHYSICAL_RESISTANCE, 0);
+    for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        SetUInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + i, 0);
+        SetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + i, 0.0f);
+    }
+    // Init data for form but skip reapply item mods for form
+    InitDataForForm(reapplyMods);
+
+    // save new stats
+    for (int i = POWER_MANA; i < MAX_POWERS; ++i)
+        SetMaxPower(Powers(i), GetCreatePowers(Powers(i)));
+
+    SetMaxHealth(classInfo.basehealth);                     // stamina bonus will applied later
+
+                                                            // cleanup mounted state (it will set correctly at aura loading if player saved at mount.
+    SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
+
+    // cleanup unit flags (will be re-applied if need at aura load).
+    RemoveFlag(UNIT_FIELD_FLAGS,
+        UNIT_FLAG_UNK_0 | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1 |
+        UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_PASSIVE | UNIT_FLAG_LOOTING |
+        UNIT_FLAG_PET_IN_COMBAT | UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED |
+        UNIT_FLAG_STUNNED | UNIT_FLAG_IN_COMBAT | UNIT_FLAG_DISARMED |
+        UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED |
+        UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_SKINNABLE | UNIT_FLAG_MOUNT |
+        UNIT_FLAG_TAXI_FLIGHT);
+    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);    // must be set
+
+                                                               // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
+    RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_FLAGS_PVP_DESIRED | PLAYER_FLAGS_FFA_PVP);
+
+    RemoveStandFlags(UNIT_STAND_FLAGS_ALL);                 // one form stealth modified bytes
+
+                                                            // restore if need some important flags
+    SetUInt32Value(PLAYER_FIELD_BYTES2, 0);                 // flags empty by default
+
+    if (reapplyMods)                                        // reapply stats values only on .reset stats (level) command
+        _ApplyAllStatBonuses();
+
+    // set current level health and mana/energy to maximum after applying all mods.
+    SetHealth(GetMaxHealth());
+    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+    if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
+        SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
+
+    // update level to hunter/summon pet
+    if (Pet* pet = GetPet())
+        pet->SynchronizeLevelWithOwner();
+}*/
 
 void Player::SendInitialSpells()
 {
@@ -4019,9 +4172,96 @@ void Player::InitVisibleBits()
 {
     updateVisualBits.SetCount(PLAYER_END);
 
+    updateVisualBits.SetBit(OBJECT_FIELD_GUID);
+    updateVisualBits.SetBit(OBJECT_FIELD_TYPE);
+    updateVisualBits.SetBit(OBJECT_FIELD_SCALE_X);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARM + 0);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARM + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_SUMMON + 0);
+    updateVisualBits.SetBit(UNIT_FIELD_SUMMON + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY + 0);
+    updateVisualBits.SetBit(UNIT_FIELD_CHARMEDBY + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_TARGET + 0);
+    updateVisualBits.SetBit(UNIT_FIELD_TARGET + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_CHANNEL_OBJECT + 0);
+    updateVisualBits.SetBit(UNIT_FIELD_CHANNEL_OBJECT + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_HEALTH);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER1);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER2);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER3);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER4);
+    updateVisualBits.SetBit(UNIT_FIELD_POWER5);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXHEALTH);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER1);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER2);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER3);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER4);
+    updateVisualBits.SetBit(UNIT_FIELD_MAXPOWER5);
+    updateVisualBits.SetBit(UNIT_FIELD_LEVEL);
+    updateVisualBits.SetBit(UNIT_FIELD_FACTIONTEMPLATE);
+    updateVisualBits.SetBit(UNIT_FIELD_BYTES_0);
+    updateVisualBits.SetBit(UNIT_FIELD_FLAGS);
+    updateVisualBits.SetBit(UNIT_FIELD_FLAGS_2);
+    for (uint16 i = UNIT_FIELD_AURA; i < UNIT_FIELD_AURASTATE; ++i)
+        updateVisualBits.SetBit(i);
+    updateVisualBits.SetBit(UNIT_FIELD_AURASTATE);
+    updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME + 0);
+    updateVisualBits.SetBit(UNIT_FIELD_BASEATTACKTIME + 1);
+    updateVisualBits.SetBit(UNIT_FIELD_BOUNDINGRADIUS);
+    updateVisualBits.SetBit(UNIT_FIELD_COMBATREACH);
+    updateVisualBits.SetBit(UNIT_FIELD_DISPLAYID);
+    updateVisualBits.SetBit(UNIT_FIELD_NATIVEDISPLAYID);
+    updateVisualBits.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
+    updateVisualBits.SetBit(UNIT_FIELD_BYTES_1);
+    updateVisualBits.SetBit(UNIT_FIELD_PETNUMBER);
+    updateVisualBits.SetBit(UNIT_FIELD_PET_NAME_TIMESTAMP);
+    updateVisualBits.SetBit(UNIT_DYNAMIC_FLAGS);
+    updateVisualBits.SetBit(UNIT_CHANNEL_SPELL);
+    updateVisualBits.SetBit(UNIT_MOD_CAST_SPEED);
+    updateVisualBits.SetBit(UNIT_FIELD_BYTES_2);
+
+    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER + 0);
+    updateVisualBits.SetBit(PLAYER_DUEL_ARBITER + 1);
+    updateVisualBits.SetBit(PLAYER_FLAGS);
+    updateVisualBits.SetBit(PLAYER_GUILDID);
+    updateVisualBits.SetBit(PLAYER_GUILDRANK);
+    updateVisualBits.SetBit(PLAYER_BYTES);
+    updateVisualBits.SetBit(PLAYER_BYTES_2);
+    updateVisualBits.SetBit(PLAYER_BYTES_3);
+    updateVisualBits.SetBit(PLAYER_DUEL_TEAM);
+    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
+
+    // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
+    for (uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_25_2; i += MAX_QUEST_OFFSET)
+        updateVisualBits.SetBit(i);
+
+    // Players visible items are not inventory stuff
+    //431) = 884 (0x374) = main weapon
+    for (uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
+    {
+        // item creator
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 0);
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 1);
+
+        uint16 visual_base = PLAYER_VISIBLE_ITEM_1_0 + (i * MAX_VISIBLE_ITEM_OFFSET);
+
+        // item entry
+        updateVisualBits.SetBit(visual_base + 0);
+
+        // item enchantment IDs
+        for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
+            updateVisualBits.SetBit(visual_base + 1 + j);
+
+        // random properties
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 0 + (i * MAX_VISIBLE_ITEM_OFFSET));
+        updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 1 + (i * MAX_VISIBLE_ITEM_OFFSET));
+    }
+
+    updateVisualBits.SetBit(PLAYER_CHOSEN_TITLE);
+
     // TODO: really implement OWNER_ONLY and GROUP_ONLY. Flags can be found in UpdateFields.h
 
-    updateVisualBits.SetBit(OBJECT_FIELD_GUID);
+    /*updateVisualBits.SetBit(OBJECT_FIELD_GUID);
     updateVisualBits.SetBit(OBJECT_FIELD_TYPE);
     updateVisualBits.SetBit(OBJECT_FIELD_SCALE_X);
 
@@ -4086,7 +4326,7 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(PLAYER_BYTES_2);
     updateVisualBits.SetBit(PLAYER_BYTES_3);
     updateVisualBits.SetBit(PLAYER_DUEL_TEAM);
-    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
+    updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);*/
 
     // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
     /*for (uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_LAST_3; i += MAX_QUEST_OFFSET)
@@ -4094,7 +4334,7 @@ void Player::InitVisibleBits()
 
     //Players visible items are not inventory stuff
     //431) = 884 (0x374) = main weapon
-    for (uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
+    /*for (uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
     {
         // item creator
         updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_CREATOR + (i * MAX_VISIBLE_ITEM_OFFSET) + 0);
@@ -4112,7 +4352,7 @@ void Player::InitVisibleBits()
         // random properties
         updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 0 + (i * MAX_VISIBLE_ITEM_OFFSET));
         updateVisualBits.SetBit(PLAYER_VISIBLE_ITEM_1_PROPERTIES + 1 + (i * MAX_VISIBLE_ITEM_OFFSET));
-    }
+    }*/
 }
 
 void Player::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) const
@@ -18187,8 +18427,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     if (MasterPlayer* masterPlayer = GetSession()->GetMasterPlayer())
         masterPlayer->SendInitialActionButtons();
         
-    m_reputationMgr.SendInitialReputations();
-    m_honorMgr.Update();
+    //m_reputationMgr.SendInitialReputations();
+    //m_honorMgr.Update();
 
     // SMSG_SET_AURA_SINGLE
 

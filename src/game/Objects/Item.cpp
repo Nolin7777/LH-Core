@@ -220,7 +220,7 @@ Item::Item() : loot(NULL)
 {
     m_objectType |= TYPEMASK_ITEM;
     m_objectTypeId = TYPEID_ITEM;
-    m_updateFlag = UPDATEFLAG_ALL;
+    m_updateFlag = UPDATEFLAG_HIGHGUID;
 
     m_valuesCount = ITEM_END;
     m_slot = 0;

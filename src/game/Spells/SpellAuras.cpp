@@ -158,7 +158,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleManaShield,                                // 97 SPELL_AURA_MANA_SHIELD implemented in Unit::CalculateAbsorbAndResist
     &Aura::HandleAuraModSkill,                              // 98 SPELL_AURA_MOD_SKILL_TALENT
     &Aura::HandleAuraModAttackPower,                        // 99 SPELL_AURA_MOD_ATTACK_POWER
-    &Aura::HandleAurasVisible,                              //100 SPELL_AURA_AURAS_VISIBLE
+    &Aura::HandleUnused,                                    //100 SPELL_AURA_AURAS_VISIBLE obsolete
     &Aura::HandleModResistancePercent,                      //101 SPELL_AURA_MOD_RESISTANCE_PCT
     &Aura::HandleNoImmediateEffect,                         //102 SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS implemented in Unit::MeleeDamageBonusDone
     &Aura::HandleAuraModTotalThreat,                        //103 SPELL_AURA_MOD_TOTAL_THREAT
@@ -3548,7 +3548,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
         // only at real aura add
         if (Real)
         {
-            target->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAGS_CREEP);
+            target->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_FLY_ANIM);
 
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH);
@@ -3579,7 +3579,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
             // if no GM invisibility
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
-                target->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAGS_CREEP);
+                target->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_FLY_ANIM);
 
                 if (target->GetTypeId() == TYPEID_PLAYER)
                     target->RemoveByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH);
@@ -4348,10 +4348,10 @@ void Aura::HandleAuraModBaseResistancePCT(bool apply, bool /*Real*/)
     }
 }
 
-void Aura::HandleAurasVisible(bool apply, bool /*Real*/)
+/*void Aura::HandleAurasVisible(bool apply, bool Real)
 {
     GetTarget()->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_AURAS_VISIBLE, apply);
-}
+}*/
 
 void Aura::HandleModResistancePercent(bool apply, bool /*Real*/)
 {

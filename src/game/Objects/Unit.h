@@ -169,11 +169,22 @@ enum UnitStandStateType
 enum UnitStandFlags
 */
 
+// byte flags value (UNIT_FIELD_BYTES_1,2)
+enum UnitStandFlags
+{
+    UNIT_STAND_FLAGS_UNK1 = 0x01,
+    UNIT_STAND_FLAGS_CREEP = 0x02,
+    UNIT_STAND_FLAGS_UNK3 = 0x04,
+    UNIT_STAND_FLAGS_UNK4 = 0x08,
+    UNIT_STAND_FLAGS_UNK5 = 0x10,
+    UNIT_STAND_FLAGS_ALL = 0xFF
+};
+
 // byte flags value (UNIT_FIELD_BYTES_1,3)
 enum UnitBytes1_Flags
 {
     UNIT_BYTE1_FLAG_ALWAYS_STAND = 0x01, // Ajoute a la mort. Non affichage du nom des vivants.
-    UNIT_BYTE1_FLAGS_CREEP       = 0x02,
+    UNIT_BYTE1_FLAG_FLY_ANIM     = 0x02,
     UNIT_BYTE1_FLAG_UNTRACKABLE  = 0x04,
     UNIT_BYTE1_FLAG_ALL          = 0xFF
 };
@@ -199,6 +210,13 @@ enum UnitBytes2_Flags
     UNIT_BYTE2_FLAG_UNK5        = 0x20,
     UNIT_BYTE2_FLAG_UNK6        = 0x40,
     UNIT_BYTE2_FLAG_UNK7        = 0x80
+};
+
+// byte flags value (UNIT_FIELD_BYTES_2,2)
+enum UnitRename
+{
+    UNIT_CAN_BE_RENAMED = 0x01,
+    UNIT_CAN_BE_ABANDONED = 0x02,
 };
 
 #define CREATURE_MAX_SPELLS     4
@@ -471,6 +489,36 @@ enum UnitMoveType
 
 extern float baseMoveSpeed[MAX_MOVE_TYPE];
 
+enum CombatRating
+{
+    CR_WEAPON_SKILL             = 0,
+    CR_DEFENSE_SKILL            = 1,
+    CR_DODGE                    = 2,
+    CR_PARRY                    = 3,
+    CR_BLOCK                    = 4,
+    CR_HIT_MELEE                = 5,
+    CR_HIT_RANGED               = 6,
+    CR_HIT_SPELL                = 7,
+    CR_CRIT_MELEE               = 8,
+    CR_CRIT_RANGED              = 9,
+    CR_CRIT_SPELL               = 10,
+    CR_HIT_TAKEN_MELEE          = 11,
+    CR_HIT_TAKEN_RANGED         = 12,
+    CR_HIT_TAKEN_SPELL          = 13,
+    CR_CRIT_TAKEN_MELEE         = 14,
+    CR_CRIT_TAKEN_RANGED        = 15,
+    CR_CRIT_TAKEN_SPELL         = 16,
+    CR_HASTE_MELEE              = 17,
+    CR_HASTE_RANGED             = 18,
+    CR_HASTE_SPELL              = 19,
+    CR_WEAPON_SKILL_MAINHAND    = 20,
+    CR_WEAPON_SKILL_OFFHAND     = 21,
+    CR_WEAPON_SKILL_RANGED      = 22,
+    CR_EXPERTISE                = 23
+};
+
+#define MAX_COMBAT_RATING         24
+
 /// internal used flags for marking special auras - for example some dummy-auras
 enum UnitAuraFlags
 {
@@ -489,7 +537,7 @@ enum UnitVisibility
 
 // [-ZERO] Need recheck values
 // Value masks for UNIT_FIELD_FLAGS
-enum UnitFlags
+/*enum UnitFlags
 {
     UNIT_FLAG_NONE                  = 0x00000000,
     UNIT_FLAG_UNK_0                 = 0x00000001,
@@ -529,6 +577,61 @@ enum UnitFlags
 
     UNIT_FLAG_UNK_28                = 0x10000000,
     UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
+};*/
+
+// Value masks for UNIT_FIELD_FLAGS
+enum UnitFlags
+{
+    UNIT_FLAG_NONE                  = 0x00000000,
+    UNIT_FLAG_UNK_0                 = 0x00000001,           // Movement checks disabled, likely paired with loss of client control packet.
+    UNIT_FLAG_NON_ATTACKABLE        = 0x00000002,           // not attackable
+    UNIT_FLAG_DISABLE_MOVE          = 0x00000004,           // Generic unspecified loss of control initiated by server script, movement checks disabled, paired with loss of client control packet.
+    UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // players, pets, totems, guardians, companions, charms, any units associated with players
+    UNIT_FLAG_RENAME                = 0x00000010,
+    UNIT_FLAG_PREPARATION           = 0x00000020,           // don't take reagents for spells with SPELL_ATTR_EX5_NO_REAGENT_WHILE_PREP
+    UNIT_FLAG_UNK_6                 = 0x00000040,
+    UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // ?? (UNIT_FLAG_PVP_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE
+    UNIT_FLAG_IMMUNE_TO_PLAYER      = 0x00000100,           // Target is immune to players
+    UNIT_FLAG_PASSIVE               = 0x00000200,           // makes you unable to attack everything. Almost identical to our "civilian"-term. Will ignore it's surroundings and not engage in combat unless "called upon" or engaged by another unit.
+    UNIT_FLAG_LOOTING               = 0x00000400,           // loot animation
+    UNIT_FLAG_PET_IN_COMBAT         = 0x00000800,           // in combat?, 2.0.8
+    UNIT_FLAG_PVP                   = 0x00001000,
+    UNIT_FLAG_SILENCED              = 0x00002000,           // silenced, 2.1.1
+    UNIT_FLAG_PERSUADED             = 0x00004000,           // persuaded, 2.0.8
+    UNIT_FLAG_USE_SWIM_ANIMATION    = 0x00008000,           // related to jerky movement in water?
+    UNIT_FLAG_UNK_16                = 0x00010000,           // removes attackable icon
+    UNIT_FLAG_PACIFIED              = 0x00020000,
+    UNIT_FLAG_STUNNED               = 0x00040000,           // Unit is a subject to stun, turn and strafe movement disabled
+    UNIT_FLAG_IN_COMBAT             = 0x00080000,
+    UNIT_FLAG_TAXI_FLIGHT           = 0x00100000,           // Unit is on taxi, paired with a duplicate loss of client control packet (likely a legacy serverside hack). Disables any spellcasts not allowed in taxi flight client-side.
+    UNIT_FLAG_DISARMED              = 0x00200000,           // disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
+    UNIT_FLAG_CONFUSED              = 0x00400000,           // Unit is a subject to confused movement, movement checks disabled, paired with loss of client control packet.
+    UNIT_FLAG_FLEEING               = 0x00800000,           // Unit is a subject to fleeing movement, movement checks disabled, paired with loss of client control packet.
+    UNIT_FLAG_POSSESSED             = 0x01000000,           // Unit is under remote control by another unit, movement checks disabled, paired with loss of client control packet. New master is allowed to use melee attack and can't select this unit via mouse in the world (as if it was own character).
+    UNIT_FLAG_NOT_SELECTABLE        = 0x02000000,
+    UNIT_FLAG_SKINNABLE             = 0x04000000,
+    UNIT_FLAG_MOUNT                 = 0x08000000,
+    UNIT_FLAG_UNK_28                = 0x10000000,
+    UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
+    UNIT_FLAG_SHEATHE               = 0x40000000,
+    UNIT_FLAG_NO_KILL_REWARD        = 0x80000000            // Unit should yield no reward (Honor/XP/Rep) on kill
+};
+
+// Value masks for UNIT_FIELD_FLAGS_2
+enum UnitFlags2
+{
+    UNIT_FLAG2_FEIGN_DEATH          = 0x00000001,
+    UNIT_FLAG2_UNK1                 = 0x00000002,           // Hides body and body armor. Weapons and shoulder and head armor still visible
+    UNIT_FLAG2_IGNORE_REPUTATION    = 0x00000004,
+    UNIT_FLAG2_COMPREHEND_LANG      = 0x00000008,
+    UNIT_FLAG2_CLONED               = 0x00000010,           // Used in SPELL_AURA_MIRROR_IMAGE
+    UNIT_FLAG2_UNK5                 = 0x00000020,
+    UNIT_FLAG2_FORCE_MOVE           = 0x00000040,
+    // UNIT_FLAG2_DISARM_OFFHAND       = 0x00000080,        // also shield case - added in 3.x, possible all later not used in pre-3.x
+    // UNIT_FLAG2_UNK8                 = 0x00000100,
+    // UNIT_FLAG2_UNK9                 = 0x00000200,
+    // UNIT_FLAG2_DISARM_RANGED        = 0x00000400,        // added in 3.x
+    // UNIT_FLAG2_REGENERATE_POWER     = 0x00000800,        // added in 3.x
 };
 
 /// Non Player Character flags
@@ -536,21 +639,30 @@ enum NPCFlags
 {
     UNIT_NPC_FLAG_NONE                  = 0x00000000,
     UNIT_NPC_FLAG_GOSSIP                = 0x00000001,       // 100%
-    UNIT_NPC_FLAG_QUESTGIVER            = 0x00000002,       // 100%
-    UNIT_NPC_FLAG_VENDOR                = 0x00000004,       // 100%
-    UNIT_NPC_FLAG_FLIGHTMASTER          = 0x00000008,       // 100%
+    UNIT_NPC_FLAG_QUESTGIVER            = 0x00000002,       // guessed, probably ok
+    UNIT_NPC_FLAG_UNK1                  = 0x00000004,
+    UNIT_NPC_FLAG_UNK2                  = 0x00000008,
     UNIT_NPC_FLAG_TRAINER               = 0x00000010,       // 100%
-    UNIT_NPC_FLAG_SPIRITHEALER          = 0x00000020,       // guessed
-    UNIT_NPC_FLAG_SPIRITGUIDE           = 0x00000040,       // guessed
-    UNIT_NPC_FLAG_INNKEEPER             = 0x00000080,       // 100%
-    UNIT_NPC_FLAG_BANKER                = 0x00000100,       // 100%
-    UNIT_NPC_FLAG_PETITIONER            = 0x00000200,       // 100% 0xC0000 = guild petitions
-    UNIT_NPC_FLAG_TABARDDESIGNER        = 0x00000400,       // 100%
-    UNIT_NPC_FLAG_BATTLEMASTER          = 0x00000800,       // 100%
-    UNIT_NPC_FLAG_AUCTIONEER            = 0x00001000,       // 100%
-    UNIT_NPC_FLAG_STABLEMASTER          = 0x00002000,       // 100%
-    UNIT_NPC_FLAG_REPAIR                = 0x00004000,       // 100%
-    UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
+    UNIT_NPC_FLAG_TRAINER_CLASS         = 0x00000020,       // 100%
+    UNIT_NPC_FLAG_TRAINER_PROFESSION    = 0x00000040,       // 100%
+    UNIT_NPC_FLAG_VENDOR                = 0x00000080,       // 100%
+    UNIT_NPC_FLAG_VENDOR_AMMO           = 0x00000100,       // 100%, general goods vendor
+    UNIT_NPC_FLAG_VENDOR_FOOD           = 0x00000200,       // 100%
+    UNIT_NPC_FLAG_VENDOR_POISON         = 0x00000400,       // guessed
+    UNIT_NPC_FLAG_VENDOR_REAGENT        = 0x00000800,       // 100%
+    UNIT_NPC_FLAG_REPAIR                = 0x00001000,       // 100%
+    UNIT_NPC_FLAG_FLIGHTMASTER          = 0x00002000,       // 100%
+    UNIT_NPC_FLAG_SPIRITHEALER          = 0x00004000,       // guessed
+    UNIT_NPC_FLAG_SPIRITGUIDE           = 0x00008000,       // guessed
+    UNIT_NPC_FLAG_INNKEEPER             = 0x00010000,       // 100%
+    UNIT_NPC_FLAG_BANKER                = 0x00020000,       // 100%
+    UNIT_NPC_FLAG_PETITIONER            = 0x00040000,       // 100% 0xC0000 = guild petitions, 0x40000 = arena team petitions
+    UNIT_NPC_FLAG_TABARDDESIGNER        = 0x00080000,       // 100%
+    UNIT_NPC_FLAG_BATTLEMASTER          = 0x00100000,       // 100%
+    UNIT_NPC_FLAG_AUCTIONEER            = 0x00200000,       // 100%
+    UNIT_NPC_FLAG_STABLEMASTER          = 0x00400000,       // 100%
+    UNIT_NPC_FLAG_GUILD_BANKER          = 0x00800000,       // cause client to send 997 opcode
+    UNIT_NPC_FLAG_SPELLCLICK            = 0x01000000,       // cause client to send 1015 opcode (spell click), dynamic, set at loading and don't must be set in DB
 };
 
 namespace Movement
@@ -1176,6 +1288,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsSitState() const;
         bool IsStandState() const;
         void SetStandState(uint8 state);
+
+        void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1, 2, flags); }
+        void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1, 2, flags); }
 
         bool IsMounted() const { return (GetMountID() != 0); }
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }

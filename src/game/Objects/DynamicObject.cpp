@@ -34,7 +34,7 @@ DynamicObject::DynamicObject() : WorldObject(), m_effIndex(EFFECT_INDEX_0), m_sp
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
-    m_updateFlag = (UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
+    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_HAS_POSITION);
 
     m_valuesCount = DYNAMICOBJECT_END;
 }

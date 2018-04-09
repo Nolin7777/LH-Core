@@ -346,8 +346,9 @@ Mail* MasterPlayer::GetMail(uint32 id)
 // ######################## ACTION BUTTONS ###########################
 void MasterPlayer::SendInitialActionButtons() const
 {
+    DETAIL_LOG("Initializing Action Buttons for '%u'", GetGUIDLow());
     WorldPacket data(SMSG_ACTION_BUTTONS, (MAX_ACTION_BUTTONS * 4));
-    for (int button = 0; button < MAX_ACTION_BUTTONS; ++button)
+    for (uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
         ActionButtonList::const_iterator itr = m_actionButtons.find(button);
         if (itr != m_actionButtons.end() && itr->second.uState != ACTIONBUTTON_DELETED)
@@ -357,6 +358,7 @@ void MasterPlayer::SendInitialActionButtons() const
     }
 
     GetSession()->SendPacket(&data);
+    DETAIL_LOG("Action Buttons for '%u' Initialized", GetGUIDLow());
 }
 
 ActionButton* MasterPlayer::addActionButton(uint8 button, uint32 action, uint8 type)

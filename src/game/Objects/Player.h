@@ -241,7 +241,7 @@ typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 struct PlayerInfo
 {
                                                             // existence checked by displayId != 0             // existence checked by displayId != 0
-    PlayerInfo() : displayId_m(0), displayId_f(0), levelInfo(NULL), mapId(0), areaId(0), positionX(0), positionY(0), positionZ(0), orientation(0)
+    PlayerInfo() : mapId(0), areaId(0), positionX(0), positionY(0), positionZ(0), orientation(0), displayId_m(0), displayId_f(0), levelInfo(NULL)
     {
     }
 
@@ -633,6 +633,14 @@ enum RestType
     REST_TYPE_IN_TAVERN = 1,
     REST_TYPE_IN_CITY   = 2
 };
+
+enum PlayerRestState
+{
+    REST_STATE_RESTED           = 0x01,
+    REST_STATE_NORMAL           = 0x02,
+    REST_STATE_RAF_LINKED       = 0x04                      // Exact use unknown
+};
+
 
 enum DuelCompleteType
 {

@@ -4056,7 +4056,7 @@ ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
             NewSummon->SetName(new_name);
     }
     else if (NewSummon->getPetType() == HUNTER_PET)
-        NewSummon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME);
+        NewSummon->SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
 
     NewSummon->AIM_Initialize();
     NewSummon->SetHealth(NewSummon->GetMaxHealth());
@@ -5383,7 +5383,7 @@ void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
     pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     if (m_caster->IsPvP())
         pTotem->SetPvP(true);

@@ -406,7 +406,127 @@ void Object::DestroyForPlayer(Player *target) const
     target->GetSession()->SendPacket(&data);
 }
 
-void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
+void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
+{
+    *data << uint8(updateFlags);                            // update flags
+
+                                                            // 0x20
+    if (updateFlags & UPDATEFLAG_LIVING)
+    {
+        Unit* unit = ((Unit*)this);
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* player = ((Player*)unit);
+            if (player->GetTransport())
+                player->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
+            else
+                player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
+        }
+
+        // Update movement info time
+        unit->m_movementInfo.UpdateTime(WorldTimer::getMSTime());
+        // Write movement info
+        unit->m_movementInfo.Write(*data);
+
+        // Unit speeds
+        *data << float(unit->GetSpeed(MOVE_WALK));
+        *data << float(unit->GetSpeed(MOVE_RUN));
+        *data << float(unit->GetSpeed(MOVE_RUN_BACK));
+        *data << float(unit->GetSpeed(MOVE_SWIM));
+        *data << float(unit->GetSpeed(MOVE_SWIM_BACK));
+        *data << float(unit->GetSpeed(MOVE_FLIGHT));
+        *data << float(unit->GetSpeed(MOVE_FLIGHT_BACK));
+        *data << float(unit->GetSpeed(MOVE_TURN_RATE));
+
+        // 0x08000000
+        if (unit->m_movementInfo.GetMovementFlags() & MOVEFLAG_SPLINE_ENABLED)
+            Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
+    }
+    // 0x40
+    else if (updateFlags & UPDATEFLAG_HAS_POSITION)
+    {
+        // 0x02
+        if (updateFlags & UPDATEFLAG_TRANSPORT && ((GameObject*)this)->GetGoType() == GAMEOBJECT_TYPE_MO_TRANSPORT)
+        {
+            *data << float(0);
+            *data << float(0);
+            *data << float(0);
+            *data << float(((WorldObject*)this)->GetOrientation());
+        }
+        else
+        {
+            *data << float(((WorldObject*)this)->GetPositionX());
+            *data << float(((WorldObject*)this)->GetPositionY());
+            *data << float(((WorldObject*)this)->GetPositionZ());
+            *data << float(((WorldObject*)this)->GetOrientation());
+        }
+    }
+
+    // 0x8
+    if (updateFlags & UPDATEFLAG_LOWGUID)
+    {
+        switch (GetTypeId())
+        {
+        case TYPEID_OBJECT:
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        case TYPEID_GAMEOBJECT:
+        case TYPEID_DYNAMICOBJECT:
+        case TYPEID_CORPSE:
+            *data << uint32(GetGUIDLow());              // GetGUIDLow()
+            break;
+        case TYPEID_UNIT:
+            *data << uint32(0x0000000B);                // unk, can be 0xB or 0xC
+            break;
+        case TYPEID_PLAYER:
+            if (updateFlags & UPDATEFLAG_SELF)
+                *data << uint32(0x00000015);            // unk, can be 0x15 or 0x22
+            else
+                *data << uint32(0x00000008);            // unk, can be 0x7 or 0x8
+            break;
+        default:
+            *data << uint32(0x00000000);                // unk
+            break;
+        }
+    }
+
+    // 0x10
+    if (updateFlags & UPDATEFLAG_HIGHGUID)
+    {
+        switch (GetTypeId())
+        {
+        case TYPEID_OBJECT:
+        case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
+        case TYPEID_GAMEOBJECT:
+        case TYPEID_DYNAMICOBJECT:
+        case TYPEID_CORPSE:
+            *data << uint32(GetObjectGuid().GetHigh()); // GetGUIDHigh()
+            break;
+        default:
+            *data << uint32(0x00000000);                // unk
+            break;
+        }
+    }
+
+    // 0x4
+    if (updateFlags & UPDATEFLAG_HAS_ATTACKING_TARGET)      // packed guid (current target guid)
+    {
+        if (((Unit*)this)->getVictim())
+            *data << ((Unit*)this)->getVictim()->GetPackGUID();
+        else
+            data->appendPackGUID(0);
+    }
+
+    // 0x2
+    if (updateFlags & UPDATEFLAG_TRANSPORT)
+    {
+        *data << uint32(WorldTimer::getMSTime());           // ms time
+    }
+}
+
+/*void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
 {
     *data << uint8(updateFlags);                            // update flags
 
@@ -489,12 +609,12 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
             this causes clients to receive different PathProgress
             resulting in players seeing the object in a different position
         */
-        if (go && go->ToTransport())
+        /*if (go && go->ToTransport())
             *data << uint32(go->ToTransport()->GetPathProgress());
         else
             *data << uint32(WorldTimer::getMSTime());           // ms time
     }
-}
+*/
 
 void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *updateMask, Player *target) const
 {
@@ -609,7 +729,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     *data << (m_uint32Values[index] | UNIT_FLAG_NOT_SELECTABLE);
                 // Gamemasters should be always able to select units and view auras
                 else if (index == UNIT_FIELD_FLAGS && target->isGameMaster())
-                    *data << ((m_uint32Values[index] | UNIT_FLAG_AURAS_VISIBLE) & ~UNIT_FLAG_NOT_SELECTABLE);
+                    *data << (m_uint32Values[index] & ~UNIT_FLAG_NOT_SELECTABLE);
                 // hide lootable animation for unallowed players
                 else if (index == UNIT_DYNAMIC_FLAGS)
                 {

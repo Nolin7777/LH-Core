@@ -8763,7 +8763,7 @@ InventoryResult Player::_CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, Item
     // Fix dupe exploit (move non empty bag)
     if (pSrcItem && pSrcItem->IsBag() && !((Bag*)pSrcItem)->IsEmpty())
     {
-        GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "_CanStoreItem_InSpecificSlot: moving non empty bag");
+        //GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "_CanStoreItem_InSpecificSlot: moving non empty bag");
         return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
     }
 
@@ -8846,7 +8846,7 @@ InventoryResult Player::_CanStoreItem_InBag(uint8 bag, ItemPosCountVec &dest, It
     // Fix dupe exploit (move non empty bag)
     if (pSrcItem && pSrcItem->IsBag() && !((Bag*)pSrcItem)->IsEmpty())
     {
-        GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "_CanStoreItem_InBag: moving non empty bag");
+        //GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "_CanStoreItem_InBag: moving non empty bag");
         return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
     }
 
@@ -8907,7 +8907,7 @@ InventoryResult Player::_CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 s
     // Fix dupe exploit (move non empty bag)
     if (pSrcItem && pSrcItem->IsBag() && !((Bag*)pSrcItem)->IsEmpty())
     {
-        GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "_CanStoreItem_InSpecificSlot: moving non empty bag");
+        //GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "_CanStoreItem_InSpecificSlot: moving non empty bag");
         return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
     }
 
@@ -9385,7 +9385,7 @@ InventoryResult Player::CanStoreItems(Item **pItems, int count) const
         // Fix dupe exploit (move non empty bag)
         if (pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
         {
-            GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Player::CanStoreItems: can't store non empty bag");
+            //GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Player::CanStoreItems: can't store non empty bag");
             return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
         }
 
@@ -10987,7 +10987,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
     // prevent put equipped/bank bag in self
     if (IsBagPos(src) && srcslot == dstbag)
     {
-        GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Swap: put equipped/bank bag in self (srcslot == dstbag)");
+        //GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Swap: put equipped/bank bag in self (srcslot == dstbag)");
         SendEquipError(EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pSrcItem, pDstItem);
         return;
     }
@@ -10995,7 +10995,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
     // prevent put equipped/bank bag in self
     if (IsBagPos(dst) && dstslot == srcbag)
     {
-        GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Swap: put equipped/bank bag in self (dstslot == srcbag)");
+        //GetSession()->GetAnticheat()->RecordCheat(CHEAT_ACTION_INFO_LOG, "ItemsCheck", "Swap: put equipped/bank bag in self (dstslot == srcbag)");
         SendEquipError(EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG, pDstItem, pSrcItem);
         return;
     }

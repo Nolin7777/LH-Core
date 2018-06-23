@@ -1,0 +1,1 @@
+-- Remove patch requirement from all event quests, objects and creatures

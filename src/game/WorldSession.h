@@ -205,6 +205,7 @@ enum AccountFlags
     ACCOUNT_FLAG_SILENCED       = 0x1,
     ACCOUNT_FLAG_SHOW_ANTICHEAT = 0x2,
     ACCOUNT_FLAG_SHOW_ANTISPAM  = 0x4,
+    ACCOUNT_FLAG_QUEUE_PRIORITY = 0x8
 };
 
 //class to deal with packet processing

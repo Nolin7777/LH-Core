@@ -2852,6 +2852,10 @@ bool World::CanSkipQueue(WorldSession const* sess)
 {
     if (sess->GetSecurity() > SEC_PLAYER)
         return true;
+
+    if (sess->GetAccountFlags() & ACCOUNT_FLAG_QUEUE_PRIORITY)
+        return true;
+
     uint32 grace_period = getConfig(CONFIG_UINT32_LOGIN_QUEUE_GRACE_PERIOD_SECS);
     if (!grace_period)
         return false;

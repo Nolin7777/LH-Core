@@ -91,12 +91,16 @@ UPDATE `item_template`
 
 DELETE FROM `forbidden_items`
     WHERE `patch` = 1 
-        AND `entry` IN (SELECT DISTINCT(`entry`) FROM `item_template` WHERE `itemset` IN
-                         (12584, 16345, 18825, 18826, 18827, 18828,
-                          18830, 18831, 18833, 18835, 18836, 18837,
-                          18838, 18840, 18843, 18844, 18847, 18848,
-                          18855, 18860, 18865, 18866, 18867, 18868,
-                          18869, 18871, 18873, 18874, 18876, 18877));
+        AND `entry` IN (12584, 16345, 18825, 18826, 18827, 18828,
+                        18830, 18831, 18833, 18835, 18836, 18837,
+                        18838, 18840, 18843, 18844, 18847, 18848,
+                        18855, 18860, 18865, 18866, 18867, 18868,
+                        18869, 18871, 18873, 18874, 18876, 18877);
+
+-- Mounts
+DELETE FROM `forbidden_items` WHERE `patch` = 1
+    AND `entry` IN (SELECT DISTINCT(`entry`) FROM `item_template` WHERE `requiredhonorrank` = 15);
+UPDATE `item_template` SET `patch` = 0 WHERE `requiredhonorrank` = 15 AND `patch` = 2;
 
 -- --------------------------------
 -- PVP Halls & Accessories

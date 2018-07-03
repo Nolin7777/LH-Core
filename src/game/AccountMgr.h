@@ -97,9 +97,10 @@ protected:
     uint32 _timer;
 };
 
-class DelayedBanAction : DelayedAction
+class DelayedBanAction : public DelayedAction
 {
-    DelayedBanAction(uint32 banAccountId, std::string& source, uint32 duration, std::string& reason, uint32 delay);
+public:
+    DelayedBanAction(uint32 banAccountId, const std::string& source, uint32 duration, const std::string& reason, uint32 delay);
     BanMode GetBanMode() const { return _mode; }
     uint32 GetDuration() const { return _duration; }
     std::string& GetReason() { return _reason; }
@@ -115,6 +116,32 @@ private:
     std::string _reason;
     std::string _author;
     uint32 _banAccountId;
+};
+
+class DelayedKickAction : public DelayedAction
+{
+public:
+    DelayedKickAction(uint32 kickAccountId, uint32 delay)
+        : DelayedAction(DAA_KICK, delay), _kickAccountId(kickAccountId)
+    {
+    }
+
+    void Execute() override;
+private:
+    uint32 _kickAccountId;
+};
+
+class DelayedSilenceAction : public DelayedAction
+{
+public:
+    DelayedSilenceAction(uint32 silenceAccountId, uint32 delay)
+        : DelayedAction(DAA_SILENCE, delay), _silenceAccountId(silenceAccountId)
+    {
+    }
+
+    void Execute() override;
+private:
+    uint32 _silenceAccountId;
 };
 
 class AccountMgr

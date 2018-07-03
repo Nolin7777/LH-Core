@@ -32,6 +32,7 @@
 #include "WorldSession.h"
 #include "Chat.h"
 #include "MasterPlayer.h"
+#include "Anticheat.hpp"
 
 extern DatabaseType LoginDatabase;
 
@@ -500,7 +501,7 @@ void AccountMgr::ProcessDelayedActions()
     }
 }
 
-DelayedBanAction::DelayedBanAction(uint32 banAccountId, std::string& source, uint32 duration, std::string& reason, uint32 delay)
+DelayedBanAction::DelayedBanAction(uint32 banAccountId, const std::string& source, uint32 duration, const std::string& reason, uint32 delay)
     : DelayedAction(DAA_BAN, delay), _banAccountId(banAccountId), _author(source), _reason(reason), _duration(duration)
 {
 }
@@ -508,4 +509,23 @@ DelayedBanAction::DelayedBanAction(uint32 banAccountId, std::string& source, uin
 void DelayedBanAction::Execute()
 {
     sWorld.BanAccount(_banAccountId, _duration, _reason, _author);
+}
+
+void DelayedKickAction::Execute()
+{
+    if (WorldSession* session = sWorld.FindSession(_kickAccountId))
+    {
+        session->KickPlayer();
+    }
+}
+
+void DelayedSilenceAction::Execute()
+{
+    if (WorldSession* session = sWorld.FindSession(_silenceAccountId))
+    {
+        if (auto anticheat = session->GetAnticheat())
+        {
+            anticheat->Silence();
+        }
+    }
 }

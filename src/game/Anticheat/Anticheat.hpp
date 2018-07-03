@@ -66,6 +66,7 @@ class SessionAnticheatInterface
         virtual void Update(uint32 diff) = 0;
 
         virtual bool IsSilenced() const = 0;
+        virtual void Silence() = 0;
 
         virtual void NewPlayer() = 0;
         virtual void LeaveWorld() = 0;

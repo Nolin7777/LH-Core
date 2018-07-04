@@ -141,6 +141,7 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual void CompleteCinematic() {}
 
         virtual bool IsSilenced() const { return false; }
+        virtual void Silence() {};
 
         virtual void NewPlayer() {} 
         virtual void LeaveWorld() {};

@@ -22,6 +22,9 @@
 #include "Unit.h"
 #include "Transport.h"
 #include "ObjectAccessor.h"
+#include "Player.h"
+#include "Unit.h"
+#include "Anticheat.hpp"
 
 namespace Movement
 {
@@ -59,6 +62,9 @@ int32 MoveSplineInit::Launch()
 {
     float realSpeedRun = 0.0f;
     MoveSpline& move_spline = *unit.movespline;
+
+    if (auto player = unit.ToPlayer())
+        player->GetSession()->GetAnticheat()->EnterSpline();
 
     Transport* newTransport = NULL;
     if (args.transportGuid)

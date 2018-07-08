@@ -93,6 +93,7 @@ class SessionAnticheatInterface
         virtual void OrderAck(uint16 opcode, uint32 counter) = 0;
 
         virtual void EnterSpline() = 0;
+        virtual void LeaveSpline() = 0;
 
         // warden
         virtual void WardenPacket(WorldPacket &packet) = 0;
@@ -180,6 +181,7 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual void OrderAck(uint16, uint32) {}
 
         virtual void EnterSpline() {}
+        virtual void LeaveSpline() {}
 
         // warden
         virtual void WardenPacket(WorldPacket &) {}

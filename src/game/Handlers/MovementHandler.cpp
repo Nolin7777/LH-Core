@@ -884,6 +884,8 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_MOVE_SPLINE_DONE");
 
+    _anticheat->LeaveSpline();
+
     MovementInfo movementInfo;                              // used only for proper packet read
 
     recv_data >> movementInfo;

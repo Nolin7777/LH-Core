@@ -627,8 +627,12 @@ void Channel::Say(ObjectGuid p, const char *what, uint32 lang, bool skipCheck)
 
         if (!skipCheck && plr &&
             (plr->GetSession()->GetAnticheat()->IsSilenced() ||
-             plr->GetSession()->GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL)))
+             (plr->getLevel() < sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL) &&
+              plr->GetSession()->GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
+           ))
+        {
             plr->GetSession()->SendPacket(&data);
+        }
         else
             SendToAll(&data, (!skipCheck && !m_players[p].IsModerator()) ? p : ObjectGuid());
     }

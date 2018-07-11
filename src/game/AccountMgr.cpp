@@ -19,6 +19,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <functional>
+
 #include "AccountMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "ObjectAccessor.h"
@@ -33,6 +35,7 @@
 #include "Chat.h"
 #include "MasterPlayer.h"
 #include "Anticheat.hpp"
+#include "SharedDefines.h"
 
 extern DatabaseType LoginDatabase;
 

@@ -492,7 +492,7 @@ void AccountMgr::ProcessDelayedActions()
         // Actions are sorted by execute time on insert. If we hit an action that
         // will not be executed at this time, then none of the following will be
         // either.
-        if (action->GetTimer() < now)
+        if (action->GetTimer() > now)
             break;
 
         action->Execute();

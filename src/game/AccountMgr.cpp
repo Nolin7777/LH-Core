@@ -502,7 +502,7 @@ void AccountMgr::ProcessDelayedActions()
 }
 
 DelayedBanAction::DelayedBanAction(uint32 banAccountId, const std::string& source, uint32 duration, const std::string& reason, uint32 delay)
-    : DelayedAction(DAA_BAN, delay), _banAccountId(banAccountId), _author(source), _reason(reason), _duration(duration)
+    : DelayedAction(DAA_BAN, delay), _banAccountId(banAccountId), _author(source), _reason(reason), _duration(duration), _mode(BAN_ACCOUNT)
 {
 }
 

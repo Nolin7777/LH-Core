@@ -25,6 +25,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include <string>
+#include "SharedDefines.h"
 
 enum AccountOpResult
 {

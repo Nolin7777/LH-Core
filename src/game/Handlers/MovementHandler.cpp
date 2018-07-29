@@ -300,8 +300,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
         return;
 
     // check if anticheat approves of this movement
-    if (!_anticheat->Movement(movementInfo, recv_data))
-        return;
+    // TODO: Force them back to the previous position and block invalid movement
+    _anticheat->Movement(movementInfo, recv_data);
 
     // Interrupt spell cast at move
     if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))

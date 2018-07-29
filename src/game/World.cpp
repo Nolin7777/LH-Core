@@ -2462,7 +2462,7 @@ void World::UpdateSessions(uint32 diff)
         ++next;
         ///- and remove not active sessions from the list
         WorldSession * pSession = itr->second;
-        WorldSessionFilter updater(pSession);
+        WorldSessionFilter updater(pSession, diff);
 
         if (!pSession->Update(updater))
         {

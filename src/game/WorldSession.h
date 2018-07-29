@@ -213,18 +213,27 @@ enum AccountFlags
 class PacketFilter
 {
     public:
-        explicit PacketFilter(WorldSession * pSession) : m_pSession(pSession), m_processLogout(false), m_processType(PACKET_PROCESS_MAX_TYPE) {}
+        explicit PacketFilter(WorldSession * pSession) : m_pSession(pSession), m_processLogout(false), m_processType(PACKET_PROCESS_MAX_TYPE), _diff(0) {}
+        explicit PacketFilter(WorldSession* pSession, uint32 const diff) : PacketFilter(pSession)
+        {
+            _diff = diff;
+        }
+
         virtual ~PacketFilter() {}
 
         virtual bool Process(WorldPacket *) { return true; }
         inline bool ProcessLogout() const { return m_processLogout; }
         inline PacketProcessing PacketProcessType() const { return m_processType; }
         inline void SetProcessType(PacketProcessing t) { m_processType = t; }
+        inline uint32 GetDiff() const { return _diff; }
 
     protected:
         WorldSession * const m_pSession;
         bool m_processLogout;
         PacketProcessing m_processType;
+
+    private:
+        uint32 _diff;
 };
 //process only thread-safe packets in Map::Update()
 class MapSessionFilter : public PacketFilter
@@ -245,7 +254,7 @@ class MapSessionFilter : public PacketFilter
 class WorldSessionFilter : public PacketFilter
 {
     public:
-        explicit WorldSessionFilter(WorldSession * pSession) : PacketFilter(pSession)
+        explicit WorldSessionFilter(WorldSession * pSession, const uint32 diff) : PacketFilter(pSession, diff)
         {
             m_processLogout = true;
             m_processType = PACKET_PROCESS_WORLD;

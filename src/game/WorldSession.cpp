@@ -322,8 +322,11 @@ bool WorldSession::Update(PacketFilter& updater)
     if (m_masterSession)
         return true;
 
-    if (m_Socket && !m_Socket->IsClosed() && _anticheat)
-        _anticheat->Update(1);  // XXX TODO FIXME
+    // Only update in a world update
+    if (updater.PacketProcessType() == PACKET_PROCESS_WORLD && m_Socket && !m_Socket->IsClosed() && _anticheat)
+    {
+        _anticheat->Update(updater.GetDiff());
+    }
 
     //check if we are safe to proceed with logout
     //logout procedure should happen only in World::UpdateSessions() method!!!

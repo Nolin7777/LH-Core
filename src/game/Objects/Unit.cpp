@@ -8127,18 +8127,27 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
 
         if (forced)
         {
-            if (Player* me = GetAffectingPlayer())
+            WorldPacket data(SetSpeed2Opc_table[mtype][1], 18);
+            data << GetPackGUID();
+            if (Player* me = ToPlayer())
             {
                 auto const counter = me->GetSession()->GetOrderCounter();
+                data << counter;
+                data << GetSpeed(mtype);
 
-                WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 18);
-                dataForMe << GetPackGUID();
-                dataForMe << counter;
-                dataForMe << GetSpeed(mtype);
-
-                me->GetSession()->SendPacket(&dataForMe);
-                me->GetSession()->GetAnticheat()->OrderSent(dataForMe.GetOpcode(), counter);
+                me->GetSession()->SendPacket(&data);
+                me->GetSession()->GetAnticheat()->OrderSent(data.GetOpcode(), counter);
                 me->GetSession()->IncrementOrderCounter();
+            }
+            else if (Unit* owner = GetCharmerOrOwner())
+            {
+                if (Player* ownerPlayer = owner->ToPlayer())
+                {
+                    data.SetOpcode(SetSpeed2Opc_table[mtype][0]);
+                    data << m_movementInfo;
+                    data << GetSpeed(mtype);
+                    ownerPlayer->GetSession()->SendPacket(&data);
+                }
             }
         }
 

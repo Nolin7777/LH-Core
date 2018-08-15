@@ -452,6 +452,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         // Account mute time
         time_t m_muteTime;
+        time_t m_lastPubChannelMsgTime;
 
         // Locales
         LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
@@ -469,6 +470,11 @@ class MANGOS_DLL_SPEC WorldSession
         void SetAccountMaxLevel(uint32 l) { _characterMaxLevel = l; }
         uint32 GetOrderCounter() const { return _orderCounter; }
         void IncrementOrderCounter() { ++_orderCounter; }
+
+        // Public chat cooldown restriction functionality
+        // Intentionally session-based to avoid login/logout hijinks
+        time_t GetLastPubChanMsgTime() { return m_lastPubChannelMsgTime; }
+        void SetLastPubChanMsgTime(time_t time) { m_lastPubChannelMsgTime = time; }
 
         bool IsReplaying() const { return _pcktReading != nullptr; }
         ObjectGuid GetRecorderGuid() const { return _recorderGuid; }
@@ -832,6 +838,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleMessagechatOpcode(WorldPacket& recvPacket);
         void HandleTextEmoteOpcode(WorldPacket& recvPacket);
         void HandleChatIgnoredOpcode(WorldPacket& recvPacket);
+        uint32_t ChatCooldown();
 
         void HandleReclaimCorpseOpcode( WorldPacket& recvPacket );
         void HandleCorpseQueryOpcode( WorldPacket& recvPacket );

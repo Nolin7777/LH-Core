@@ -163,7 +163,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.escape_string(safe_account);
     // No SQL injection, username escaped.
 
-    QueryResult *result = LoginDatabase.PQuery("SELECT "
+    auto result = std::unique_ptr<QueryResult>(LoginDatabase.PQuery("SELECT "
         "a.id, "                // 0
         "aa.gmLevel, "          // 1
         "a.sessionkey, "        // 2
@@ -176,9 +176,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         "a.locale, "            // 9
         "a.os, "                // 10
         "a.flags, "             // 11
-        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate " // 12
+        "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, " // 12
+        "a.invite_id "
         "FROM account a LEFT JOIN account_access aa ON a.id = aa.id AND aa.RealmID IN (-1, %u) "
-        "LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 WHERE a.username = '%s' ORDER BY aa.RealmID DESC LIMIT 1", realmID, safe_account.c_str());
+        "LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 WHERE a.username = '%s' ORDER BY aa.RealmID DESC LIMIT 1", realmID, safe_account.c_str()));
 
     // Stop if the account is not found
     if (!result)
@@ -220,8 +221,6 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
             packet.Initialize(SMSG_AUTH_RESPONSE, 1);
             packet << uint8(AUTH_FAILED);
             SendPacket(packet);
-
-            delete result;
             BASIC_LOG("WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs).");
             return -1;
         }
@@ -236,7 +235,6 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     if (K.AsByteArray().empty())
     {
-        delete result;
         return -1;
     }
 
@@ -245,13 +243,12 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     locale = LocaleConstant(fields[9].GetUInt8());
     if (locale >= MAX_LOCALE)
         locale = LOCALE_enUS;
+
     os = fields[10].GetString();
     uint32 accFlags = fields[11].GetUInt32();
     bool isBanned = fields[12].GetBool();
+    uint32 inviteID = fields[13].GetUInt32();
 
-    delete result;
-
-    
     if (isBanned || sAccountMgr.IsIPBanned(GetRemoteAddress()))
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
@@ -333,6 +330,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     m_Session->SetUsername(account);
     m_Session->SetGameBuild(BuiltNumberClient);
     m_Session->SetAccountFlags(accFlags);
+    m_Session->SetInviteID(inviteID);
     m_Session->SetOS(clientOs);
     m_Session->LoadTutorialsData();
     m_Session->InitializeAnticheat(K);

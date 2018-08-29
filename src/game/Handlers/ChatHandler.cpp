@@ -429,7 +429,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             ChatHandler::FillMessageData(&data, this, type, lang, msg.c_str());
             group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetObjectGuid()));
             if (lang != LANG_ADDON)
+            {
                 sWorld.LogChat(this, "Group", msg, NULL, group->GetId());
+                _anticheat->Party(msg);
+            }
         }
         break;
         case CHAT_MSG_GUILD: // Master side
@@ -470,7 +473,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             group->BroadcastPacket(&data, false);
 
             if (lang != LANG_ADDON)
+            {
                 sWorld.LogChat(this, "Raid", msg, NULL, group->GetId());
+                _anticheat->Raid(msg);
+            }
         }
         break;
         case CHAT_MSG_RAID_LEADER: // Master side: TODO
@@ -488,7 +494,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID_LEADER, lang, msg.c_str());
             group->BroadcastPacket(&data, false);
             if (lang != LANG_ADDON)
+            {
                 sWorld.LogChat(this, "Raid", msg, NULL, group->GetId());
+                _anticheat->Raid(msg);
+            }
         }
         break;
 

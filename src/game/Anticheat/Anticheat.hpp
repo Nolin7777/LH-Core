@@ -104,6 +104,8 @@ class SessionAnticheatInterface
         virtual void Yell(const std::string &msg) = 0;
         virtual void Channel(const std::string &msg) = 0;
         virtual void Mail(const std::string &subject, const std::string &body, const ObjectGuid &to) = 0;
+        virtual void Party(const std::string &msg) = 0;
+        virtual void Raid(const std::string &msg) = 0;
 };
 
 // interface to anticheat system
@@ -192,6 +194,8 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual void Yell(const std::string &msg) {}
         virtual void Channel(const std::string &msg) {}
         virtual void Mail(const std::string &subject, const std::string &body, const ObjectGuid &to) {}
+        virtual void Party(const std::string &msg) {}
+        virtual void Raid(const std::string &msg) {}
 };
 
 #ifdef USE_ANTICHEAT

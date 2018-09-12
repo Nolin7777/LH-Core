@@ -45,12 +45,12 @@ UPDATE `battleground_template`
 -- Update quest relations
 UPDATE `creature_questrelation` SET `patch` = 2 WHERE `quest` IN (
         SELECT `entry` FROM `quest_template`
-        WHERE `ReqItemId1` IN (20558, 20559, 20560) AND `patch` = 6
+        WHERE `ReqItemId1` IN (20558, 20559, 20560)
     );
 
 UPDATE `creature_involvedrelation` SET `patch` = 2 WHERE `quest` IN (
         SELECT `entry` FROM `quest_template`
-        WHERE `ReqItemId1` IN (20558, 20559, 20560) AND `patch` = 6
+        WHERE `ReqItemId1` IN (20558, 20559, 20560)
     );
 
 UPDATE `quest_template`
@@ -58,6 +58,9 @@ UPDATE `quest_template`
     WHERE `ReqItemId1` IN (20558, 20559, 20560) AND `patch` = 6;
 
 UPDATE `item_template` SET `patch` = 2 WHERE `entry` IN (20558, 20559, 20560);
+
+-- Turn in NPC
+UPDATE `creature` SET `patch_min` = 2 WHERE `id` IN (15350, 15351);
 
 -- --------------------------------
 -- Arathi Basin available in 1.2

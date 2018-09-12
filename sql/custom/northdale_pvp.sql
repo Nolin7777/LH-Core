@@ -22,6 +22,44 @@ UPDATE `creature_involvedrelation` SET `patch` = 0 WHERE `quest` IN (
 UPDATE `quest_template` SET `patch` = 0 WHERE `ReqItemId1` IN (19213, 19322) AND `patch` IN (3, 5);
 
 -- --------------------------------
+-- MARKS OF HONOUR AVAILABLE 1.4
+-- --------------------------------
+-- AV
+UPDATE `battleground_template`
+    SET `AllianceWinSpell` = 24955, `AllianceLoseSpell` = 24954,
+        `HordeWinSpell` = 24955, `HordeLoseSpell` = 24954
+    WHERE `id` = 1;
+
+-- WSG
+UPDATE `battleground_template`
+    SET `AllianceWinSpell` = 24951, `AllianceLoseSpell` = 24950,
+        `HordeWinSpell` = 24951, `HordeLoseSpell` = 24950
+    WHERE `id` = 2;
+
+-- AB
+UPDATE `battleground_template`
+    SET `AllianceWinSpell` = 24953, `AllianceLoseSpell` = 24952,
+        `HordeWinSpell` = 24953, `HordeLoseSpell` = 24952
+    WHERE `id` = 3;
+
+-- Update quest relations
+UPDATE `creature_questrelation` SET `patch` = 2 WHERE `quest` IN (
+        SELECT `entry` FROM `quest_template`
+        WHERE `ReqItemId1` IN (20558, 20559, 20560) AND `patch` = 6
+    );
+
+UPDATE `creature_involvedrelation` SET `patch` = 2 WHERE `quest` IN (
+        SELECT `entry` FROM `quest_template`
+        WHERE `ReqItemId1` IN (20558, 20559, 20560) AND `patch` = 6
+    );
+
+UPDATE `quest_template`
+    SET `patch` = 2
+    WHERE `ReqItemId1` IN (20558, 20559, 20560) AND `patch` = 6;
+
+UPDATE `item_template` SET `patch` = 2 WHERE `entry` IN (20558, 20559, 20560);
+
+-- --------------------------------
 -- Arathi Basin available in 1.2
 -- --------------------------------
 UPDATE `battleground_template` SET `MinLvl` = 20, `MaxLvl` = 60 WHERE `id` = 3;

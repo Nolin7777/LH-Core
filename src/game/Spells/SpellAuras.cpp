@@ -1408,6 +1408,27 @@ void Aura::TriggerSpell()
         // Spell exist but require custom code
         switch (auraId)
         {
+            case 28270:
+            {
+                // Apply spell 28270 to any random player in the vicinity
+                auto caster = GetTarget();
+                if (!caster)
+                    return;
+
+                MaNGOS::AnyPlayerInObjectRangeCheck check(caster, 30.0f);
+                std::list<Player*> players;
+                MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, check);
+
+                Cell::VisitWorldObjects(caster, searcher, 30.0f);
+
+                for (auto player : players)
+                {
+                    if (player != caster && !player->HasAura(28270))
+                        player->AddAura(28270);
+                }
+
+                return;
+            }
             case 7054:
                 spellRandom = urand(0, 14) + 7038;
                 target->CastSpell(target, spellRandom, true, nullptr, this);
@@ -5819,6 +5840,7 @@ void Aura::PeriodicDummyTick()
 {
     SpellEntry const* spell = GetSpellProto();
     Unit *target = GetTarget();
+
     switch (spell->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:

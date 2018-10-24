@@ -1197,7 +1197,7 @@ bool WorldSession::AllowPacket(uint16 opcode)
     if (reason.str() != "")
     {
         reason << " (" << LookupOpcodeName(opcode) << ")";
-        _anticheat->RecordCheat(CHEAT_ACTION_INFO_LOG| sWorld.getConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION), "AntiFlood", reason.str().c_str());
+        _anticheat->RecordCheat(sWorld.getConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION), "AntiFlood", reason.str().c_str());
         return false;
     }
 

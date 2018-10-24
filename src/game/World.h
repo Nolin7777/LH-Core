@@ -270,6 +270,15 @@ enum eConfigUInt32Values
     CONFIG_UINT32_WAR_EFFORT_AUTOCOMPLETE_PERIOD,
     CONFIG_UINT32_ACCOUNT_CONCURRENT_AUCTION_LIMIT,
     CONFIG_UINT32_ACC_DELAYED_ACTION_LIMIT,
+    CONFIG_UINT32_PERFLOG_SLOW_MAIL,
+    CONFIG_UINT32_PERFLOG_SLOW_AUCTIONS,
+    CONFIG_UINT32_PERFLOG_SLOW_GROUPS,
+    CONFIG_UINT32_PERFLOG_SLOW_SAVEDVAR,
+    CONFIG_UINT32_PERFLOG_SLOW_CORPSE_UPDATE,
+    CONFIG_UINT32_PERFLOG_SLOW_EVENT_UPDATE,
+    CONFIG_UINT32_PERFLOG_SLOW_OBJECT_REMOVAL,
+    CONFIG_UINT32_PERFLOG_SLOW_INSTANCE_STATE,
+    CONFIG_UINT32_PERFLOG_SLOW_ACCOUNT_UPDATE,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -821,6 +830,8 @@ class World
         void SetWorldUpdateTimer(WorldTimers timer, uint32 current);
         time_t GetWorldUpdateTimer(WorldTimers timer);
         time_t GetWorldUpdateTimerInterval(WorldTimers timer);
+
+        static void PerformanceLog(uint32 threshold, uint32 timer, std::string message);
 
     protected:
         void _UpdateGameTime();

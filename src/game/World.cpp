@@ -928,6 +928,15 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_PACKETS,           "PerformanceLog.SlowMapPackets", 60);
     setConfig(CONFIG_UINT32_PERFLOG_SLOW_SESSIONS_UPDATE,       "PerformanceLog.SlowSessionsUpdate", 0);
     setConfig(CONFIG_UINT32_PERFLOG_SLOW_PACKET_BCAST,          "PerformanceLog.SlowPacketBroadcast", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_MAIL,                  "PerformanceLog.SlowMail", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_AUCTIONS,              "PerformanceLog.SlowAuctions", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_GROUPS,                "PerformanceLog.SlowGroups", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_SAVEDVAR,              "PerformanceLog.SlowSavedVar", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_CORPSE_UPDATE,         "PerformanceLog.SlowCorpseUpdate", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_EVENT_UPDATE,          "PerformanceLog.SlowEventUpdate", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_OBJECT_REMOVAL,        "PerformanceLog.SlowObjectRemovalUpdate", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_INSTANCE_STATE,        "PerformanceLog.SlowInstanceStateUpdate", 0);
+    setConfig(CONFIG_UINT32_PERFLOG_SLOW_ACCOUNT_UPDATE,        "PerformanceLog.SlowAccountUpdate", 0);
     setConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS,                "Continents.MotionUpdate.Threads", 0);
     setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_CONTINENTS,                   "Terrain.Preload.Continents", 1);
     setConfig(CONFIG_BOOL_TERRAIN_PRELOAD_INSTANCES,                    "Terrain.Preload.Instances", 1);
@@ -1715,6 +1724,15 @@ public:
     }
 };
 
+void World::PerformanceLog(uint32 threshold, uint32 timer, std::string message)
+{
+    if (!!threshold)
+    {
+        uint32 diff = WorldTimer::getMSTimeDiffToNow(timer);
+        sLog.out(LOG_PERFORMANCE, "Slow update %s: %ums", message, diff);
+    }
+}
+
 /// Update the World !
 void World::Update(uint32 diff)
 {
@@ -1730,9 +1748,12 @@ void World::Update(uint32 diff)
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
 
+    uint32 mailUpdateTime = WorldTimer::getMSTime();
     ///-Update mass mailer tasks if any
     sMassMailMgr.Update();
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAIL), mailUpdateTime, "MailManager");
 
+    uint32 auctionUpdateTime = WorldTimer::getMSTime();
     /// <ul><li> Handle auctions when the timer has passed
     if (m_timers[WUPDATE_AUCTIONS].Passed())
     {
@@ -1742,6 +1763,7 @@ void World::Update(uint32 diff)
         ///- Handle expired auctions
         sAuctionMgr.Update();
     }
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_AUCTIONS), auctionUpdateTime, "AuctionManager");
 
     /// <li> Handle session updates
     uint32 updateSessionsTime = WorldTimer::getMSTime();
@@ -1768,13 +1790,26 @@ void World::Update(uint32 diff)
     for (int i = 0; i < threadsCount; ++i)
         asyncTaskThreads.push_back(new ACE_Based::Thread(new WorldAsyncTasksExecutor()));
 
+    uint32 mapUpdateTime = WorldTimer::getMSTime();
     sMapMgr.Update(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE), mapUpdateTime, "MapManager");
+
+    uint32 bgUpdateTime = WorldTimer::getMSTime();
     sBattleGroundMgr.Update(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE), bgUpdateTime, "BGManager");
+
+    uint32 lfgUpdateTime = WorldTimer::getMSTime();
     sLFGMgr.Update(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE), lfgUpdateTime, "LFGManager");
+
+    uint32 zonesUpdateTime = WorldTimer::getMSTime();
     sZoneScriptMgr.Update(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE), zonesUpdateTime, "ZoneManager");
+
     sAutoTestingMgr->Update(diff);
     sNodesMgr->OnWorldUpdate(diff);
 
+    uint32 groupsUpdateTime = WorldTimer::getMSTime();
     ///- Update groups with offline leaders
     if (m_timers[WUPDATE_GROUPS].Passed())
     {
@@ -1785,6 +1820,7 @@ void World::Update(uint32 diff)
                 i->second->UpdateOfflineLeader(m_gameTime, delay);
         }
     }
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_GROUPS), groupsUpdateTime, "Groups");
 
     uint32 asyncWaitBegin = WorldTimer::getMSTime();
     for (int i = 0; i < threadsCount; ++i)
@@ -1797,20 +1833,21 @@ void World::Update(uint32 diff)
     if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE) && updateMapSystemTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE))
         sLog.out(LOG_PERFORMANCE, "Update map system: %ums [%ums for async]", updateMapSystemTime, WorldTimer::getMSTimeDiffToNow(asyncWaitBegin));
 
+    uint32 savedVariablesTime = WorldTimer::getMSTime();
     ///- Sauvegarde des variables internes (table variables) : MaJ par rapport a la DB
     if (m_timers[WUPDATE_SAVE_VAR].Passed())
     {
         m_timers[WUPDATE_SAVE_VAR].Reset();
         sObjectMgr.SaveVariables();
     }
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_SAVEDVAR), savedVariablesTime, "SavedVariables");
 
     // execute callbacks from sql queries that were queued recently
     uint32 asyncQueriesTime = WorldTimer::getMSTime();
     UpdateResultQueue();
-    asyncQueriesTime = WorldTimer::getMSTimeDiffToNow(asyncQueriesTime);
-    if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_ASYNC_QUERIES) && asyncQueriesTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_ASYNC_QUERIES))
-        sLog.out(LOG_PERFORMANCE, "Update async queries: %ums", asyncQueriesTime);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_ASYNC_QUERIES), asyncQueriesTime, "AsyncQueries");
 
+    uint32 corpseUpdateTime = WorldTimer::getMSTime();
     ///- Erase old corpses
     if (m_timers[WUPDATE_CORPSES].Passed())
     {
@@ -1818,7 +1855,9 @@ void World::Update(uint32 diff)
 
         sObjectAccessor.RemoveOldCorpses();
     }
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_CORPSE_UPDATE), corpseUpdateTime, "CorpseUpdate");
 
+    uint32 eventsUpdateTime = WorldTimer::getMSTime();
     ///- Process Game events when necessary
     if (m_timers[WUPDATE_EVENTS].Passed())
     {
@@ -1827,13 +1866,18 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
         m_timers[WUPDATE_EVENTS].Reset();
     }
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_EVENT_UPDATE), eventsUpdateTime, "EventsUpdate");
 
+    uint32 objectRemovalTime = WorldTimer::getMSTime();
     /// </ul>
     ///- Move all creatures with "delayed move" and remove and delete all objects with "delayed remove"
     sMapMgr.RemoveAllObjectsInRemoveList();
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_OBJECT_REMOVAL), objectRemovalTime, "ObjectRemoval");
 
+    uint32 instanceStateTime = WorldTimer::getMSTime();
     // update the instance reset times
     sMapPersistentStateMgr.Update();
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_INSTANCE_STATE), instanceStateTime, "InstanceStateUpdate");
 
     /// Maintenance checker
     if (m_MaintenanceTimeChecker < diff)
@@ -1848,8 +1892,10 @@ void World::Update(uint32 diff)
     sPlayerBotMgr.update(diff);
     // Update AutoBroadcast
     sAutoBroadCastMgr.update(diff);
-    // Update liste des ban si besoin
+
+    uint32 accountUpdateTime = WorldTimer::getMSTime();
     sAccountMgr.Update(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_ACCOUNT_UPDATE), accountUpdateTime, "AccountMgr");
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();

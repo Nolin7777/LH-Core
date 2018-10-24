@@ -862,6 +862,8 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT, "MaxCreatureSummonLimit", DEFAULT_CREATURE_SUMMON_LIMIT);
 
+    setConfig(CONFIG_UINT32_ACC_DELAYED_ACTION_LIMIT, "AccountDelayedActionProcessLimit", 5);
+
     m_creatureSummonCountLimit = getConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT);
 
     // Smartlog data

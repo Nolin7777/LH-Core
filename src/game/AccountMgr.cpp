@@ -489,6 +489,9 @@ void AccountMgr::ProcessDelayedActions()
 {
     ACE_Guard<ACE_Thread_Mutex> guard(_delayedActionMutex);
     auto now = time(nullptr);
+
+    auto numToProcess = sWorld.getConfig(CONFIG_UINT32_ACC_DELAYED_ACTION_LIMIT);
+    uint32 processed = 0;
     for (auto iter = _delayedActions.begin(); iter != _delayedActions.end();)
     {
         auto action = *iter;
@@ -501,6 +504,9 @@ void AccountMgr::ProcessDelayedActions()
         action->Execute();
         delete action;
         iter = _delayedActions.erase(iter);
+
+        if (++processed >= numToProcess)
+            break;
     }
 }
 

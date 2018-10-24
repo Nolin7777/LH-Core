@@ -314,7 +314,7 @@ void Log::Initialize()
     logFiles[LOG_CHAT_SPAM]         = openLogFile("ChatSpamLogFile", nullptr, "a");
 
     timestampPrefix[LOG_DBERRFIX] = false;
-    consoleWrite[LOG_ANTICHEAT_BASIC] = true;
+    //consoleWrite[LOG_ANTICHEAT_BASIC] = true;
 
     // Main log file settings
     m_includeTime  = sConfig.GetBoolDefault("LogTime", false);

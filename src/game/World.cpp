@@ -1729,7 +1729,8 @@ void World::PerformanceLog(uint32 threshold, uint32 timer, std::string message)
     if (!!threshold)
     {
         uint32 diff = WorldTimer::getMSTimeDiffToNow(timer);
-        sLog.out(LOG_PERFORMANCE, "Slow update %s: %ums", message, diff);
+        if (diff >= threshold)
+            sLog.out(LOG_PERFORMANCE, "Slow update %s: %ums", message.c_str(), diff);
     }
 }
 
@@ -1889,7 +1890,9 @@ void World::Update(uint32 diff)
         m_MaintenanceTimeChecker -= diff;
 
     //Update PlayerBotMgr
+    uint32 playerBotTime = WorldTimer::getMSTime();
     sPlayerBotMgr.update(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_INSTANCE_STATE), playerBotTime, "PlayerBot");
     // Update AutoBroadcast
     sAutoBroadCastMgr.update(diff);
 

@@ -1807,8 +1807,10 @@ void World::Update(uint32 diff)
     sZoneScriptMgr.Update(diff);
     PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE), zonesUpdateTime, "ZoneManager");
 
+    uint32 nodesAutoTime = WorldTimer::getMSTime();
     sAutoTestingMgr->Update(diff);
     sNodesMgr->OnWorldUpdate(diff);
+    PerformanceLog(getConfig(CONFIG_UINT32_PERFLOG_SLOW_GROUPS), nodesAutoTime, "AutoNodesManager");
 
     uint32 groupsUpdateTime = WorldTimer::getMSTime();
     ///- Update groups with offline leaders

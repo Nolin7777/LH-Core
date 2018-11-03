@@ -170,7 +170,7 @@ void SqlResultQueue::Update(uint32 timeout)
         if (timeout && WorldTimer::getMSTimeDiffToNow(begin) > timeout)
             break;
     }
-    if (unsafeQueryTime > timeout)
+    if (WorldTimer::getMSTimeDiffToNow(unsafeQueryTime) > timeout)
     {
         sLog.out(LOG_PERFORMANCE, "Unsafe queries took longer than the timeout. %u remaining", numUnsafeQueries);
     }

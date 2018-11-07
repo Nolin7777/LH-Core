@@ -55,4 +55,6 @@ VALUES
 (533, 25918, 0, 2, "Greater Blessing of Wisdom (R1)"),
 
 (533, 20217, 0, 2, "Blessing of Kings (R1)"),
-(533, 25898, 0, 2, "Greater Blessing of Kings (R1)");
+(533, 25898, 0, 2, "Greater Blessing of Kings (R1)"),
+
+(533, 15123, 0, 0, 'Resist Fire (UBRS)');

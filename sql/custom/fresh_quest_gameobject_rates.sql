@@ -50,7 +50,6 @@ UPDATE `gameobject` SET `spawntimesecsmin`=300, `spawntimesecsmax`= 420 WHERE `i
 UPDATE `gameobject` SET `spawntimesecsmin`=540, `spawntimesecsmax` = 660 WHERE `id` IN (1622,1623,1624,1628,2041,2042,2043,2044,2046) and map IN (0,1);
 
 -- high level herbs
-UPDATE `gameobject` SET `spawntimesecsmin`=1700, `spawntimesecsmax` = 1900 WHERE `id` IN (2866,142140,142141,142142,142143,142144,142145,176583,176584,176586,176587,176588,176642) and map IN (0,1);
-
+UPDATE `gameobject` SET `spawntimesecsmin`=1600, `spawntimesecsmax` = 1800 WHERE `id` IN (2866,142140,142141,142142,142143,142144,142145,176583,176584,176586,176587,176588,176642) and map IN (0,1);
 -- black lotus
-UPDATE `gameobject` SET `spawntimesecs`=1200 WHERE `id` IN (176589) and map IN (0,1);
+UPDATE `gameobject` SET `spawntimesecsmin`=1600, `spawntimesecsmax` = 1900 WHERE `id` IN (176589) and map IN (0,1);

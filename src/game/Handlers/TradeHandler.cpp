@@ -256,6 +256,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
     TradeData* my_trade = _player->m_trade;
     if (!my_trade)
         return;
+
     double lastModificationTimeInMS = difftime(time(NULL), my_trade->GetLastModificationTime()) * 1000;
     if (lastModificationTimeInMS < my_trade->GetScamPreventionDelay()) // if we are not outside the delay period since last modification
     {

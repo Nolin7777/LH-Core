@@ -276,12 +276,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
 
     Player *pl = GetPlayer();
 
-    if (IsAccountRestricted())
-    {
-        SendRestrictedHelp(LANG_INV_AUCTION_LIST_RESTRICTED);
-        return;
-    }
-
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(auctioneerGuid);
     if (!auctionHouseEntry)
         return;
@@ -426,12 +420,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
 void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionPlaceBid");
-
-    if (IsAccountRestricted())
-    {
-        SendRestrictedHelp(LANG_INV_AUCTION_LIST_RESTRICTED);
-        return;
-    }
 
     ObjectGuid auctioneerGuid;
     uint32 auctionId;

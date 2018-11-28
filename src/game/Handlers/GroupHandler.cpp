@@ -94,7 +94,8 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recv_data)
 
     if (IsAccountRestricted())
     {
-        if (!player->GetSocial()->HasFriend(GetPlayer()->GetObjectGuid()))
+        if (!CanSociallyInteractWith(player->GetSession())
+            && player->GetZoneId() != GetPlayer()->GetZoneId())
         {
             SendRestrictedHelp(LANG_INV_PARTY_INVITE_RESTRICTED);
             return;

@@ -426,9 +426,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
                 const auto whisperLevelReq = sWorld.getConfig(CONFIG_UINT32_WHISP_MIN_LEVEL);
                 const auto maxLevel = masterPlr->GetSession()->GetAccountMaxLevel();
-                const auto social = player->GetSession()->GetPlayer()->GetSocial(); // (╯°□°）╯︵ ┻━┻
+                const auto social = player->GetSocial();
 
-                if (maxLevel < whisperLevelReq && !social->HasFriend(masterPlr->GetObjectGuid()))
+                if (maxLevel < whisperLevelReq && CanSociallyInteractWith(player->GetSession()))
                 {
                     if (IsAccountRestricted()) // only applies if below the old whisper limit
                     {

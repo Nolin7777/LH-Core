@@ -553,6 +553,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void SetInviteID(uint32 id) { _inviteID = id; }
         bool IsAccountRestricted() const;
+        bool CanSociallyInteractWith(WorldSession* other) const;
         void SendRestrictedHelp(int32 entry);
         uint32 GetInviteID() const { return _inviteID; }
         uint32 _inviteID;

@@ -1323,3 +1323,18 @@ bool WorldSession::IsAccountRestricted() const
     return sWorld.getConfig(CONFIG_BOOL_ENABLE_INVITES) && !GetInviteID()
         && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_INVITE_RESTRICT_CAP);
 }
+
+bool WorldSession::CanSociallyInteractWith(WorldSession* other) const
+{
+    if (!other)
+        return false;
+
+    MasterPlayer* masterPlayer = GetMasterPlayer();
+    ASSERT(masterPlayer);
+
+    auto otherMaster = other->GetMasterPlayer();
+    ASSERT(otherMaster);
+
+    return otherMaster->GetSocial()->HasFriend(masterPlayer->GetObjectGuid())
+        || otherMaster->GetGuildId() == masterPlayer->GetGuildId();
+}

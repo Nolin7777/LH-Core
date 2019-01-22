@@ -33,6 +33,8 @@
 
 #include "BufferedSocket.h"
 
+class SocketAcceptor;
+
 struct PINData
 {
     uint8 salt[16];
@@ -61,6 +63,7 @@ class AuthSocket: public BufferedSocket
 
         void OnAccept();
         void OnRead();
+        void OnClose();
         void SendProof(Sha1Hash sha);
         void LoadRealmlist(ByteBuffer &pkt);
         bool VerifyPinData(uint32 pin, const PINData& clientData);
@@ -78,6 +81,9 @@ class AuthSocket: public BufferedSocket
         bool _HandleXferAccept();
 
         void _SetVSFields(const std::string& rI);
+
+        uint32 GetLastActionTime() const { return _lastActionTime; }
+        void SetAcceptor(SocketAcceptor* acceptor) { _acceptor = acceptor; }
 
     private:
         enum eStatus
@@ -137,6 +143,9 @@ class AuthSocket: public BufferedSocket
         AccountSecurityMap _accountSecurityOnRealm;
 
         ACE_HANDLE patch_;
+
+        uint32 _lastActionTime;
+        SocketAcceptor* _acceptor;
 
         void InitPatch();
 };

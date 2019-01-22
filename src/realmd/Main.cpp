@@ -44,6 +44,8 @@
 #include <ace/Acceptor.h>
 #include <ace/SOCK_Acceptor.h>
 
+#include "SocketAcceptor.hpp"
+
 #ifdef USE_SENDGRID
 #include "MailerService.h"
 #include <curl/curl.h>
@@ -284,7 +286,7 @@ extern int main(int argc, char **argv)
     LoginDatabase.CommitTransaction();
 
     ///- Launch the listening network socket
-    ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor> acceptor;
+    SocketAcceptor acceptor;
 
     uint16 rmport = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
     std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
@@ -351,6 +353,8 @@ extern int main(int argc, char **argv)
     uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
 
+    auto connectionTimeout = (uint32)sConfig.GetIntDefault("ConnectionTimeout", 120);
+
     #ifndef WIN32
     detachDaemon();
     #endif
@@ -362,6 +366,26 @@ extern int main(int argc, char **argv)
 
         if (ACE_Reactor::instance()->run_reactor_event_loop(interval) == -1)
             break;
+
+        if (!!connectionTimeout)
+        {
+            auto now = time(nullptr);
+            auto connections = acceptor.GetConnections();
+            for (auto iter = connections.begin(); iter != connections.end(); )
+            {
+                // Pre-increment because the connection may be removed from the list
+                // due to timeout
+                auto conn = *iter;
+                ++iter;
+
+                auto actionTime = conn->GetLastActionTime();
+                if (!!actionTime && (now - actionTime > connectionTimeout))
+                {
+                    conn->close_connection();
+                    conn->close();
+                }
+            }
+        }
 
         if( (++loopCounter) == numLoops )
         {

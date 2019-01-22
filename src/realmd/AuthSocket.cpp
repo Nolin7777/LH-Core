@@ -50,6 +50,8 @@
 
 #include <sstream>
 
+#include "SocketAcceptor.hpp"
+
 extern DatabaseType LoginDatabase;
 
 enum AccountFlags
@@ -176,7 +178,7 @@ typedef struct AuthHandler
 
 /// Constructor - set the N and g values for SRP6
 AuthSocket::AuthSocket() : gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0),
-_geoUnlockPIN(0)
+_geoUnlockPIN(0), _lastActionTime(0), _acceptor(nullptr)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -193,6 +195,9 @@ AuthSocket::~AuthSocket()
 {
     if(patch_ != ACE_INVALID_HANDLE)
         ACE_OS::close(patch_);
+
+    if (_acceptor)
+        _acceptor->RemoveConnectionHandler(this);
 }
 
 AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
@@ -207,6 +212,13 @@ AccountTypes AuthSocket::GetSecurityOn(uint32 realmId) const
 void AuthSocket::OnAccept()
 {
     BASIC_LOG("Accepting connection from '%s'", get_remote_address().c_str());
+    _lastActionTime = time(nullptr);
+}
+
+void AuthSocket::OnClose()
+{
+    if (_acceptor)
+        _acceptor->RemoveConnectionHandler(this);
 }
 
 /// Read the packet from the client
@@ -250,6 +262,7 @@ void AuthSocket::OnRead()
 
             DEBUG_LOG("[Auth] Got data for cmd %u recv length %u", _cmd, (uint32)recv_len());
 
+            _lastActionTime = time(nullptr);
             if (!(*this.*table[i].handler)())
             {
                 DEBUG_LOG("[Auth] Command handler failed for cmd %u recv length %u", _cmd, (uint32)recv_len());

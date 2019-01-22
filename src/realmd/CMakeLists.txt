@@ -20,6 +20,7 @@ set (EXECUTABLE_SRCS
 	AuthCodes.h
 	AuthSocket.h
 	BufferedSocket.h
+	SocketAcceptor.hpp
 	PatchHandler.h
 	RealmList.h
 	AuthSocket.cpp
@@ -27,6 +28,7 @@ set (EXECUTABLE_SRCS
 	Main.cpp
 	PatchHandler.cpp
 	RealmList.cpp
+	SocketAcceptor.cpp
 )
 
 

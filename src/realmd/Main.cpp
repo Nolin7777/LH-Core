@@ -385,7 +385,6 @@ extern int main(int argc, char **argv)
                 {
                     BASIC_LOG("Idle connection timeout from '%s'", conn->get_remote_address().c_str());
                     conn->close_connection();
-                    conn->close();
                 }
             }
         }

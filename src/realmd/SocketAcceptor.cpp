@@ -3,7 +3,7 @@
 #include "AuthSocket.h"
 #include <list>
 #include <map>
-#include <xstring>
+#include <string>
 
 SocketAcceptor::SocketAcceptor(uint32 connectThrottle, uint32 failedLoginThrottle)
     : ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor>(), _connectThrottlePeriod(connectThrottle),

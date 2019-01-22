@@ -266,6 +266,10 @@ void AuthSocket::OnRead()
             if (!(*this.*table[i].handler)())
             {
                 DEBUG_LOG("[Auth] Command handler failed for cmd %u recv length %u", _cmd, (uint32)recv_len());
+
+                if (_acceptor)
+                    _acceptor->SetFailedLoginThrottle(get_remote_address());
+
                 close_connection();
                 return;
             }

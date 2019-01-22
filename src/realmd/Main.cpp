@@ -285,8 +285,10 @@ extern int main(int argc, char **argv)
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
     LoginDatabase.CommitTransaction();
 
+    uint32 connectionThrottlePeriod = sConfig.GetIntDefault("ConnectionThrottlePeriod", 4);
+    uint32 failedLoginThrottlePeriod = sConfig.GetIntDefault("FailedLoginThrottlePeriod", 10);
     ///- Launch the listening network socket
-    SocketAcceptor acceptor;
+    SocketAcceptor acceptor(connectionThrottlePeriod, failedLoginThrottlePeriod);
 
     uint16 rmport = sConfig.GetIntDefault("RealmServerPort", DEFAULT_REALMSERVER_PORT);
     std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
@@ -381,10 +383,16 @@ extern int main(int argc, char **argv)
                 auto actionTime = conn->GetLastActionTime();
                 if (!!actionTime && (now - actionTime > connectionTimeout))
                 {
+                    BASIC_LOG("Idle connection timeout from '%s'", conn->get_remote_address().c_str());
                     conn->close_connection();
                     conn->close();
                 }
             }
+        }
+
+        if (!!connectionThrottlePeriod || !!failedLoginThrottlePeriod)
+        {
+            acceptor.UpdateThrottlePeriods();
         }
 
         if( (++loopCounter) == numLoops )

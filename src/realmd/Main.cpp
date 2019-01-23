@@ -369,24 +369,24 @@ extern int main(int argc, char **argv)
         if (ACE_Reactor::instance()->run_reactor_event_loop(interval) == -1)
             break;
 
-        if (!!connectionTimeout)
+        auto now = time(nullptr);
+        auto connections = acceptor.GetConnections();
+        for (auto iter = connections.begin(); iter != connections.end(); )
         {
-            auto now = time(nullptr);
-            auto connections = acceptor.GetConnections();
-            for (auto iter = connections.begin(); iter != connections.end(); )
+            // Pre-increment because the connection may be removed from the list
+            // due to timeout
+            auto conn = *iter;
+            ++iter;
+
+            // Awaiting deletion. BufferedSocket::Close will delete it
+            if (conn->IsClosed())
             {
-                // Pre-increment because the connection may be removed from the list
-                // due to timeout
-                auto conn = *iter;
-                ++iter;
+                conn->close();
+                continue;
+            }
 
-                // Awaiting deletion. BufferedSocket::Close will delete it
-                if (conn->IsClosed())
-                {
-                    conn->close();
-                    continue;
-                }
-
+            if (!!connectionTimeout)
+            {
                 auto actionTime = conn->GetLastActionTime();
                 if (!!actionTime && (now - actionTime > connectionTimeout))
                 {

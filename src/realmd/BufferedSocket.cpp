@@ -35,7 +35,8 @@
 
 BufferedSocket::BufferedSocket(void):
     input_buffer_(4096),
-    remote_address_("<unknown>")
+    remote_address_("<unknown>"),
+    _closed(false)
 {
 }
 
@@ -267,5 +268,5 @@ void BufferedSocket::close_connection(void)
 
     reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
 
-    close();
+    _closed = true;
 }

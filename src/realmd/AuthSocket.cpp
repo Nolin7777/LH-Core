@@ -177,7 +177,7 @@ typedef struct AuthHandler
 #define AUTH_TOTAL_COMMANDS sizeof(table)/sizeof(AuthHandler)
 
 /// Constructor - set the N and g values for SRP6
-AuthSocket::AuthSocket() : gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0),
+AuthSocket::AuthSocket() : BufferedSocket(), gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0),
 _geoUnlockPIN(0), _lastActionTime(0), _acceptor(nullptr)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");

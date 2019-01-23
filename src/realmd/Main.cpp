@@ -380,6 +380,13 @@ extern int main(int argc, char **argv)
                 auto conn = *iter;
                 ++iter;
 
+                // Awaiting deletion. BufferedSocket::Close will delete it
+                if (conn->IsClosed())
+                {
+                    conn->close();
+                    continue;
+                }
+
                 auto actionTime = conn->GetLastActionTime();
                 if (!!actionTime && (now - actionTime > connectionTimeout))
                 {

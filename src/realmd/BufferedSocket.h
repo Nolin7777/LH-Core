@@ -67,6 +67,8 @@ class BufferedSocket: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
         virtual int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE,
                 ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
 
+        bool IsClosed() const { return _closed; }
+
     private:
         ssize_t noblk_send(ACE_Message_Block &message_block);
 
@@ -75,6 +77,7 @@ class BufferedSocket: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
 
     protected:
         std::string remote_address_;
+        bool _closed;
 
 };
 

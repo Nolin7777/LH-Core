@@ -2882,23 +2882,44 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
     // TODO: for map local guid counters possible force reload map instead shutdown server at guid counter overflow
     m_guidGenerators_lock.acquire();
     uint32 guid = 0;
-    switch (guidhigh)
+    try
     {
-        case HIGHGUID_UNIT:
-            guid = m_CreatureGuids.Generate();
-            break;
-        case HIGHGUID_GAMEOBJECT:
-            guid = m_GameObjectGuids.Generate();
-            break;
-        case HIGHGUID_DYNAMICOBJECT:
-            guid = m_DynObjectGuids.Generate();
-            break;
-        case HIGHGUID_PET:
-            guid = m_PetGuids.Generate();
-            break;
-        default:
-            MANGOS_ASSERT(0);
+        switch (guidhigh)
+        {
+            case HIGHGUID_UNIT:
+                guid = m_CreatureGuids.Generate();
+                break;
+            case HIGHGUID_GAMEOBJECT:
+                guid = m_GameObjectGuids.Generate();
+                break;
+            case HIGHGUID_DYNAMICOBJECT:
+                guid = m_DynObjectGuids.Generate();
+                break;
+            case HIGHGUID_PET:
+                guid = m_PetGuids.Generate();
+                break;
+            default:
+                MANGOS_ASSERT(0);
+        }
     }
+    catch (std::runtime_error ex)
+    {
+        std::stringstream players;
+        int count = 0;
+        for (auto iter = m_mapRefManager.begin(); iter != m_mapRefManager.end() && count < 10; ++iter)
+        {
+            if (count++)
+                players << ", ";
+
+            players << iter->getSource()->GetName();
+        }
+
+        sLog.outError("Exception generating next GUID. Type: %s, map: %u (instance %u). Players: %s",
+            ObjectGuid::GetTypeName(guidhigh), GetId(), GetInstanceId(), players.str().c_str());
+
+        World::StopNow(ERROR_EXIT_CODE);
+    }
+
     m_guidGenerators_lock.release();
     return guid;
 }

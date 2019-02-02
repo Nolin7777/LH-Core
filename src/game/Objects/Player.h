@@ -1709,6 +1709,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
             return m_bHasDelayedTeleport && (isAlive() || !m_bHasBeenAliveAtDelayedTeleport);
         }
 
+        time_t GetLastTeleportTime() const { return _lastTeleportTime; }
+
         void CheckAreaExploreAndOutdoor(void);
 
         static Team TeamForRace(uint8 race);
@@ -2462,6 +2464,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool m_bHasDelayedTeleport;
         bool m_bHasBeenAliveAtDelayedTeleport;
         uint32 m_areaCheckTimer; // Trigger call to UpdateUnderwaterState/CheckAreaExploreAndOutdoor
+        time_t _lastTeleportTime;
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;

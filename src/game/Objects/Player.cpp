@@ -409,7 +409,8 @@ UpdateMask Player::updateVisualBits;
 Player::Player(WorldSession *session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this),
     m_enableInstanceSwitch(true), m_currentTicketCounter(0),
-    m_honorMgr(this), m_bNextRelocationsIgnored(0)
+    m_honorMgr(this), m_bNextRelocationsIgnored(0),
+    _lastTeleportTime(0)
 {
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
@@ -1933,6 +1934,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             wps();
         }
         m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For interpolation
+
+        _lastTeleportTime = time(nullptr);
     }
     else
     {
@@ -2095,6 +2098,8 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData *data)
                 m_teleportRecover = wps;
             wps();
         }
+
+        _lastTeleportTime = time(nullptr);
 
         return true;
     }

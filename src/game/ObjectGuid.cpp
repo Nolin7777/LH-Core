@@ -78,7 +78,7 @@ void ObjectGuid::Set(uint64 const& guid)
 }
 
 template<HighGuid high>
-uint32 ObjectGuidGenerator<high>::Generate()
+uint32 ObjectGuidGenerator<high>::Generate(bool nothrow = true)
 {
     if (!m_freedGuids.empty())
     {
@@ -89,7 +89,8 @@ uint32 ObjectGuidGenerator<high>::Generate()
     if (m_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
     {
         sLog.outError("%s guid overflow!! Can't continue, shutting down server. ", ObjectGuid::GetTypeName(high));
-        throw std::runtime_error("guid overflow");
+        if (!nothrow)
+            throw std::runtime_error("guid overflow");
     }
     return m_nextGuid++;
 }

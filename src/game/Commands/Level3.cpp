@@ -1106,7 +1106,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
     }
 
     auto it = skills.find(args);
-    
+
     if (it == skills.end())
     {
         std::stringstream options;
@@ -2390,7 +2390,7 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
                     SetSentErrorMessage(true);
                     return false;
                 }
-                
+
                 if (!CharacterDatabase.DirectPExecute("DELETE FROM character_inventory WHERE item = %u", guid))
                 {
                     SendSysMessage("Encountered an error while attempting to remove item from inventory");
@@ -3823,6 +3823,26 @@ bool ChatHandler::HandleGetDistanceCommand(char* args)
     dz = player->GetPositionZ() - obj->GetPositionZ();
 
     PSendSysMessage(LANG_DISTANCE, player->GetDistance(obj), player->GetDistance2d(obj), sqrt(dx * dx + dy * dy + dz * dz));
+
+    return true;
+}
+
+bool ChatHandler::HandleFacemeCommand(char* /*args*/)
+{
+    Unit* target = getSelectedUnit();
+    if (!target || !m_session->GetPlayer()->GetSelectionGuid())
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (target->GetTypeId() == TYPEID_PLAYER)
+    {
+        target->InterruptNonMeleeSpells(true);
+        target->SetFacingToObject(m_session->GetPlayer());
+        PSendSysMessage("%s is facing you.", GetNameLink((Player*) target).c_str());
+    }
 
     return true;
 }

@@ -290,7 +290,7 @@ class ObjectGuidGenerator
 
     public:                                                 // modifiers
         void Set(uint32 val) { m_nextGuid = val; }
-        uint32 Generate(bool nothrow = true);
+        uint32 Generate(bool nothrow);
         void GenerateRange(uint32& first, uint32& last);
 
     public:                                                 // accessors
@@ -309,7 +309,7 @@ public:
     uint32 Generate()
     {
         Guard _g(lock);
-        return ObjectGuidGenerator<high>::Generate();
+        return ObjectGuidGenerator<high>::Generate(true);
     }
     void FreeGuid(uint32 g)
     {

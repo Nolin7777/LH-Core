@@ -838,12 +838,12 @@ class ObjectMgr
         uint32 GetFirstTemporaryGameObjectLowGuid() const { return m_FirstTemporaryGameObjectGuid; }
 
         // used in .npc add/.gobject add commands for adding static spawns
-        uint32 GenerateStaticCreatureLowGuid() { if (m_StaticCreatureGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryCreatureGuid) return 0; return m_StaticCreatureGuids.Generate(); }
-        uint32 GenerateStaticGameObjectLowGuid() { if (m_StaticGameObjectGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryGameObjectGuid) return 0; return m_StaticGameObjectGuids.Generate(); }
+        uint32 GenerateStaticCreatureLowGuid() { if (m_StaticCreatureGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryCreatureGuid) return 0; return m_StaticCreatureGuids.Generate(true); }
+        uint32 GenerateStaticGameObjectLowGuid() { if (m_StaticGameObjectGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryGameObjectGuid) return 0; return m_StaticGameObjectGuids.Generate(true); }
 
-        uint32 GeneratePlayerLowGuid() { return m_CharGuids.Generate(); }
+        uint32 GeneratePlayerLowGuid() { return m_CharGuids.Generate(true); }
         uint32 GenerateItemLowGuid() { return m_ItemGuids.Generate(); }
-        uint32 GenerateCorpseLowGuid() { return m_CorpseGuids.Generate(); }
+        uint32 GenerateCorpseLowGuid() { return m_CorpseGuids.Generate(true); }
         void FreeItemLowGuid(uint32 g) { return m_ItemGuids.FreeGuid(g); }
 
         uint32 GenerateAuctionID();

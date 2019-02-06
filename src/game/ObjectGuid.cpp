@@ -78,7 +78,7 @@ void ObjectGuid::Set(uint64 const& guid)
 }
 
 template<HighGuid high>
-uint32 ObjectGuidGenerator<high>::Generate(bool nothrow = true)
+uint32 ObjectGuidGenerator<high>::Generate(bool nothrow)
 {
     if (!m_freedGuids.empty())
     {

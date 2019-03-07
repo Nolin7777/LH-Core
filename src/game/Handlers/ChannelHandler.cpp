@@ -30,7 +30,7 @@ void WorldSession::HandleJoinChannelOpcode(WorldPacket& recvPacket)
 
     recvPacket >> channelname;
 
-    if (!normalizePlayerName(channelname))
+    if (!normalizePlayerName(channelname, (size_t)64))
         return;
 
     DEBUG_LOG("Opcode CMSG_JOIN_CHANNEL channel \"%s\"", channelname.c_str());

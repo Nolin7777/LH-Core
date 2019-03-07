@@ -57,7 +57,9 @@
 
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
-bool normalizePlayerName(std::string& name)
+#include "utf8cpp/utf8.h"
+
+bool normalizePlayerName(std::string& name, size_t max_len)
 {
     if (name.empty())
         return false;
@@ -67,7 +69,7 @@ bool normalizePlayerName(std::string& name)
         return false;
 
     size_t len = wstr_buf.size();
-    if (len > MAX_INTERNAL_PLAYER_NAME)
+    if (len > max_len)
         return false;
 
     wstr_buf[0] = wcharToUpper(wstr_buf[0]);

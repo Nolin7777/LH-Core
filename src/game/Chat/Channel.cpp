@@ -55,7 +55,8 @@ Channel::Channel(const std::string& name)
     }
     else                                                    // it's custom channel
     {
-        normalizePlayerName(m_name, (size_t)64);
+        if (!normalizePlayerName(m_name, (size_t)128))
+            m_name = "";
 
         if (m_name == u8"World")
         {

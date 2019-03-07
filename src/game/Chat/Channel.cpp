@@ -55,6 +55,8 @@ Channel::Channel(const std::string& name)
     }
     else                                                    // it's custom channel
     {
+        normalizePlayerName(m_name, (size_t)64);
+
         if (m_name == u8"World")
         {
             m_flags |= CHANNEL_FLAG_GENERAL;

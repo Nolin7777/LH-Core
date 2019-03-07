@@ -56,7 +56,10 @@ Channel::Channel(const std::string& name)
     else                                                    // it's custom channel
     {
         if (!normalizePlayerName(m_name, (size_t)128))
-            m_name = "";
+        {
+            m_name = "INVALIDCHANNEL";
+            m_announce = false;
+        }
 
         if (m_name == u8"World")
         {

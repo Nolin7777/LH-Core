@@ -2378,3 +2378,14 @@ bool ChatHandler::HandleDebugOverflowCommand(char* args)
 
     return true;
 }
+
+
+bool ChatHandler::HandleDebugChatFreezeCommand(char* args)
+{
+    std::string message("| |01");
+
+    auto master = GetSession()->GetMasterPlayer();
+    master->Whisper(message, LANG_UNIVERSAL, master);
+
+    return true;
+}

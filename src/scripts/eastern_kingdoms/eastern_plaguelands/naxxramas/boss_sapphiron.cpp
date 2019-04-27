@@ -407,17 +407,6 @@ struct boss_sapphironAI : public ScriptedAI
 
                 events.ScheduleEvent(EVENT_LIFTOFF, 250);
             }
-            else if (phase == PHASE_LANDING)
-            {
-                SetHover(false);
-                m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
-                events.ScheduleEvent(EVENT_LANDED, Seconds(1));
-            }
-        }
-        else if (pointId = MOVE_POINT_FLYPOINT)
-        {
-            SetHover(true);
-            SetBoundingRadii(false);
         }
     }
 
@@ -426,14 +415,10 @@ struct boss_sapphironAI : public ScriptedAI
         if (on)
         {
             m_creature->SetHover(true);
-            //m_creature->SetFly(true);
-            //m_creature->CastSpell(m_creature, 18430, true);
         }
         else
         {
-            //m_creature->SetFly(false);
             m_creature->SetHover(false);
-            //m_creature->RemoveAurasDueToSpell(18430);
         }
     }
 
@@ -553,8 +538,8 @@ struct boss_sapphironAI : public ScriptedAI
                     wingBuffetCreature = pWG->GetObjectGuid();
                 }
 
-                // Sets moveflag hover in the spline, the client does something special with it :shrug:
-                m_creature->GetMotionMaster()->MovePoint(MOVE_POINT_FLYPOINT, aLiftOffPosition[0], aLiftOffPosition[1], aLiftOffPosition[2] + 2, MOVE_PATHFINDING | MOVE_FLY_MODE);
+                SetHover(true);
+                SetBoundingRadii(false);
                 break;
             }
             case EVENT_LAND:
@@ -568,8 +553,9 @@ struct boss_sapphironAI : public ScriptedAI
                     return;
                 }
                 phase = PHASE_LANDING;
-                //SetHover(false);
-                m_creature->GetMotionMaster()->MovePoint(MOVE_POINT_LIFTOFF, aLiftOffPosition[0], aLiftOffPosition[1], aLiftOffPosition[2], MOVE_PATHFINDING | MOVE_FLY_MODE);
+                SetHover(false);
+                m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
+                events.ScheduleEvent(EVENT_LANDED, Seconds(3));
                 break;
             }
             case EVENT_LANDED:
@@ -582,9 +568,9 @@ struct boss_sapphironAI : public ScriptedAI
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
                 events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
 
-                SetCombatMovement(true);
-                m_creature->GetMotionMaster()->Clear(true);
+                m_creature->GetMotionMaster()->Clear(false);
                 m_creature->SelectHostileTarget();
+                SetCombatMovement(true);
 
                 SetBoundingRadii(true);
                 phase = PHASE_GROUND;
@@ -592,7 +578,7 @@ struct boss_sapphironAI : public ScriptedAI
             }
             case EVENT_ICEBOLT:
             {
-                //DoIceBolt();
+                DoIceBolt();
                 break;
             }
             case EVENT_FROST_BREATH_DUMMY:
@@ -609,8 +595,8 @@ struct boss_sapphironAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) != CAST_OK)
                     events.Repeat(100);
-                //else
-                    //events.ScheduleEvent(EVENT_LAND, 7000);
+                else
+                    events.ScheduleEvent(EVENT_LAND, 7000);
                 break;
             }
             case EVENT_BLIZZARD:

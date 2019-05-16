@@ -172,7 +172,10 @@ void WorldSession::HandleCharEnum(QueryResult * result)
     data.put<uint8>(0, num);
     _charactersCount = num;
 
-    SendPacket(&data);
+    if (_anticheat)
+        _anticheat->SendCharEnum(std::move(data));
+    else
+        SendPacket(&data);
 }
 
 void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recv_data*/)

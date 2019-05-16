@@ -68,6 +68,8 @@ class SessionAnticheatInterface
         virtual bool IsSilenced() const = 0;
         virtual void Silence() = 0;
 
+        virtual void SendCharEnum(WorldPacket &&packet) = 0;
+
         virtual void NewPlayer() = 0;
         virtual void LeaveWorld() = 0;
 
@@ -147,6 +149,8 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 
         virtual bool IsSilenced() const { return false; }
         virtual void Silence() {};
+
+        virtual void SendCharEnum(WorldPacket &&packet) { _session->SendPacket(&packet); }
 
         virtual void NewPlayer() {} 
         virtual void LeaveWorld() {};

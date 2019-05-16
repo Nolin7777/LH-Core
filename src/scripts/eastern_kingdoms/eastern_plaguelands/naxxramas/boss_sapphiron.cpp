@@ -91,9 +91,12 @@ enum Phase
     PHASE_DEAD
 };
 
-static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
+static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 137.626f };
 uint32 SPAWN_ANIM_TIMER = 21500;
 static constexpr float AGGRO_RADIUS = 70.0f;
+
+#define BOUNDING_RADIUS 12.0f
+#define COMBAT_REACH 23.0f
 
 struct boss_sapphironAI : public ScriptedAI
 {
@@ -122,6 +125,8 @@ struct boss_sapphironAI : public ScriptedAI
             phase = PHASE_GROUND;
         }
         m_TargetNotReachableTimer = 0;
+
+        SetBoundingRadii(true);
     }
 
     instance_naxxramas* m_pInstance;
@@ -153,12 +158,13 @@ struct boss_sapphironAI : public ScriptedAI
         events.Reset();
         berserkTimer = 900000; // 15 min
         m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
-        m_creature->RemoveAurasDueToSpell(17131);
         UnSummonWingBuffet();
         DeleteAndDispellIceBlocks();
-        setHover(false, true);
+        SetHover(false);
         SetCombatMovement(true);
         m_TargetNotReachableTimer = 0;
+
+
 
         if (m_pInstance && m_pInstance->GetData(TYPE_SAPPHIRON) != DONE)
             m_pInstance->SetData(TYPE_SAPPHIRON, NOT_STARTED);
@@ -374,6 +380,7 @@ struct boss_sapphironAI : public ScriptedAI
         
         iceboltTargets.push_back(target->GetObjectGuid());
         m_creature->SetFacingToObject(target);
+        m_creature->SetTargetGuid(target->GetObjectGuid());
         DoCastSpellIfCan(target, SPELL_ICEBOLT, CF_TRIGGERED);
         
         RescheduleIcebolt();
@@ -381,66 +388,50 @@ struct boss_sapphironAI : public ScriptedAI
 
     void MovementInform(uint32 uiType, uint32 pointId) override
     {
-        if (pointId == MOVE_POINT_LIFTOFF && phase == PHASE_LIFT_OFF)
+        if (uiType != POINT_MOTION_TYPE || m_creature->IsInEvadeMode())
+            return;
+
+        if (pointId == MOVE_POINT_LIFTOFF)
         {
-            events.ScheduleEvent(EVENT_LIFTOFF, 250);
+            if (phase == PHASE_LIFT_OFF)
+            {
+                SetCombatMovement(false);
+                m_creature->GetMotionMaster()->Clear(true);
+                m_creature->GetMotionMaster()->MoveIdle();
+
+                m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                m_creature->InterruptNonMeleeSpells(false);
+                m_creature->AttackStop(true);
+
+                m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
+
+                events.ScheduleEvent(EVENT_LIFTOFF, 250);
+            }
         }
     }
 
-    void setHover(bool on, bool onReset = false)
+    void SetHover(bool on)
     {
         if (on)
         {
-            m_creature->InterruptNonMeleeSpells(false);
-            m_creature->AttackStop();
-            m_creature->RemoveAllAttackers();
-            SetCombatMovement(false);
-            m_creature->SetReactState(ReactStates::REACT_PASSIVE);
-            m_creature->UpdateCombatState(false);
-
-            m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
-            m_creature->SetUnitMovementFlags(MOVEFLAG_HOVER);
-            m_creature->SendHeartBeat(true);
-            WorldPacket data;
-            data.Initialize(SMSG_MOVE_SET_HOVER, 8 + 4);
-            data << m_creature->GetPackGUID();
-            data << uint32(0);
-            m_creature->SendMovementMessageToSet(std::move(data), true);
-            
-            m_creature->m_TargetNotReachableTimer = 0;
-            if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
-                m_creature->ClearTemporaryFaction();
-
-            //m_creature->SetFly(true);
-            //m_creature->SetLevitate(true);
-            m_creature->SetMeleeZLimit(0.0f);
+            m_creature->SetHover(true);
         }
         else
         {
-            m_creature->RemoveAurasDueToSpell(17131);
-            if (m_creature->HasUnitMovementFlag(MOVEFLAG_HOVER))
-            {
-                m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
-                
-                m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
-            }
+            m_creature->SetHover(false);
+        }
+    }
 
-
-            WorldPacket data;
-            data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
-            data << m_creature->GetPackGUID();
-            data << uint32(0);
-            m_creature->SendMovementMessageToSet(std::move(data), true);
-
-            if (!onReset)
-            {
-                m_creature->UpdateCombatState(true);
-                m_creature->SetReactState(ReactStates::REACT_AGGRESSIVE);
-            }
-
-            //m_creature->SetFly(false);
-            //m_creature->SetLevitate(false);
-            m_creature->SetMeleeZLimit(MELEE_Z_LIMIT);
+    void SetBoundingRadii(bool land)
+    {
+        if (land)
+        {
+            m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, BOUNDING_RADIUS);
+            m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, COMBAT_REACH);
+        }
+        else
+        {
+            m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, COMBAT_REACH / 2);
         }
     }
 
@@ -528,13 +519,10 @@ struct boss_sapphironAI : public ScriptedAI
                 if (m_creature->GetHealthPercent() > 10.0f)
                 {
                     events.Reset();
-                    m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
                     m_creature->InterruptNonMeleeSpells(false);
-                    m_creature->GetMotionMaster()->Clear(false);
-                    m_creature->GetMotionMaster()->MoveIdle();
                     m_creature->GetMotionMaster()->MovePoint(MOVE_POINT_LIFTOFF, aLiftOffPosition[0], aLiftOffPosition[1], aLiftOffPosition[2]);
                     phase = PHASE_LIFT_OFF;
-                    m_creature->SetTargetGuid(0);
+                    m_creature->ClearTarget();
                 }
                 break;
             case EVENT_LIFTOFF: // liftoff is triggered from MovementInform()
@@ -550,8 +538,8 @@ struct boss_sapphironAI : public ScriptedAI
                     wingBuffetCreature = pWG->GetObjectGuid();
                 }
 
-                setHover(true);
-
+                SetHover(true);
+                SetBoundingRadii(false);
                 break;
             }
             case EVENT_LAND:
@@ -564,10 +552,10 @@ struct boss_sapphironAI : public ScriptedAI
                     events.Repeat(100);
                     return;
                 }
-                setHover(false);
-                //m_creature->GetMotionMaster()->MovePoint(MOVE_POINT_FLYPOINT, m_creature->GetPositionX(), m_creature->GetPositionY(), 137.7f, MOVE_PATHFINDING | MOVE_FLY_MODE);
                 phase = PHASE_LANDING;
-                events.ScheduleEvent(EVENT_LANDED, Seconds(4));
+                SetHover(false);
+                m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
+                events.ScheduleEvent(EVENT_LANDED, Seconds(3));
                 break;
             }
             case EVENT_LANDED:
@@ -580,9 +568,11 @@ struct boss_sapphironAI : public ScriptedAI
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
                 events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
 
-                SetCombatMovement(true);
                 m_creature->GetMotionMaster()->Clear(false);
                 m_creature->SelectHostileTarget();
+                SetCombatMovement(true);
+
+                SetBoundingRadii(true);
                 phase = PHASE_GROUND;
                 break;
             }

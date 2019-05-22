@@ -1936,6 +1936,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For interpolation
 
         _lastTeleportTime = time(nullptr);
+        if (auto anticheat = GetSession()->GetAnticheat())
+            anticheat->Teleport(Position(m_teleport_dest));
     }
     else
     {

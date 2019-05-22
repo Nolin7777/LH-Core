@@ -217,6 +217,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     {
         GetPlayer()->SendHeartBeat(true);
     }
+
+    if (_anticheat)
+        _anticheat->Teleport(Position(loc));
 }
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)

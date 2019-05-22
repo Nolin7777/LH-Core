@@ -89,12 +89,6 @@ class Transport;
 
 typedef UNORDERED_MAP<Player*, UpdateData> UpdateDataMapType;
 
-struct Position
-{
-    Position() : x(0.0f), y(0.0f), z(0.0f), o(0.0f) {}
-    float x, y, z, o;
-};
-
 struct WorldLocation
 {
     uint32 mapid;
@@ -108,6 +102,13 @@ struct WorldLocation
         : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(loc.orientation) {}
 };
 
+struct Position
+{
+    Position() : x(0.0f), y(0.0f), z(0.0f), o(0.0f) {}
+    float x, y, z, o;
+    Position(const WorldLocation& loc)
+        : x(loc.coord_x), y(loc.coord_y), z(loc.coord_y), o(loc.orientation) {}
+};
 
 //use this class to measure time between world update ticks
 //essential for units updating their spells after cells become active

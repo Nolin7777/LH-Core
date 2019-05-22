@@ -90,6 +90,7 @@ class SessionAnticheatInterface
         virtual bool IsInKnockBack() const = 0;
         virtual void KnockBack(float speedxy, float speedz, float cos, float sin) = 0;
         virtual void OnExplore(const AreaEntry *p) = 0;
+        virtual void Teleport(const Position &pos) = 0;
 
         virtual void OrderSent(uint16 opcode, uint32 counter) = 0;
         virtual void OrderAck(uint16 opcode, uint32 counter) = 0;
@@ -182,6 +183,7 @@ class NullSessionAnticheat : public SessionAnticheatInterface
         virtual bool IsInKnockBack() const { return _inKnockBack; }
         virtual void KnockBack(float speedxy, float speedz, float cos, float sin) { _inKnockBack = true; }
         virtual void OnExplore(const AreaEntry *) {}
+        virtual void Teleport(const Position &pos) {}
 
         virtual void OrderSent(uint16, uint32) {}
         virtual void OrderAck(uint16, uint32) {}

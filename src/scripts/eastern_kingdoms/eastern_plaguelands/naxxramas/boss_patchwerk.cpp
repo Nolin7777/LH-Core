@@ -135,14 +135,21 @@ struct boss_patchwerkAI : public ScriptedAI
         ThreatList const& tList = m_creature->getThreatManager().getThreatList();
         for (ThreatList::const_iterator iter = tList.begin(); iter != tList.end(); ++iter)
         {
+            auto ref = *iter;
             // Skipping maintank, only using him if there is no other viable target todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
-            if ((*iter)->getUnitGuid() == mainTankGuid)
+            if (ref->getUnitGuid() == mainTankGuid)
                 continue;
-            if (!(*iter)->getUnitGuid().IsPlayer())
+            if (!ref->getUnitGuid().IsPlayer())
                 continue;
 
-            if (Unit* pTempTarget = m_creature->GetMap()->GetUnit((*iter)->getUnitGuid()))
+            if (Unit* pTempTarget = m_creature->GetMap()->GetUnit(ref->getUnitGuid()))
             {
+                if (pTempTarget->IsImmuneToDamage(SPELL_SCHOOL_MASK_NORMAL))
+                    continue;
+
+                if (!m_creature->IsValidAttackTarget(pTempTarget))
+                    continue;
+
                 // target has higher hp than anyone checked so far
                 if (pTempTarget->GetHealth() > uiHighestHP)
                 {

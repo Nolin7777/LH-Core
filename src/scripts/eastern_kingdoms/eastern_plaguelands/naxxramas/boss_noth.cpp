@@ -298,7 +298,7 @@ struct boss_nothAI : public ScriptedAI
     void Summon2Guardians()
     {
         // Choose one of two locations south-west, and either the north-east or north-west location
-        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW1, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW2, CF_TRIGGERED);
         DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_NE : SPELL_SUM_GUARD_NW, CF_TRIGGERED);
     }
 

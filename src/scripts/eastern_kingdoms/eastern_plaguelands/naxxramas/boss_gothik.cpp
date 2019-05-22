@@ -347,7 +347,7 @@ struct boss_gothikAI : public ScriptedAI
             {
                 // Don't count dead players, including those that are feigned. Otherwise
                 // we could have a bunch of feigned players sitting on one side ;)
-                if (p->isDead())
+                if (p->isDead() || p->HasAura(SPELL_AURA_FEIGN_DEATH))
                     continue;
 
                 if(m_pInstance->IsInRightSideGothArea(p))
@@ -464,7 +464,12 @@ struct boss_gothikAI : public ScriptedAI
                     if (auiSummonData[m_uiSummonCount][2])
                         SummonAdds(true, auiSummonData[m_uiSummonCount][2]);
 
-                    m_uiSummonTimer += auiSummonData[m_uiSummonCount][3] - uiDiff;
+                    m_uiSummonTimer += auiSummonData[m_uiSummonCount][3];
+                    if (m_uiSummonTimer <= uiDiff)
+                        m_uiSummonTimer = 0;
+                    else
+                        m_uiSummonTimer -= uiDiff;
+
                     ++m_uiSummonCount;
                 }
                 else

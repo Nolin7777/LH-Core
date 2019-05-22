@@ -100,8 +100,8 @@ struct CommonInitializer
         auto incr = (uint32)((double)(s.SegLength(i)) * (double)velocityInv);
         if (incr > 0 && incr > std::numeric_limits<uint32>::max() - time)
             time = std::numeric_limits<uint32>::max();
-
-        time += (uint32)incr;
+        else
+            time += (uint32)incr;
 
         return time;
     }

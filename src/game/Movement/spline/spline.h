@@ -187,9 +187,6 @@ namespace Movement
                 while (i < index_hi)
                 {
                     new_length = cacher(*this, i);
-                    // Length overflowed : assign max value
-                    if (new_length < 0)
-                        new_length = std::numeric_limits<length_type>::max();
                     lengths[++i] = new_length;
 
                     MANGOS_ASSERT(prev_length <= new_length);
@@ -206,7 +203,7 @@ namespace Movement
             void set_length(index_type i, length_type length) { lengths[i] = length;}
             void clear();
     };
-
+    typedef Spline<uint32> MySpline;
 }
 
 #include "spline.impl.h"

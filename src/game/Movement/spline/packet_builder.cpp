@@ -75,7 +75,7 @@ void PacketBuilder::WriteCommonMonsterMovePart(const MoveSpline& move_spline, Wo
     data << move_spline.Duration();
 }
 
-int32 WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data, uint32 start)
+int32 WriteLinearPath(const MySpline& spline, ByteBuffer& data, uint32 start)
 {
     uint32 maxPointsPerPacket = sWorld.getConfig(CONFIG_UINT32_MAX_POINTS_PER_MVT_PACKET);
     uint32 last_idx = spline.getPointCount() - 3;
@@ -112,14 +112,14 @@ int32 WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data, uint32 star
     return lastIdxWritten;
 }
 
-void WriteCatmullRomPath(const Spline<int32>& spline, ByteBuffer& data)
+void WriteCatmullRomPath(const MySpline& spline, ByteBuffer& data)
 {
     uint32 count = spline.getPointCount() - 3;
     data << count;
     data.append<Vector3>(&spline.getPoint(2), count);
 }
 
-void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data)
+void WriteCatmullRomCyclicPath(const MySpline& spline, ByteBuffer& data)
 {
     uint32 count = spline.getPointCount() - 3;
     data << uint32(count + 1);
@@ -132,7 +132,7 @@ int PacketBuilder::WriteMonsterMove(const MoveSpline& move_spline, WorldPacket& 
     WriteCommonMonsterMovePart(move_spline, data);
     size_t durationPos = data.wpos() - 4;
 
-    const Spline<int32>& spline = move_spline.spline;
+    const MySpline& spline = move_spline.spline;
     MoveSplineFlag splineflags = move_spline.splineflags;
     if (splineflags & MoveSplineFlag::Mask_CatmullRom)
     {

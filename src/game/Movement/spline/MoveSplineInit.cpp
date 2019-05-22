@@ -58,7 +58,7 @@ void MoveSplineInit::Move(PathFinder const* pfinder)
         SetFly();
 }
 
-int32 MoveSplineInit::Launch()
+uint32 MoveSplineInit::Launch()
 {
     float realSpeedRun = 0.0f;
     MoveSpline& move_spline = *unit.movespline;

@@ -40,7 +40,6 @@ namespace Movement
     class MoveSpline
     {
         public:
-            typedef Spline<int32> MySpline;
             enum UpdateResult
             {
                 Result_None         = 0x01,
@@ -59,14 +58,14 @@ namespace Movement
 
             MoveSplineFlag  splineflags;
 
-            int32           time_passed;
+            uint32           time_passed;
             int32           point_Idx;
             int32           last_point_sent_Idx;
             int32           point_Idx_offset;
             const char*     mvtOrigin; // For debug purposes
 
             void init_spline(const MoveSplineInitArgs& args);
-            UpdateResult _updateState(int32& ms_time_diff);
+            UpdateResult _updateState(uint32& ms_time_diff);
 
         public:
 
@@ -74,10 +73,10 @@ namespace Movement
             void computeFallElevation(float& el) const;
 
             uint32 GetTransportGuid() const { return transportGuid; }
-            int32 next_timestamp() const { return spline.length(point_Idx + 1);}
-            int32 segment_time_elapsed() const { return next_timestamp() - time_passed;}
-            int32 timeElapsed() const { return Duration() - time_passed;}
-            int32 timePassed() const { return time_passed;}
+            uint32 next_timestamp() const { return spline.length(point_Idx + 1);}
+            uint32 segment_time_elapsed() const { return next_timestamp() - time_passed;}
+            uint32 timeElapsed() const { return Duration() - time_passed;}
+            uint32 timePassed() const { return time_passed;}
 
             const MySpline& _Spline() const { return spline;}
             int32 _currentSplineIdx() const { return point_Idx;}
@@ -90,7 +89,7 @@ namespace Movement
             explicit MoveSpline();
 
             template<class UpdateHandler>
-            void updateState(int32 difftime, UpdateHandler& handler)
+            void updateState(uint32 difftime, UpdateHandler& handler)
             {
                 MANGOS_ASSERT(Initialized());
                 do
@@ -98,7 +97,7 @@ namespace Movement
                 while (difftime > 0);
             }
 
-            void updateState(int32 difftime)
+            void updateState(uint32 difftime)
             {
                 MANGOS_ASSERT(Initialized());
                 do _updateState(difftime);
@@ -118,8 +117,8 @@ namespace Movement
             int32 getLastPointSent() const { return last_point_sent_Idx; }
             void setLastPointSent(int i) { last_point_sent_Idx = i; }
 
-            int32 Duration() const { return spline.length();}
-            int32 Duration(int first, int last) const { return spline.length(first, last);}
+            uint32 Duration() const { return spline.length();}
+            uint32 Duration(int first, int last) const { return spline.length(first, last);}
 
             std::string ToString() const;
             const char* GetMovementOrigin() const { return mvtOrigin; }

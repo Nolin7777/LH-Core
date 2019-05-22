@@ -89,7 +89,6 @@ enum
     minimal_duration = 1,
 };
 
-#include <intsafe.h>
 struct CommonInitializer
 {
     CommonInitializer(float _velocity) : velocityInv(1000.f / _velocity), time(minimal_duration) {}

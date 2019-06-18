@@ -142,10 +142,10 @@ bool Group::Create(ObjectGuid guid, const char * name)
 
         // store group in database
         CharacterDatabase.BeginTransaction();
-        CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId ='%u'", m_Id);
+        CharacterDatabase.PExecute("DELETE FROM `groups` WHERE groupId ='%u'", m_Id);
         CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId ='%u'", m_Id);
 
-        CharacterDatabase.PExecute("INSERT INTO groups(groupId,leaderGuid,mainTank,mainAssistant,lootMethod,looterGuid,lootThreshold,icon1,icon2,icon3,icon4,icon5,icon6,icon7,icon8,isRaid) "
+        CharacterDatabase.PExecute("INSERT INTO `groups`(groupId,leaderGuid,mainTank,mainAssistant,lootMethod,looterGuid,lootThreshold,icon1,icon2,icon3,icon4,icon5,icon6,icon7,icon8,isRaid) "
                                    "VALUES('%u','%u','%u','%u','%u','%u','%u','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','" UI64FMTD "','%u')",
                                    m_Id, m_leaderGuid.GetCounter(), m_mainTankGuid.GetCounter(), m_mainAssistantGuid.GetCounter(), uint32(m_lootMethod),
                                    m_looterGuid.GetCounter(), uint32(m_lootThreshold),
@@ -230,7 +230,7 @@ void Group::ConvertToRaid()
     _initRaidSubGroupsCounter();
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET isRaid = 1 WHERE groupId='%u'", m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET isRaid = 1 WHERE groupId='%u'", m_Id);
     SendUpdate();
 
     // update quest related GO states (quest activity dependent from raid membership)
@@ -523,7 +523,7 @@ void Group::Disband(bool hideDestroy)
     if (!isBGGroup())
     {
         CharacterDatabase.BeginTransaction();
-        CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId='%u'", m_Id);
+        CharacterDatabase.PExecute("DELETE FROM `groups` WHERE groupId='%u'", m_Id);
         CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId='%u'", m_Id);
         CharacterDatabase.CommitTransaction();
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, NULL);
@@ -1567,7 +1567,7 @@ void Group::_setLeader(ObjectGuid guid)
         Player::ConvertInstancesToGroup(player, this, slot->guid);
 
         // update the group leader
-        CharacterDatabase.PExecute("UPDATE groups SET leaderGuid='%u' WHERE groupId='%u'", slot_lowguid, m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET leaderGuid='%u' WHERE groupId='%u'", slot_lowguid, m_Id);
         CharacterDatabase.CommitTransaction();
     }
 
@@ -1683,7 +1683,7 @@ bool Group::_setMainTank(ObjectGuid guid)
     m_mainTankGuid = guid;
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET mainTank='%u' WHERE groupId='%u'", m_mainTankGuid.GetCounter(), m_Id);
+        CharacterDatabase.PExecute("UPDATE `groups` SET mainTank='%u' WHERE groupId='%u'", m_mainTankGuid.GetCounter(), m_Id);
 
     return true;
 }
@@ -1706,7 +1706,7 @@ bool Group::_setMainAssistant(ObjectGuid guid)
     m_mainAssistantGuid = guid;
 
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET mainAssistant='%u' WHERE groupId='%u'",
+        CharacterDatabase.PExecute("UPDATE `groups` SET mainAssistant='%u' WHERE groupId='%u'",
                                    m_mainAssistantGuid.GetCounter(), m_Id);
 
     return true;

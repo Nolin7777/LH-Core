@@ -77,6 +77,7 @@ if(UNIX)
     ${MYSQL_LIBRARY}
     ${OPENSSL_LIBRARIES}
     ${OPENSSL_EXTRA_LIBRARIES}
+    ${CMAKE_DL_LIBS}
   )
 endif()
 

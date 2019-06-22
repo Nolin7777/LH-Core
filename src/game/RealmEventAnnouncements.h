@@ -8,6 +8,7 @@ class Player;
 // horrible design but who cares? I have <24h to make this work.
 class RealmEventAnnounce {
     void announce_level_up(std::uint32_t level, const Player& player);
+    void generic_level_up(std::uint32_t level, const Player& player);
 
 public:
     enum class MapID { // not actual IDs... obviously

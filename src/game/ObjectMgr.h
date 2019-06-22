@@ -531,7 +531,7 @@ enum PermVariables
     REALM_FIRST_30                = 50002, // done
     REALM_FIRST_40                = 50003, // done
     REALM_FIRST_50                = 50004, // done
-    REALM_FIRST_ONYXIA_CLEAR      = 50009, // done
+    REALM_FIRST_ONYXIA_CLEAR      = 50008, // done
     REALM_FIRST_MC_CLEAR          = 50009, // done
     REALM_FIRST_BWL_CLEAR         = 50010, // done
     REALM_FIRST_ZG_CLEAR          = 50011, // done
@@ -565,7 +565,10 @@ enum PermVariables
     REALM_FIRST_60_WARLOCK        = 50047, // done
     REALM_FIRST_60_MAGE           = 50048, // done
     REALM_FIRST_60_ROGUE          = 50049, // done
-    REALM_FIRST_BIGGLESWORTH      = 50050  // done
+    REALM_FIRST_BIGGLESWORTH      = 50050, // done
+    REALM_FIRST_LEVEL_N           = 50051  // done
+    /* 50051 - 50111 are reserved for level achievements */
+    /* Example REALM_FIRST_LEVEL_N + 5 = REALM_FIRST_LEVEL_5 */
 };
 
 class GameObjectUseRequirement

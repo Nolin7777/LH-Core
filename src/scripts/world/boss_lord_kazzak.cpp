@@ -23,6 +23,7 @@ SDCategory: Dark-Portal
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "RealmEventAnnouncements.h"
 
 enum
 {
@@ -87,9 +88,9 @@ enum
     SPELL_TWISTEDREFLECTION     = 21063
 
                                   // Others :
-                                  // - Il y a un gangregarde elite a ses pieds, assez relou si on foire le pull. C'est parce que Lord Kazzak est a coté du PnJ de la quete demoniste. Il devrait patrouiller autour du cratere au sud ouest.
-                                  // - Il passe en evade lorsqu'on s'eloigne trop. En fait il ne devrait jamais evade. Du coup impossible de verif' si ses shadowbolt ont bien 100yards de portée.
-                                  // - Il repop instantanement apres avoir été looté. (Perso j'suis pas contre, il a des jambieres sympa :lol: )
+                                  // - Il y a un gangregarde elite a ses pieds, assez relou si on foire le pull. C'est parce que Lord Kazzak est a cotï¿½ du PnJ de la quete demoniste. Il devrait patrouiller autour du cratere au sud ouest.
+                                  // - Il passe en evade lorsqu'on s'eloigne trop. En fait il ne devrait jamais evade. Du coup impossible de verif' si ses shadowbolt ont bien 100yards de portï¿½e.
+                                  // - Il repop instantanement apres avoir ï¿½tï¿½ lootï¿½. (Perso j'suis pas contre, il a des jambieres sympa :lol: )
                                   // - Il a une hitbox bizarre, comme Azuregos, c'est certainement du au pathfinding. Le tank approche, aggro... le WB ne tape pas, se TP 3metres en arriere, reviens... le tank s'approche ou se recule un peu pour lui poser un fracasse, des fois ca marche, d'autre fois c'est plus long.
 };
 
@@ -203,6 +204,7 @@ struct boss_lordkazzakAI : public ScriptedAI
 
     void JustDied(Unit* /*pKiller*/)
     {
+        sRealmEventAnnounce.boss_kill(12397);
         DoScriptText(SAY_DEATH, m_creature);
     }
 

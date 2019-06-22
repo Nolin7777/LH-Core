@@ -1005,7 +1005,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     // hack
     if(pVictim->GetEntry() == 448 || pVictim->GetEntry() == 6498
         || pVictim->GetEntry() == 6499 || pVictim->GetEntry() == 6500
-        || pVictim->GetEntry() == 6584) {
+        || pVictim->GetEntry() == 6584 || pVictim->GetEntry() == 6109) {
         if(IsPlayer())
         {
             const auto player = (Player*)this;

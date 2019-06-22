@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "blackwing_lair.h"
+#include "RealmEventAnnouncements.h"
 
 struct RazCoords
 {
@@ -474,6 +475,14 @@ struct instance_blackwing_lair : public ScriptedInstance
                     if (Creature* pRazorgore = instance->GetCreature(m_auiData[DATA_RAZORGORE_GUID]))
                         pRazorgore->MonsterYell("If I fall into the abyss, I'll take all of you mortals with me!",0,0);
                 }
+                else
+                {
+                    sRealmEventAnnounce.boss_kill(who->GetEntry(), instance->GetPlayers());
+                }
+                
+                break;
+            case NPC_NEFARIAN:
+                sRealmEventAnnounce.boss_kill(who->GetEntry(), instance->GetPlayers());
                 break;
         }
     }

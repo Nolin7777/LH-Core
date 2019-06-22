@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "molten_core.h"
+#include "RealmEventAnnouncements.h"
 
 #define NPC_FLAMEWAKER_HEALER    11663
 #define NPC_FLAMEWAKER_ELITE     11664
@@ -141,6 +142,14 @@ struct instance_molten_core : ScriptedInstance
             case 179703:
                 m_uiFirelordCacheGUID = pGo->GetGUID(); //majordomo event chest
                 break;
+        }
+    }
+
+    void OnCreatureDeath(Creature* creature)
+    {
+        if (creature->GetEntry() == NPC_RAGNAROS)
+        {
+            sRealmEventAnnounce.boss_kill(NPC_RAGNAROS, instance->GetPlayers());
         }
     }
 

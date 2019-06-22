@@ -524,6 +524,48 @@ enum PermVariables
     VAR_WE_GONG_BANG_TIMES          = 30053,    // Track how many times the gong has been rung
     VAR_WE_AUTOCOMPLETE_TIME        = 30054,    // The last time the progress auto complete was performed
     VAR_WE_HIVE_REWARD              = 30055,    // A mask of slain colossus events to start
+
+    // Silver Hand event tracking hacks
+    REALM_FIRST_60                = 50000, // done
+    REALM_FIRST_20                = 50001, // done
+    REALM_FIRST_30                = 50002, // done
+    REALM_FIRST_40                = 50003, // done
+    REALM_FIRST_50                = 50004, // done
+    REALM_FIRST_ONYXIA_CLEAR      = 50009, // done
+    REALM_FIRST_MC_CLEAR          = 50009, // done
+    REALM_FIRST_BWL_CLEAR         = 50010, // done
+    REALM_FIRST_ZG_CLEAR          = 50011, // done
+    REALM_FIRST_AQ20_CLEAR        = 50012, // done
+    REALM_FIRST_AQ40_CLEAR        = 50013, // done
+    REALM_FIRST_NAXX_CLEAR        = 50015, // done
+    REALM_FIRST_NIGHTMARE_DRAGON  = 50016, // done
+    REALM_FIRST_YSONDRE           = 50017, // done
+    REALM_FIRST_EMERISS           = 50018, // done
+    REALM_FIRST_TAERAR            = 50019, // done
+    REALM_FIRST_LETHON            = 50020, // done
+    REALM_FIRST_BANG_A_GONG       = 50021, // done
+    REALM_FIRST_THUNDERFURY       = 50023, // haha, good luck, done
+    REALM_FIRST_SKERAM            = 50024, // done
+    REALM_FIRST_RAZORGORE         = 50025, // done
+    REALM_FIRST_DEVILSAUR_KILL    = 50026, // done
+    REALM_FIRST_SEAL_OF_ASCENSION = 50027, // done
+    REALM_FIRST_150_RIDING        = 50028, // done
+    REALM_FIRST_BARON_MOUNT       = 50029, // done
+    REALM_FIRST_HOGGER            = 50030, // done
+    REALM_FIRST_KAZZAK            = 50037, // done
+    REALM_FIRST_AZUREGOS          = 50038, // done
+    REALM_FIRST_DREADSTEED        = 50039, // done
+    REALM_FIRST_CHARGER           = 50040, // done
+    REALM_FIRST_60_WARRIOR        = 50041, // done
+    REALM_FIRST_60_PRIEST         = 50042, // done
+    REALM_FIRST_60_SHAMAN         = 50043, // done
+    REALM_FIRST_60_HUNTER         = 50044, // done
+    REALM_FIRST_60_DRUID          = 50045, // done
+    REALM_FIRST_60_PALADIN        = 50046, // done
+    REALM_FIRST_60_WARLOCK        = 50047, // done
+    REALM_FIRST_60_MAGE           = 50048, // done
+    REALM_FIRST_60_ROGUE          = 50049, // done
+    REALM_FIRST_BIGGLESWORTH      = 50050  // done
 };
 
 class GameObjectUseRequirement

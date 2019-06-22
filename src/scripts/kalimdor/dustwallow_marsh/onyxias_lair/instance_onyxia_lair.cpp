@@ -1,6 +1,7 @@
 #include "scriptPCH.h"
 #include "instance_onyxia_lair.h"
-
+#include "RealmEventAnnouncements.h"
+#include "Language.h"
 #define MAX_ENCOUNTER   1
 
 struct instance_onyxia_lair : public ScriptedInstance
@@ -12,6 +13,7 @@ struct instance_onyxia_lair : public ScriptedInstance
     uint32 m_auiEncounter[MAX_ENCOUNTER];
 
     void Initialize() { }
+    void OnCreatureDeath(Creature* creature) override;
 
     bool IsEncounterInProgress() const override
     {
@@ -41,6 +43,14 @@ struct instance_onyxia_lair : public ScriptedInstance
         }
     }
 };
+
+void instance_onyxia_lair::OnCreatureDeath(Creature* creature)
+{
+    if (creature->GetEntry() == 10184)
+    {
+        sRealmEventAnnounce.boss_kill(10184, instance->GetPlayers());
+    }
+}
 
 InstanceData* GetInstanceData_instance_onyxia_lair(Map* pMap)
 {

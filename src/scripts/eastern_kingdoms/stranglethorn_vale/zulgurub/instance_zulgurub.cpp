@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "zulgurub.h"
+#include "RealmEventAnnouncements.h"
 
 #define ZG_LOG sLog.outDebug
 //#define ZG_LOG sLog.outError(
@@ -312,6 +313,11 @@ void instance_zulgurub::OnCreatureDeath(Creature * pCreature)
     {
         pCreature->ForcedDespawn(3000);
         pCreature->SetRespawnTime(345600000);
+    }
+
+    if (pCreature->GetEntry() == NPC_HAKKAR)
+    {
+        sRealmEventAnnounce.boss_kill(NPC_HAKKAR, instance->GetPlayers());
     }
 
 }

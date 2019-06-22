@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include "RealmEventAnnouncements.h"
 #include "InstanceStatistics.h"
 
 enum NaxxEvents
@@ -1242,6 +1243,7 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
     {
         if(GetData(TYPE_KELTHUZAD) != DONE)
         {
+            sRealmEventAnnounce.boss_kill(NPC_MR_BIGGLESWORTH, GetMap()->GetPlayers());
             m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
             sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
         }
@@ -1258,6 +1260,9 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
         break;
     case NPC_LightningTotem:
         pCreature->DeleteLater();
+        break;
+    case NPC_KELTHUZAD:
+        sRealmEventAnnounce.boss_kill(NPC_KELTHUZAD, GetMap()->GetPlayers());
         break;
     }
 }

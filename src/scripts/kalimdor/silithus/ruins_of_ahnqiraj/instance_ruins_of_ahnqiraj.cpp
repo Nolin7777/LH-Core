@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "ruins_of_ahnqiraj.h"
+#include "RealmEventAnnouncements.h"
 
 enum
 {
@@ -311,6 +312,11 @@ void instance_ruins_of_ahnqiraj::OnObjectCreate(GameObject *pGo)
 
 void instance_ruins_of_ahnqiraj::OnCreatureDeath(Creature* pCreature)
 {
+    if (pCreature->GetEntry() == NPC_RAJAXX)
+    {
+        sRealmEventAnnounce.boss_kill(NPC_RAJAXX, instance->GetPlayers());
+    }
+
     switch (pCreature->GetEntry())
     {
         case NPC_KURINNAXX:

@@ -698,6 +698,8 @@ class World
         void LoadNostalriusConfig(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
+        void SendWorldMusic(uint32_t music_id);
+        void SendWorldSound(uint32_t sound_id);
          // Only for GMs with ticket notification ON
         void SendGMTicketText(int32 string_id, ...);
         void SendGMTicketText(const char* text);

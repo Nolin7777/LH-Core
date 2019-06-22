@@ -63,6 +63,7 @@
 #include "Chat.h"
 #include "CreatureLinkingMgr.h"
 #include "InstanceStatistics.h"
+#include "RealmEventAnnouncements.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -1001,6 +1002,19 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
 void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss)
 {
+    // hack
+    if(pVictim->GetEntry() == 448 || pVictim->GetEntry() == 6498
+        || pVictim->GetEntry() == 6499 || pVictim->GetEntry() == 6500
+        || pVictim->GetEntry() == 6584) {
+        if(IsPlayer())
+        {
+            const auto player = (Player*)this;
+            if(player->GetSession()->GetSecurity() == SEC_PLAYER) {
+                sRealmEventAnnounce.boss_kill(pVictim->GetEntry(), *player);
+            }
+        }
+    }
+
     // find player: owner of controlled `this` or `this` itself maybe
     // for loot will be sued only if group_tap==NULL
     Player *player_tap = GetCharmerOrOwnerPlayerOrPlayerItself();

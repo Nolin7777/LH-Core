@@ -269,9 +269,9 @@ std::string secsToTimeString(time_t timeInSecs, bool shortText, bool hoursOnly)
             if (shortText)
                 ss << "s";
             else if (secs <= 1)
-                ss << " Second.";
+                ss << " Second";
             else
-                ss << " Seconds.";
+                ss << " Seconds";
         }
     }
 

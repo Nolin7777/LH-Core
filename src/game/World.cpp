@@ -1929,6 +1929,29 @@ void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self, uint32 te
 
 namespace MaNGOS
 {
+
+template<typename std::uint32_t Opcode>
+class WorldAudioBuilder
+{
+public:
+    typedef std::vector<WorldPacket*> WorldPacketList;
+    explicit WorldAudioBuilder(uint32_t id) : id(id) {}
+    void operator()(WorldPacketList& data_list, int32 loc_idx)
+    {
+        do_helper(data_list);
+    }
+private:
+    void do_helper(WorldPacketList& data_list)
+    {
+        WorldPacket* data = new WorldPacket();
+        data->Initialize(Opcode, 4);
+        *data << uint32(id);
+        data_list.push_back(data);
+    }
+
+    const uint32_t id;
+};
+
 class WorldWorldTextBuilder
 {
 public:
@@ -1987,7 +2010,32 @@ private:
 };
 }                                                           // namespace MaNGOS
 
-/// Send a System Message to all players (except self if mentioned)
+void World::SendWorldSound(uint32_t sound_id)
+{
+    MaNGOS::WorldAudioBuilder<SMSG_PLAY_SOUND> builder(sound_id);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldAudioBuilder<SMSG_PLAY_SOUND>> sound_do(builder);
+    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
+            continue;
+
+        sound_do(itr->second->GetPlayer());
+    }
+}
+
+void World::SendWorldMusic(uint32_t music_id)
+{
+    MaNGOS::WorldAudioBuilder<SMSG_PLAY_MUSIC> music_builder(music_id);
+    MaNGOS::LocalizedPacketListDo<MaNGOS::WorldAudioBuilder<SMSG_PLAY_MUSIC>> music_do(music_builder);
+    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
+            continue;
+
+        music_do(itr->second->GetPlayer());
+    }
+}
+
 void World::SendWorldText(int32 string_id, ...)
 {
     va_list ap;

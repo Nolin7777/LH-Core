@@ -67,6 +67,7 @@
 #include "MapReferenceImpl.h"
 #include "GMTicketMgr.h"
 #include "MasterPlayer.h"
+#include "RealmEventAnnouncements.h"
 
 /* Nostalrius */
 #include "Config/Config.h"
@@ -2724,6 +2725,11 @@ void Player::GiveLevel(uint32 level)
     if (level == getLevel())
         return;
 
+    if (GetSession()->GetSecurity() == SEC_PLAYER)
+    {
+        sRealmEventAnnounce.level_up(level, *this);
+    }
+
     uint32 numInstanceMembers = 0;
     uint32 numGroupMembers = 0;
 
@@ -3497,6 +3503,11 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
         WorldPacket data(SMSG_LEARNED_SPELL, 4);
         data << uint32(spell_id);
         GetSession()->SendPacket(&data);
+
+        if(GetSession()->GetSecurity() == SEC_PLAYER)
+        {
+            sRealmEventAnnounce.skill_acquired(spell_id, *this);
+        }
     }
 
     // learn all disabled higher ranks (recursive)
@@ -10070,6 +10081,14 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         count += itr->count;
 
     Item *pItem = Item::CreateItem(item, count, this);
+    
+    // this line could be better placed but who cares anymore?
+    // also, Skeith will probably spawn himself a Thunderfury after 10 mins
+    if (GetSession()->GetSecurity() == SEC_PLAYER)
+    {
+        sRealmEventAnnounce.item_acquired(item, *this);
+    }
+
     if (pItem)
     {
         ItemAddedQuestCheck(item, count);
@@ -12833,6 +12852,11 @@ void Player::CompleteQuest(uint32 quest_id)
 {
     if (quest_id)
     {
+        if (GetSession()->GetSecurity() == SEC_PLAYER)
+        {
+            sRealmEventAnnounce.quest_complete(quest_id, *this);
+        }
+    
         SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
 
         uint16 log_slot = FindQuestSlot(quest_id);

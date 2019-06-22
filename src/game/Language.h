@@ -1148,5 +1148,8 @@ enum MangosStrings
     // opvp si
     LANG_OPVP_SI_CAPTURE_H              = 10049,
     LANG_OPVP_SI_CAPTURE_A              = 10050,
+
+    // Silver Hand hacks
+    LANG_REALM_ACHIEVEMENT = 50000
 };
 #endif

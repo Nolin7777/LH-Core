@@ -228,6 +228,7 @@ set (game_SRCS
 	vmap/VMapFactory.cpp
 	vmap/VMapManager2.cpp
 	vmap/WorldModel.cpp
+	RealmEventAnnouncements.cpp
 	AccountMgr.h
 	AuraRemovalMgr.h
 	AutoBroadCastMgr.h
@@ -424,7 +425,7 @@ set (game_SRCS
 	vmap/VMapManager2.h
 	vmap/VMapTools.h
 	vmap/WorldModel.h
-
+	RealmEventAnnouncements.h
 )
 
 
@@ -579,6 +580,7 @@ target_link_libraries(game
   shared
   detour
   ${CMAKE_DL_LIBS}
+  curl
 )
 
 #add_dependencies(game revision.h)

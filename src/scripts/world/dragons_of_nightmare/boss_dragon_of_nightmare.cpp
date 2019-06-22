@@ -6,6 +6,7 @@
 #include "ScriptedPetAI.h"
 #include "boss_dragon_of_nightmare.h"
 #include "HardcodedEvents.h"
+#include "RealmEventAnnouncements.h"
 
 uint32 GetDrakeVar(uint32 entry)
 {
@@ -53,6 +54,7 @@ void boss_dragon_of_nightmareAI::EnterEvadeMode()
 
 void boss_dragon_of_nightmareAI::JustDied(Unit* pKiller)
 {
+    sRealmEventAnnounce.boss_kill(m_creature->GetEntry());
     ScriptedAI::JustDied(pKiller);
 }
 

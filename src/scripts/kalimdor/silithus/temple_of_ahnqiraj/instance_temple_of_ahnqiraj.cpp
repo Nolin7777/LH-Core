@@ -26,6 +26,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
+#include "RealmEventAnnouncements.h"
 
 static constexpr uint32 CTHUN_WHISPER_MUTE_DURATION = 60000 * 10;
 static constexpr uint32 CTHUN_FIRST_WHISPER         = 90000;
@@ -269,6 +270,14 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
             //pCreature->ForcedDespawn(1);
         }
         break;
+    }
+}
+
+void instance_temple_of_ahnqiraj::OnCreatureDeath(Creature* creature)
+{
+    if (creature->GetEntry() == NPC_CTHUN)
+    {
+        sRealmEventAnnounce.boss_kill(NPC_CTHUN, instance->GetPlayers());
     }
 }
 

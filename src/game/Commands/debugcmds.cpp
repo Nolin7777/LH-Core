@@ -317,6 +317,37 @@ bool ChatHandler::HandleDebugPlayCinematicCommand(char* args)
     return true;
 }
 
+
+bool ChatHandler::HandleDebugPlayWorldMusicCommand(char* args)
+{
+    uint32 dwSoundId;
+
+    if (!ExtractUint32KeyFromLink(&args, "Hwmusic", dwSoundId))
+    {
+        PSendSysMessage(LANG_SOUND_NOT_EXIST, dwSoundId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+     sWorld.SendWorldMusic(dwSoundId);
+     return true;
+}
+
+bool ChatHandler::HandleDebugPlayWorldSoundCommand(char* args)
+{
+    uint32 dwSoundId;
+
+    if (!ExtractUint32KeyFromLink(&args, "Hwsound", dwSoundId))
+    {
+        PSendSysMessage(LANG_SOUND_NOT_EXIST, dwSoundId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+     sWorld.SendWorldSound(dwSoundId);
+     return true;
+}
+
 //Play sound
 bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
 {

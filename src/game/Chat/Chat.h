@@ -403,6 +403,8 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleDebugPlayCinematicCommand(char* args);
         bool HandleDebugPlaySoundCommand(char* args);
+        bool HandleDebugPlayWorldSoundCommand(char* args);
+        bool HandleDebugPlayWorldMusicCommand(char* args);
         bool HandleDebugPlayScriptText(char* args);
         bool HandleDebugPlayMusicCommand(char* args);
 

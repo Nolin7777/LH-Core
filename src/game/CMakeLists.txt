@@ -578,6 +578,7 @@ add_library(game STATIC
 target_link_libraries(game
   shared
   detour
+  ${CMAKE_DL_LIBS}
 )
 
 #add_dependencies(game revision.h)

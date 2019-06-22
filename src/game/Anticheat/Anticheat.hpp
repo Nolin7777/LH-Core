@@ -207,11 +207,12 @@ class NullSessionAnticheat : public SessionAnticheatInterface
 #ifdef USE_ANTICHEAT
 #include "module/libanticheat.hpp"
 #else
-class NullAnticheatLib sealed : public AnticheatLibInterface
+class NullAnticheatLib final : public AnticheatLibInterface
 {
     public:
         virtual void Reload() {}
         virtual void Initialize() {}
+        std::string NormalizeString(const std::string &message, uint32 mask) override { return ""; }
 
         virtual std::unique_ptr<SessionAnticheatInterface> NewSession(WorldSession *session, const BigNumber &)
         {

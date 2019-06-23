@@ -312,6 +312,7 @@ void Log::Initialize()
     logFiles[LOG_ANTICHEAT_BASIC]   = openLogFile("AnticheatLogFile", nullptr, "a");
     logFiles[LOG_GM_CRITICAL]       = openLogFile("CriticalCommandsLogFile", nullptr, "a");
     logFiles[LOG_CHAT_SPAM]         = openLogFile("ChatSpamLogFile", nullptr, "a");
+    logFiles[LOG_DISCORD_ALT]       = openLogFile("DiscordAltLogFile", nullptr, "a");
 
     timestampPrefix[LOG_DBERRFIX] = false;
     //consoleWrite[LOG_ANTICHEAT_BASIC] = true;

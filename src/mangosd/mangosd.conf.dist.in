@@ -498,6 +498,7 @@ ClientIdsLogFile = "client.log"
 LootsLogFile = "loot.log"
 LevelupLogFile = "levelup.log"
 LogMoneyTrades = "trades.log"
+DiscordAltLogFile = "discord.log"
 LogMoneyTreshold = 10000
 CharLogFile = "Char.log"
 CharLogTimestamp = 0

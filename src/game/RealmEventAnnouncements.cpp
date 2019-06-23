@@ -8,7 +8,11 @@
 #include "GuildMgr.h"
 #include "SharedDefines.h"
 #include "../shared/json.hpp"
+
+#ifdef USE_DISCORD
 #include <curl/curl.h>
+#endif
+
 #include <unordered_map>
 
 struct BossDetails {
@@ -59,6 +63,7 @@ INSTANTIATE_SINGLETON_1(RealmEventAnnounce);
 void discord_post(const std::string& message, std::uint32_t id, 
                   const std::string post = "http://netslum.cc:8080/post/progress",
                   std::uint32_t entity_id = 0, const std::string name = "") {
+    #ifdef USE_DISCORD
     CURL* curl = curl_easy_init();
 
     if (!curl)
@@ -88,6 +93,9 @@ void discord_post(const std::string& message, std::uint32_t id,
     curl_easy_perform(curl);
     curl_slist_free_all(list);
     curl_easy_cleanup(curl);
+    #else
+    sLog.out(LOG_DISCORD_ALT, "Realm First: event_id: %u description: %s id: %u name: %s)", id, message, entity_id, name);
+    #endif
 }
 
 // look ma, free function because I don't have time for recompiling

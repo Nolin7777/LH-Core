@@ -576,11 +576,14 @@ add_library(game STATIC
   ${game_SRCS}
 )
 
+if (USE_DISCORD)
+  target_link_libraries(${EXECUTABLE_NAME} curl)
+endif()
+
 target_link_libraries(game
   shared
   detour
   ${CMAKE_DL_LIBS}
-  curl
 )
 
 #add_dependencies(game revision.h)

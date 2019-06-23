@@ -891,7 +891,12 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
     }
 
     m_isActiveObject = (data->spawnFlags & SPAWN_FLAG_ACTIVE);
-    m_visibilityModifier = data->visibilityModifier;
+
+    // Is go a large object? 
+    if (GetGOInfo()->IsLargeGameObject())
+        m_visibilityModifier = VISIBILITY_DISTANCE_LARGE; // from go data
+    else
+        m_visibilityModifier = data->visibilityModifier; // custom db change aka hack
 
     return true;
 }

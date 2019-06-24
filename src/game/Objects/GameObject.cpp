@@ -894,7 +894,7 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
 
     // Is go a large object? 
     if (GetGOInfo()->IsLargeGameObject())
-        m_visibilityModifier = VISIBILITY_DISTANCE_LARGE; // from go data
+        m_visibilityModifier = 400.f; // from go data
     else
         m_visibilityModifier = data->visibilityModifier; // custom db change aka hack
 

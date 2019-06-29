@@ -332,7 +332,7 @@ void RealmEventAnnounce::announce_level_up(std::uint32_t level, const Player& pl
             const std::string played = secsToTimeString(player.GetTotalPlayedTime(), false, false);
             std::stringstream ss;
             ss << "Congratulations to " << player.GetName() << " on realm first level 60 " << it->second.second << " in " << played << "! Best of luck with the journey ahead...";
-            sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, it->second.first);
+            sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
             discord_post(ss.str(), it->second.first);
             discord_post("", it->second.first, "https://lightshope.org/api/progress/", player.GetEntry(), player.GetName());
         }
@@ -356,10 +356,9 @@ void RealmEventAnnounce::level_up(std::uint32_t level, const Player& player) {
 void RealmEventAnnounce::quest_complete(std::uint32_t quest, const Player& player) {
     bool ignore = false;
 
-    if (quest == 4489 && !sObjectMgr.GetSavedVariable(REALM_FIRST_DREADSTEED, 0, &ignore)) {
+    if (quest == 7631 && !sObjectMgr.GetSavedVariable(REALM_FIRST_DREADSTEED, 0, &ignore)) {
         std::stringstream ss;
-        ss << "Having placed the scryer upon the bone-littered floor, " << player.GetName() << " drew the soul of a once noble"
-        << " charger from the remains of Darkweaver. Arise, your service is needed once more.";
+        ss << player.GetName() << " conjures forth a dark steed, borne of fire, ash and brimstone. Fear he who rides the Dreadsteed.";
         sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
         sObjectMgr.SetSavedVariable(REALM_FIRST_DREADSTEED, 1, true);
         discord_post(ss.str(), REALM_FIRST_DREADSTEED);
@@ -368,7 +367,8 @@ void RealmEventAnnounce::quest_complete(std::uint32_t quest, const Player& playe
 
     if (quest == 7647 && !sObjectMgr.GetSavedVariable(REALM_FIRST_CHARGER, 0, &ignore)) {
         std::stringstream ss;
-        ss << player.GetName() << " conjures forth a dark steed, borne of fire, ash and brimstone. Fear he who rides the Dreadsteed.";
+        ss << "Having placed the scryer upon the bone-littered floor, " << player.GetName() << " drew the soul of a once noble"
+        << " charger from the remains of Darkweaver. Arise, your service is needed once more.";
         sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
         sObjectMgr.SetSavedVariable(REALM_FIRST_CHARGER, 1, true);
         discord_post(ss.str(), REALM_FIRST_CHARGER);
@@ -427,5 +427,15 @@ void RealmEventAnnounce::item_acquired(std::uint32_t item, const Player& player)
         sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
         discord_post(ss.str(), REALM_FIRST_SEAL_OF_ASCENSION);
         discord_post("", REALM_FIRST_SEAL_OF_ASCENSION, "https://lightshope.org/api/progress/", player.GetEntry(), player.GetName());
+    }
+
+    if (item == 18404 && !sObjectMgr.GetSavedVariable(REALM_FIRST_ONYXIA_ATTUNE, 0, &ignore)) {
+        sObjectMgr.SetSavedVariable(REALM_FIRST_ONYXIA_ATTUNE, 1, true);
+
+        std::stringstream ss;
+        ss << player.GetName() << " has attuned to Onyxia's Lair. Lady Prestor awaits..."; 
+        sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
+        discord_post(ss.str(), REALM_FIRST_ONYXIA_ATTUNE);
+        discord_post("", REALM_FIRST_ONYXIA_ATTUNE, "https://lightshope.org/api/progress/", player.GetEntry(), player.GetName());
     }
 }

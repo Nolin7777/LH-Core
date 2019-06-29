@@ -554,7 +554,7 @@ enum PermVariables
     REALM_FIRST_HOGGER            = 50030, // done
     REALM_FIRST_KAZZAK            = 50037, // done
     REALM_FIRST_AZUREGOS          = 50038, // done
-    REALM_FIRST_DREADSTEED        = 50039, // done
+    REALM_FIRST_FELSTEED          = 50039, // done
     REALM_FIRST_CHARGER           = 50040, // done
     REALM_FIRST_60_WARRIOR        = 50041, // done
     REALM_FIRST_60_PRIEST         = 50042, // done
@@ -566,7 +566,9 @@ enum PermVariables
     REALM_FIRST_60_MAGE           = 50048, // done
     REALM_FIRST_60_ROGUE          = 50049, // done
     REALM_FIRST_BIGGLESWORTH      = 50050, // done
-    REALM_FIRST_LEVEL_N           = 50051  // done
+    REALM_FIRST_LEVEL_N           = 50051,  // done
+    REALM_FIRST_ONYXIA_ATTUNE     = 50112,  // done
+    REALM_FIRST_DREADSTEED        = 50113 // done
     /* 50051 - 50111 are reserved for level achievements */
     /* Example REALM_FIRST_LEVEL_N + 5 = REALM_FIRST_LEVEL_5 */
 };

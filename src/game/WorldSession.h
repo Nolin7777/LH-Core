@@ -74,6 +74,15 @@ enum PartyOperation
     PARTY_OP_LEAVE = 2,
 };
 
+enum class VPNStatus
+{
+    PENDING_LOOKUP,
+    VPN,
+    NO_VPN,
+    BYPASS_CHECK,
+    CHECK_FAILED,
+};
+
 enum PartyResult
 {
     ERR_PARTY_RESULT_OK                 = 0,
@@ -468,6 +477,9 @@ class MANGOS_DLL_SPEC WorldSession
         uint32 getDialogStatus(Player *pPlayer, Object* questgiver, uint32 defstatus);
         uint32 GetAccountMaxLevel() const { return _characterMaxLevel; }
         void SetAccountMaxLevel(uint32 l) { _characterMaxLevel = l; }
+
+        VPNStatus GetVPNStatus() { return _vpnStatus; }
+        void SetVPNStatus(VPNStatus vpn_status) { _vpnStatus = vpn_status; }
         uint32 GetOrderCounter() const { return _orderCounter; }
         void IncrementOrderCounter() { ++_orderCounter; }
 
@@ -848,6 +860,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleTextEmoteOpcode(WorldPacket& recvPacket);
         void HandleChatIgnoredOpcode(WorldPacket& recvPacket);
         uint32_t ChatCooldown();
+        bool VPNChatBlock();
 
         void HandleReclaimCorpseOpcode( WorldPacket& recvPacket );
         void HandleCorpseQueryOpcode( WorldPacket& recvPacket );
@@ -942,6 +955,7 @@ class MANGOS_DLL_SPEC WorldSession
         ObjectGuid _clientMoverGuid;
         WorldSocket *m_Socket;
         std::string m_Address;
+        std::uint32_t m_AddressInt;
         std::string m_localIp;
 
         AccountTypes _security;
@@ -976,6 +990,7 @@ class MANGOS_DLL_SPEC WorldSession
         uint32          _charactersCount;
         uint32          _characterMaxLevel;
         uint32          _orderCounter;
+        VPNStatus       _vpnStatus;
 
         std::set<std::string> _addons;
 

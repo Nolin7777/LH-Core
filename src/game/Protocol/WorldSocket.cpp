@@ -177,6 +177,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         "a.os, "                // 10
         "a.flags, "             // 11
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, " // 12
+        "a.vpn, "               // 13
         "a.invite_id "
         "FROM account a LEFT JOIN account_access aa ON a.id = aa.id AND aa.RealmID IN (-1, %u) "
         "LEFT JOIN account_banned ab ON a.id = ab.id AND ab.active = 1 WHERE a.username = '%s' ORDER BY aa.RealmID DESC LIMIT 1", realmID, safe_account.c_str()));
@@ -334,6 +335,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     m_Session->SetOS(clientOs);
     m_Session->LoadTutorialsData();
     m_Session->InitializeAnticheat(K);
+    m_Session->SetVPNStatus(static_cast<VPNStatus>(fields[13].GetUInt8()));
 
     // In case needed sometime the second arg is in microseconds 1 000 000 = 1 sec
     ACE_OS::sleep(ACE_Time_Value(0, 10000));

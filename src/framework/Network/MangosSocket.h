@@ -115,6 +115,7 @@ class MangosSocket : protected WorldHandler
 
         /// Get address of connected peer.
         const std::string& GetRemoteAddress () const { return m_Address; }
+        const std::uint32_t GetRemoteAddressInt () const { return m_AddressInt; }
 
         /// Send A packet on the socket, this function is reentrant.
         /// @param pct packet to send
@@ -190,6 +191,9 @@ class MangosSocket : protected WorldHandler
 
         /// Address of the remote peer
         std::string m_Address;
+
+        /// Address of the remote peer
+        std::uint32_t m_AddressInt;
 
         /// Class used for managing encryption of the headers
         Crypt m_Crypt;

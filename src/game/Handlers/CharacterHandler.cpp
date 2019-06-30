@@ -44,6 +44,7 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "Anticheat.hpp"
+#include "VPNLookup.h"
 
 // config option SkipCinematics supported values
 enum CinematicsSkipMode
@@ -465,6 +466,48 @@ void WorldSession::LoginPlayer(ObjectGuid loginPlayerGuid)
     CharacterDatabase.DelayQueryHolderUnsafe(&chrHandler, &CharacterHandler::HandlePlayerLoginCallback, holder);
 }
 
+/* Run the lookup in an async task inside the main update, safe for session consistency */
+class VPNLookupTask : public AsyncTask
+{
+public:
+    VPNLookupTask(std::uint32_t account_id) : account_id_(account_id) {}
+
+    void run() override
+    {
+        auto session = sWorld.FindSession(account_id_);
+
+        if (!session)
+        {
+            return;
+        }
+
+        auto vpn_lookup = VPNLookup::get_global_vpnlookup();
+        const auto res = vpn_lookup->blocking_lookup(session->GetSocket()->GetRemoteAddressInt());
+
+        if(res == VPNLookup::Result::VPN)
+        {
+            session->SetVPNStatus(VPNStatus::VPN);
+
+            if(!LoginDatabase.PExecute("UPDATE `account` SET `vpn` = 1 WHERE `id` = %u", account_id_))
+            {
+                sLog.outError("Unable to execute VPN status update query!");
+            }
+        }
+        else if(res == VPNLookup::Result::NOT_VPN)
+        {
+            session->SetVPNStatus(VPNStatus::NO_VPN);
+        }
+        else if(res == VPNLookup::Result::INTERNAL_ERROR)
+        {
+            session->SetVPNStatus(VPNStatus::CHECK_FAILED);    
+            sLog.outError("Internal error during VPN lookup!");
+        }
+    }
+
+private:
+    const std::uint32_t account_id_;
+};
+
 void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 {
     // The following fixes a crash. Use case:
@@ -532,6 +575,20 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         delete holder;                                      // delete all unprocessed queries
         m_playerLoading = false;
         return;
+    }
+
+    // since we don't use the VPN check for anything except chat, skip it if
+    // they're above the level required for chatting with a VPN
+    if (GetAccountMaxLevel() > sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL)
+        && GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
+    {
+        SetVPNStatus(VPNStatus::BYPASS_CHECK);
+    }
+    
+    if(GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
+    {
+        auto task = new VPNLookupTask(GetAccountId());
+        sWorld.AddAsyncTask(task);
     }
 
     ASSERT(pCurrChar->GetSession() == this);

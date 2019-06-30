@@ -198,6 +198,27 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     }
 
     std::string nameLink = cHandler.playerLink(data->target_name);
+    const auto vpn_status = session->GetVPNStatus();
+    std::string vpn_str;
+
+    switch (vpn_status)
+    {
+        case VPNStatus::VPN:
+            vpn_str = "Yes";
+            break;
+        case VPNStatus::NO_VPN:
+            vpn_str = "No";
+            break;
+        case VPNStatus::CHECK_FAILED:
+            vpn_str = "Check failed";
+            break;
+        case VPNStatus::BYPASS_CHECK:
+            vpn_str = "Check bypassed";
+            break;
+        case VPNStatus::PENDING_LOOKUP:
+            vpn_str = "Query still pending";
+            break;
+    }
 
     cHandler.PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className,
         (data->online ? "" : cHandler.GetMangosString(LANG_OFFLINE)),
@@ -205,7 +226,7 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
         data->accId, sAccountMgr.IsAccountBanned(data->accId) ? ", banned" : "",
         data->security, cHandler.playerLink(data->last_ip).c_str(),
         sAccountMgr.IsIPBanned(data->last_ip) ? " [BANIP]" : "", data->last_login.c_str(),
-        data->latency, localeNames[data->loc], data->two_factor_enabled.c_str());
+        data->latency, localeNames[data->loc], data->two_factor_enabled.c_str(), vpn_str.c_str());
 
     std::string timeStr = secsToTimeString(data->total_player_time, true, true);
     uint32 money = data->money;

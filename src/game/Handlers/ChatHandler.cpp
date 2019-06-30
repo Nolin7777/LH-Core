@@ -3,6 +3,7 @@
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
  * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ * Copyright (C) 2017-2019 Light's Hope <https://lightshope.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 #include "Opcodes.h"
 #include "ObjectMgr.h"
 #include "Chat.h"
+#include "VPNLookup.h"
 #include "Database/DatabaseEnv.h"
 #include "ChannelMgr.h"
 #include "Group.h"
@@ -132,6 +134,28 @@ uint32_t WorldSession::ChatCooldown()
     }
 
     return 0;
+}
+
+bool WorldSession::VPNChatBlock()
+{
+    if (GetSecurity() == SEC_PLAYER && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL)
+        && (GetVPNStatus() != VPNStatus::NO_VPN || GetVPNStatus() != VPNStatus::BYPASS_CHECK ||
+            GetVPNStatus() != VPNStatus::CHECK_FAILED))
+    {
+        if(GetVPNStatus() == VPNStatus::VPN)
+        {
+            ChatHandler(this).SendSysMessage("You cannot speak yet (too low level).");
+            return true;
+        }
+        
+        if(GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
+        {
+            ChatHandler(this).SendSysMessage("Unable to send chat message. Please try again in a few moments...");
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
@@ -289,6 +313,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         return;
                     }
 
+                    if(VPNChatBlock())
+                    {
+                       return;
+                    }
+
                     // Public channels restrictions
                     if (!chn->HasFlag(Channel::CHANNEL_FLAG_CUSTOM))
                     {
@@ -351,6 +380,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
             }
 
+            if(VPNChatBlock())
+            {
+                return;
+            }
+
             GetPlayer()->Say(msg, lang);
 
             if (lang != LANG_ADDON)
@@ -365,6 +399,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
             {
                 ChatHandler(this).SendSysMessage("You cannot use emotes yet (too low level).");
+                return;
+            }
+
+            if(VPNChatBlock())
+            {
                 return;
             }
 
@@ -383,6 +422,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
             {
                 ChatHandler(this).SendSysMessage("You cannot yell yet (too low level).");
+                return;
+            }
+
+            if(VPNChatBlock())
+            {
                 return;
             }
 
@@ -442,6 +486,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         );
                     }
 
+                    return;
+                }
+
+                if(VPNChatBlock())
+                {
                     return;
                 }
             }

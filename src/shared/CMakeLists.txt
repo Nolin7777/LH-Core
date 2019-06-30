@@ -100,6 +100,8 @@ if(USE_LIBCURL)
 	MailerService.h
 	SendgridMail.cpp
 	MailerService.cpp
+	VPNLookup.h
+	VPNLookup.cpp
   )
 endif()
 

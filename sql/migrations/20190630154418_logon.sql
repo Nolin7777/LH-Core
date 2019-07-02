@@ -15,7 +15,6 @@ CREATE TABLE `vpn_cache` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `ip_UNIQUE` (`ip` ASC) VISIBLE);
 
-UPDATE `mangos_string` SET `content_default` = '%s %s%s %s (guid: %u) Account: %s (id: %u%s) GMLevel: %u Last IP: %s%s Last login: %s Latency: %ums Client: %s 2FA: %s VPN: %s' WHERE (`entry` = '616');
 ALTER TABLE `account` ADD COLUMN `vpn` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `invite_id`;
 
 -- End of migration.

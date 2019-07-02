@@ -28,7 +28,6 @@
 #include "Opcodes.h"
 #include "ObjectMgr.h"
 #include "Chat.h"
-#include "VPNLookup.h"
 #include "Database/DatabaseEnv.h"
 #include "ChannelMgr.h"
 #include "Group.h"
@@ -43,6 +42,10 @@
 #include "Anticheat.hpp"
 #include "AccountMgr.h"
 #include "SocialMgr.h"
+
+#ifdef USE_LIBCURL
+#include "VPNLookup.h"
+#endif
 
 bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
 {
@@ -138,17 +141,14 @@ uint32_t WorldSession::ChatCooldown()
 
 bool WorldSession::VPNChatBlock()
 {
-    if (GetSecurity() == SEC_PLAYER && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL)
-        && (GetVPNStatus() != VPNStatus::NO_VPN || GetVPNStatus() != VPNStatus::BYPASS_CHECK ||
-            GetVPNStatus() != VPNStatus::CHECK_FAILED))
+    if (GetSecurity() == SEC_PLAYER && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL))
     {
-        if(GetVPNStatus() == VPNStatus::VPN)
+        if (GetVPNStatus() == VPNStatus::VPN)
         {
             ChatHandler(this).SendSysMessage("You cannot speak yet (too low level).");
             return true;
         }
-        
-        if(GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
+        else if (GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
         {
             ChatHandler(this).SendSysMessage("Unable to send chat message. Please try again in a few moments...");
             return true;

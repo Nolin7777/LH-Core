@@ -34,7 +34,6 @@ std::string ip_to_str(std::uint32_t ip) {
 }
 
 VPNLookup::VPNLookup() : _stop(false) {
-    curl_global_init(CURL_GLOBAL_ALL);
     load_cache();
     _worker = std::thread(&VPNLookup::process, this);
 }

@@ -30,6 +30,11 @@
 #include "WorldSocketMgr.h"
 #include "MapNodes/NodesMgr.h"
 
+#ifdef USE_LIBCURL
+#include <curl/curl.h>
+#include "VPNLookup.h"
+#endif
+
 #include "Common.h"
 #include "Master.h"
 #include "WorldSocket.h"
@@ -50,7 +55,6 @@
 #include "MassMailMgr.h"
 #include "DBCStores.h"
 #include "migrations_list.h"
-#include "VPNLookup.h"
 
 #include <ace/OS_NS_signal.h>
 #include <ace/TP_Reactor.h>
@@ -302,11 +306,14 @@ int Master::Run()
     auto vpn_block_key = sConfig.GetStringDefault("VPN_BLOCK_KEY", "");
     auto vpn_gii_contact = sConfig.GetStringDefault("VPN_GII_CONTACT", "");
     
+#ifdef USE_LIBCURL
+    curl_global_init(CURL_GLOBAL_ALL);
     VPNLookup vpn_lookup;
     vpn_lookup.set_param(VPNLookup::ConfigParam::IPQS_KEY,     std::move(vpn_ipqs_key));
     vpn_lookup.set_param(VPNLookup::ConfigParam::GII_CONTACT,  std::move(vpn_gii_contact));
     vpn_lookup.set_param(VPNLookup::ConfigParam::VPNBLOCK_KEY, std::move(vpn_block_key));
     VPNLookup::set_global_vpnlookup(&vpn_lookup);
+#endif
 
     ///- Launch WorldRunnable thread
     ACE_Based::Thread world_thread(new WorldRunnable);
@@ -536,6 +543,9 @@ int Master::Run()
         #endif
 
         delete cliThread;
+#ifdef USE_LIBCURL
+        curl_global_cleanup();
+#endif
     }
 
     ///- Exit the process with specified return value

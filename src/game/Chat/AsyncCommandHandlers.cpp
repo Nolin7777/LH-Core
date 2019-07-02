@@ -218,6 +218,9 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
         case VPNStatus::PENDING_LOOKUP:
             vpn_str = "Query still pending";
             break;
+        case VPNStatus::FEATURE_DISABLED:
+            vpn_str = "Feature disabled";
+            break;
     }
 
     cHandler.PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className,

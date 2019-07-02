@@ -44,7 +44,9 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "Anticheat.hpp"
+#ifdef USE_LIBCURL
 #include "VPNLookup.h"
+#endif
 
 // config option SkipCinematics supported values
 enum CinematicsSkipMode
@@ -466,11 +468,13 @@ void WorldSession::LoginPlayer(ObjectGuid loginPlayerGuid)
     CharacterDatabase.DelayQueryHolderUnsafe(&chrHandler, &CharacterHandler::HandlePlayerLoginCallback, holder);
 }
 
-/* Run the lookup in an async task inside the main update, safe for session consistency */
+/* Handle the lookup result inside the main update, safe for session consistency */
+#ifdef USE_LIBCURL
 class VPNLookupTask : public AsyncTask
 {
 public:
-    VPNLookupTask(std::uint32_t account_id) : account_id_(account_id) {}
+    VPNLookupTask(std::uint32_t account_id, const VPNLookup::Result)
+        : account_id_(account_id), result_(result) {}
 
     void run() override
     {
@@ -481,10 +485,7 @@ public:
             return;
         }
 
-        auto vpn_lookup = VPNLookup::get_global_vpnlookup();
-        const auto res = vpn_lookup->blocking_lookup(session->GetSocket()->GetRemoteAddressInt());
-
-        if(res == VPNLookup::Result::VPN)
+        if(result_ == VPNLookup::Result::VPN)
         {
             session->SetVPNStatus(VPNStatus::VPN);
 
@@ -493,11 +494,11 @@ public:
                 sLog.outError("Unable to execute VPN status update query!");
             }
         }
-        else if(res == VPNLookup::Result::NOT_VPN)
+        else if(result_ == VPNLookup::Result::NOT_VPN)
         {
             session->SetVPNStatus(VPNStatus::NO_VPN);
         }
-        else if(res == VPNLookup::Result::INTERNAL_ERROR)
+        else if(result_ == VPNLookup::Result::INTERNAL_ERROR)
         {
             session->SetVPNStatus(VPNStatus::CHECK_FAILED);    
             sLog.outError("Internal error during VPN lookup!");
@@ -506,7 +507,9 @@ public:
 
 private:
     const std::uint32_t account_id_;
+    const VPNLookup::Result result_;
 };
+#endif
 
 void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 {
@@ -577,19 +580,29 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         return;
     }
 
-    // since we don't use the VPN check for anything except chat, skip it if
-    // they're above the level required for chatting with a VPN
-    if (GetAccountMaxLevel() > sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL)
-        && GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
+#ifdef USE_LIBCURL
+    if (GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
     {
-        SetVPNStatus(VPNStatus::BYPASS_CHECK);
+        // since we don't use the VPN check for anything except chat, skip it if
+        // they're above the level required for chatting with a VPN
+        if (GetAccountMaxLevel() >= sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL))
+        {
+            SetVPNStatus(VPNStatus::BYPASS_CHECK);
+        }
+        else
+        {
+            auto vpn_lookup = VPNLookup::get_global_vpnlookup();
+            vpn_lookup->lookup(session->GetSocket()->GetRemoteAddressInt(),
+                [account_id = GetAccountId()](VPNLookup::Result res) {
+                    auto task = new VPNLookupTask(account_id);
+                    sWorld.AddAsyncTask(task);
+                }
+            );
+        }
     }
-    
-    if(GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
-    {
-        auto task = new VPNLookupTask(GetAccountId());
-        sWorld.AddAsyncTask(task);
-    }
+#else
+    SetVPNStatus(VPNStatus::FEATURE_DISABLED);
+#endif
 
     ASSERT(pCurrChar->GetSession() == this);
     SetPlayer(pCurrChar);

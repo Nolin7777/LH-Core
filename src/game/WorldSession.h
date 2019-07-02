@@ -81,6 +81,7 @@ enum class VPNStatus
     NO_VPN,
     BYPASS_CHECK,
     CHECK_FAILED,
+    FEATURE_DISABLED
 };
 
 enum PartyResult

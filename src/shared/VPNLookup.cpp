@@ -289,7 +289,7 @@ VPNLookup::Result VPNLookup::lookup_ipintel(const std::string& ip, const std::st
 // http://api.vpnblocker.net/v2/json/IPHere/APIKeyHere
 VPNLookup::Result VPNLookup::lookup_vpnblocker(const std::string& ip, const std::string& key) try {
     std::stringstream uri;
-    uri << "http://api.vpnblocker.net/v2/json/" << ip /*<< "/" << "api_key"*/;
+    uri << "http://api.vpnblocker.net/v2/json/" << ip << "/" << key;
 
     std::string response;
     long resp_code = 0;

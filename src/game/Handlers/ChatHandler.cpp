@@ -43,7 +43,7 @@
 #include "AccountMgr.h"
 #include "SocialMgr.h"
 
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
 #include "VPNLookup.h"
 #endif
 

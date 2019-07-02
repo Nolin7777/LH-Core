@@ -30,7 +30,7 @@
 #include "WorldSocketMgr.h"
 #include "MapNodes/NodesMgr.h"
 
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
 #include <curl/curl.h>
 #include "VPNLookup.h"
 #endif
@@ -306,7 +306,7 @@ int Master::Run()
     auto vpn_block_key = sConfig.GetStringDefault("VPN_BLOCK_KEY", "");
     auto vpn_gii_contact = sConfig.GetStringDefault("VPN_GII_CONTACT", "");
     
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
     curl_global_init(CURL_GLOBAL_ALL);
     VPNLookup vpn_lookup;
     vpn_lookup.set_param(VPNLookup::ConfigParam::IPQS_KEY,     std::move(vpn_ipqs_key));
@@ -543,7 +543,7 @@ int Master::Run()
         #endif
 
         delete cliThread;
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
         curl_global_cleanup();
 #endif
     }

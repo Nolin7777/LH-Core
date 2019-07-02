@@ -44,7 +44,7 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 #include "Anticheat.hpp"
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
 #include "VPNLookup.h"
 #endif
 
@@ -469,11 +469,11 @@ void WorldSession::LoginPlayer(ObjectGuid loginPlayerGuid)
 }
 
 /* Handle the lookup result inside the main update, safe for session consistency */
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
 class VPNLookupTask : public AsyncTask
 {
 public:
-    VPNLookupTask(std::uint32_t account_id, const VPNLookup::Result)
+    VPNLookupTask(std::uint32_t account_id, const VPNLookup::Result result)
         : account_id_(account_id), result_(result) {}
 
     void run() override
@@ -580,7 +580,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         return;
     }
 
-#ifdef USE_LIBCURL
+#ifdef USE_VPN_DETECT
     if (GetVPNStatus() == VPNStatus::PENDING_LOOKUP)
     {
         // since we don't use the VPN check for anything except chat, skip it if
@@ -592,9 +592,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         else
         {
             auto vpn_lookup = VPNLookup::get_global_vpnlookup();
-            vpn_lookup->lookup(session->GetSocket()->GetRemoteAddressInt(),
+            vpn_lookup->lookup(GetSocket()->GetRemoteAddressInt(),
                 [account_id = GetAccountId()](VPNLookup::Result res) {
-                    auto task = new VPNLookupTask(account_id);
+                    auto task = new VPNLookupTask(account_id, res);
                     sWorld.AddAsyncTask(task);
                 }
             );

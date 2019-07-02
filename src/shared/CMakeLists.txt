@@ -162,3 +162,6 @@ add_library(shared STATIC
   ${shared_SRCS}
 )
 
+if (USE_LIBCURL)
+  target_link_libraries(shared curl)
+endif()

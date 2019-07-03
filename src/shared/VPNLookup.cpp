@@ -20,6 +20,7 @@
 #include "json.hpp"
 #include "Log.h"
 #include "Database/DatabaseEnv.h"
+#include <chrono>
 #include <sstream>
 
 using json = nlohmann::json;
@@ -39,16 +40,24 @@ VPNLookup::VPNLookup() : _stop(false) {
 }
 
 void VPNLookup::process() {
+    std::unique_lock<std::mutex> guard(_queue_lock, std::defer_lock_t);
+
     while(!_stop) {
         _semaphore.acquire();
-        std::unique_lock<std::mutex> guard(_queue_lock);
+
+        guard.lock();
 
         while(!_queue.empty()) {
-            auto& lookup_request = _queue.front();
+            auto lookup_request = _queue.front();
+            _queue.pop();
+            guard.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // crap rate limiting
             const auto res = blocking_lookup(lookup_request.ip);
             lookup_request.callback(res);
-            _queue.pop();
+            guard.lock();
         }
+
+        guard.unlock();
     }
 }
 

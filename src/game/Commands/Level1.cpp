@@ -46,6 +46,9 @@
 #ifdef _DEBUG_VMAPS
 #include "VMapFactory.h"
 #endif
+#ifdef USE_VPN_DETECT
+#include "VPNLookup.h"
+#endif
 #include <regex>
 
 //-----------------------Npc Commands-----------------------
@@ -2388,4 +2391,107 @@ bool ChatHandler::HandleDebugChatFreezeCommand(char* args)
     master->Whisper(message, LANG_UNIVERSAL, master);
 
     return true;
+}
+
+// :(
+bool ChatHandler::HandleVPNBlacklistCommand(char* args) try
+{
+#ifdef USE_VPN_DETECT
+    const std::string ip(args);
+
+    if (ip.empty())
+    {
+        PSendSysMessage("IP string required.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::stringstream ipss(ip);
+    char dot;
+    std::uint32_t a, b, c, d;
+    ipss >> a >> dot >> b >> dot >> c >> dot >> d;
+    const std::uint32_t ipv4 = (a << 24) | (b << 16) | (c << 8) | d;
+    
+    auto res = LoginDatabase.PExecute("INSERT INTO vpn_cache (`ip`, `is_vpn`) VALUES (%u, %u)", ipv4 & ~0xFF, 1);
+
+    if (!res)
+    {
+        PSendSysMessage("Unable to save VPN status in the database.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    auto vpn_lookup = VPNLookup::get_global_vpnlookup();
+
+    if (vpn_lookup)
+    {
+        vpn_lookup->reload_cache();
+    }
+
+    PSendSysMessage("Address added to VPN blacklist cache.");
+    SetSentErrorMessage(true);
+    return true;
+#else
+    PSendSysMessage("VPN detection is disabled.");
+    SetSentErrorMessage(true);
+    return true;
+#endif
+}
+catch (std::exception& e) 
+{
+    PSendSysMessage("Stop trying to crash the server."); // make these functions suck less
+    SetSentErrorMessage(true);
+    return false;
+}
+
+// hacky command
+bool ChatHandler::HandleVPNStatusSetCommand(char* args)
+{
+#ifdef USE_VPN_DETECT
+    Player* target = nullptr;
+    ObjectGuid target_guid;
+    std::string target_name;
+
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+    {
+        return false;
+    }
+
+    if(!target)
+    {
+        PSendSysMessage("Please select a valid target.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    const auto session = target->GetSession();
+
+    if (!session)
+    {
+        PSendSysMessage("Error locating target's session.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    const bool enable_vpn = session->GetVPNStatus() != VPNStatus::VPN;
+    auto res = LoginDatabase.PExecute("UPDATE `account` SET `vpn` = %u WHERE `id` = %u",
+        enable_vpn? 1 : 3, session->GetAccountId());
+
+    if (!res)
+    {
+        PSendSysMessage("Unable to save VPN status in the database.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    session->SetVPNStatus(enable_vpn? VPNStatus::VPN : VPNStatus::BYPASS_CHECK);
+    PSendSysMessage("Set target's VPN status to: %s", (enable_vpn? "VPN filtered" : "VPN bypass"));
+    SetSentErrorMessage(true);
+    return true;
+
+#else
+    PSendSysMessage("VPN detection is disabled.");
+    SetSentErrorMessage(true);
+    return false;
+#endif
 }

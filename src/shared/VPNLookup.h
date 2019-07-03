@@ -78,6 +78,7 @@ public:
     ~VPNLookup();
 
     void shutdown();
+    void reload_cache();
     void lookup(std::uint32_t ip, LookupCallback callback);
     void set_param(ConfigParam param, std::string value);
     Result blocking_lookup(std::uint32_t ip);

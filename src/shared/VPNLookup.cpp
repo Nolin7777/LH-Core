@@ -116,6 +116,12 @@ void VPNLookup::load_cache() {
     } while(res->NextRow());
 }
 
+void VPNLookup::reload_cache()
+{
+    std::lock_guard<std::mutex> lock(_cache_lock);
+    load_cache();
+}
+
 VPNLookup::CacheResult VPNLookup::lookup_cache(const std::uint32_t ip) {
     // save on lookups by assuming the entire class C (/24)
     // block will return the same result

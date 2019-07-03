@@ -1089,6 +1089,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, "runtest",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleRunTestCommand,             "", nullptr },
         { MSTR, "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
         { MSTR, "gold",           SEC_GAMEMASTER,     true, nullptr,                                           "", goldCommandTable },
+        { MSTR, "vpnset",         SEC_GAMEMASTER,     true, &ChatHandler::HandleVPNStatusSetCommand,         "", nullptr },
+        { MSTR, "vpnblacklist",   SEC_ADMINISTRATOR,  true, &ChatHandler::HandleVPNBlacklistCommand,         "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 

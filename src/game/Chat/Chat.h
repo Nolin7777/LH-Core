@@ -421,6 +421,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugSendOpenBagCommand(char* args);
         bool HandleDebugOverflowCommand(char* args);
         bool HandleDebugChatFreezeCommand(char* args);
+        bool HandleVPNStatusSetCommand(char* args);
+        bool HandleVPNBlacklistCommand(char* args);
 
         /*
         Send the visual of the next channeled spell after args, suggested macro :

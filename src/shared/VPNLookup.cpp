@@ -40,24 +40,25 @@ VPNLookup::VPNLookup() : _stop(false) {
 }
 
 void VPNLookup::process() {
-    std::unique_lock<std::mutex> guard(_queue_lock, std::defer_lock_t);
-
     while(!_stop) {
         _semaphore.acquire();
 
-        guard.lock();
+        std::unique_lock<std::mutex> guard(_queue_lock);
 
-        while(!_queue.empty()) {
-            auto lookup_request = _queue.front();
-            _queue.pop();
-            guard.unlock();
+        if(_queue.empty()) {
+            continue;
+        }
+
+        auto local_queue = std::move(_queue);
+        guard.unlock();
+
+        while(!local_queue.empty()) {
+            auto& lookup_request = local_queue.front();
             std::this_thread::sleep_for(std::chrono::milliseconds(50)); // crap rate limiting
             const auto res = blocking_lookup(lookup_request.ip);
             lookup_request.callback(res);
-            guard.lock();
+            local_queue.pop();
         }
-
-        guard.unlock();
     }
 }
 

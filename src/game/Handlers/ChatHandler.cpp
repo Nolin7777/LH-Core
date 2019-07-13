@@ -139,10 +139,48 @@ uint32_t WorldSession::ChatCooldown()
     return 0;
 }
 
-bool WorldSession::VPNChatBlock()
+bool WorldSession::VPNChatBlock(const uint32_t type)
 {
+    auto config_id = CONFIG_UINT32_SAY_MIN_LEVEL;
+
+    switch(type)
+    {
+        case CHAT_MSG_CHANNEL:
+            config_id = CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL;
+            break;
+        case CHAT_MSG_SAY:
+            config_id = CONFIG_UINT32_SAY_MIN_LEVEL;
+            break;
+        CHAT_MSG_EMOTE: 
+            config_id = CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL;
+            break;
+        CHAT_MSG_YELL:
+            config_id = CONFIG_UINT32_YELL_MIN_LEVEL;
+            break;
+        CHAT_MSG_WHISPER:
+            config_id = CONFIG_UINT32_WHISP_MIN_LEVEL;
+            break;
+        default:
+            sLog.outError("Unknown chat message type passed to VPNChatBlock. Using SAY_MIN_LEVEL.");
+    }
+
     if (GetSecurity() == SEC_PLAYER && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_VPN_CHAT_LEVEL))
     {
+        if (GetVPNStatus() == VPNStatus::CHECK_DELAYED)
+        {
+            if (GetAccountMaxLevel() >= sWorld.getConfig(config_id))
+            {
+                SetVPNStatus(VPNStatus::PENDING_LOOKUP);
+                QueueVPNLookup();
+                ChatHandler(this).SendSysMessage("Please wait a few moments and try again...");
+            }
+            else
+            {
+                ChatHandler(this).SendSysMessage("You cannot speak yet (too low level).");    
+            }
+            
+            return true;
+        }
         if (GetVPNStatus() == VPNStatus::VPN)
         {
             ChatHandler(this).SendSysMessage("You cannot speak yet (too low level).");
@@ -313,7 +351,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         return;
                     }
 
-                    if(VPNChatBlock())
+                    if(VPNChatBlock(type))
                     {
                        return;
                     }
@@ -380,7 +418,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
             }
 
-            if(VPNChatBlock())
+            if(VPNChatBlock(type))
             {
                 return;
             }
@@ -402,7 +440,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
             }
 
-            if(VPNChatBlock())
+            if(VPNChatBlock(type))
             {
                 return;
             }
@@ -425,7 +463,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
             }
 
-            if(VPNChatBlock())
+            if(VPNChatBlock(type))
             {
                 return;
             }
@@ -489,7 +527,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                     return;
                 }
 
-                if(VPNChatBlock())
+                if(VPNChatBlock(type))
                 {
                     return;
                 }

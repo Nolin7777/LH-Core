@@ -54,6 +54,10 @@
 #include "NodesOpcodes.h"
 #include "MasterPlayer.h"
 
+#ifdef USE_VPN_DETECT
+#include "VPNLookup.h"
+#endif
+
 #include <string>
 
 // select opcodes appropriate for processing in Map::Update context for current session state
@@ -1338,4 +1342,62 @@ bool WorldSession::CanSociallyInteractWith(WorldSession* other) const
 
     return otherMaster->GetSocial()->HasFriend(masterPlayer->GetObjectGuid())
         || otherMaster->GetGuildId() == masterPlayer->GetGuildId();
+}
+
+/* Handle the lookup result inside the main update, safe for session consistency */
+#ifdef USE_VPN_DETECT
+class VPNLookupTask : public AsyncTask
+{
+public:
+    VPNLookupTask(std::uint32_t account_id, const VPNLookup::Result result)
+        : account_id_(account_id), result_(result) {}
+
+    void run() override
+    {
+        auto session = sWorld.FindSession(account_id_);
+
+        if (!session)
+        {
+            return;
+        }
+
+        if(result_ == VPNLookup::Result::VPN)
+        {
+            session->SetVPNStatus(VPNStatus::VPN);
+
+            if(!LoginDatabase.PExecute("UPDATE `account` SET `vpn` = 1 WHERE `id` = %u", account_id_))
+            {
+                sLog.outError("Unable to execute VPN status update query!");
+            }
+        }
+        else if(result_ == VPNLookup::Result::NOT_VPN)
+        {
+            session->SetVPNStatus(VPNStatus::NO_VPN);
+        }
+        else if(result_ == VPNLookup::Result::INTERNAL_ERROR)
+        {
+            session->SetVPNStatus(VPNStatus::CHECK_FAILED);    
+            sLog.outError("Internal error during VPN lookup!");
+        }
+    }
+
+private:
+    const std::uint32_t account_id_;
+    const VPNLookup::Result result_;
+};
+#endif
+
+void WorldSession::QueueVPNLookup()
+{
+#ifdef USE_VPN_DETECT
+    auto vpn_lookup = VPNLookup::get_global_vpnlookup();
+
+    vpn_lookup->lookup(GetSocket()->GetRemoteAddressInt(),
+        [account_id = GetAccountId()](VPNLookup::Result res) {
+            auto task = new VPNLookupTask(account_id, res);
+            sWorld.AddAsyncTask(task);
+    });
+#elif
+    sLog.outError("Attempted to perform a VPN lookup yet the feature is disabled.")
+#endif
 }

@@ -80,6 +80,7 @@ enum class VPNStatus
     VPN,
     NO_VPN,
     BYPASS_CHECK,
+    CHECK_DELAYED,
     CHECK_FAILED,
     FEATURE_DISABLED
 };
@@ -481,6 +482,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         VPNStatus GetVPNStatus() { return _vpnStatus; }
         void SetVPNStatus(VPNStatus vpn_status) { _vpnStatus = vpn_status; }
+        void QueueVPNLookup();
         uint32 GetOrderCounter() const { return _orderCounter; }
         void IncrementOrderCounter() { ++_orderCounter; }
 
@@ -861,7 +863,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleTextEmoteOpcode(WorldPacket& recvPacket);
         void HandleChatIgnoredOpcode(WorldPacket& recvPacket);
         uint32_t ChatCooldown();
-        bool VPNChatBlock();
+        bool VPNChatBlock(uint32_t type);
 
         void HandleReclaimCorpseOpcode( WorldPacket& recvPacket );
         void HandleCorpseQueryOpcode( WorldPacket& recvPacket );

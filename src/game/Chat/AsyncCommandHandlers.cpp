@@ -58,6 +58,7 @@ void PInfoHandler::HandlePInfoCommand(WorldSession *session, Player *target, Obj
 
         data->target_guid = target->GetObjectGuid();
         data->online = true;
+        data->vpn_status = target->GetSession()->GetVPNStatus();
 
         HandleDataAfterPlayerLookup(data);
     }
@@ -198,10 +199,9 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     }
 
     std::string nameLink = cHandler.playerLink(data->target_name);
-    const auto vpn_status = session->GetVPNStatus();
     std::string vpn_str;
 
-    switch (vpn_status)
+    switch (data->vpn_status)
     {
         case VPNStatus::VPN:
             vpn_str = "Yes";
@@ -214,6 +214,9 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
             break;
         case VPNStatus::BYPASS_CHECK:
             vpn_str = "Check bypassed";
+            break;
+        case VPNStatus::CHECK_DELAYED:
+            vpn_str = "Check delayed";
             break;
         case VPNStatus::PENDING_LOOKUP:
             vpn_str = "Query still pending";

@@ -567,10 +567,26 @@ enum PermVariables
     REALM_FIRST_60_ROGUE          = 50049, // done
     REALM_FIRST_BIGGLESWORTH      = 50050, // done
     REALM_FIRST_LEVEL_N           = 50051,  // done
-    REALM_FIRST_ONYXIA_ATTUNE     = 50112,  // done
-    REALM_FIRST_DREADSTEED        = 50113 // done
     /* 50051 - 50111 are reserved for level achievements */
     /* Example REALM_FIRST_LEVEL_N + 5 = REALM_FIRST_LEVEL_5 */
+    REALM_FIRST_ONYXIA_ATTUNE     = 50112,  // done
+    REALM_FIRST_DREADSTEED        = 50113,  // done
+    REALM_FIRST_WS_FROSTSABER     = 50114,
+    REALM_FIRST_ANY_NAXX_BOSS     = 50115,
+    REALM_FIRST_PATCHWERK         = 50116,
+    REALM_FIRST_GROBBULUS         = 50117,
+    REALM_FIRST_GLUTH             = 50118,
+    REALM_FIRST_THADDIUS          = 50119,
+    REALM_FIRST_NOTH              = 50120,
+    REALM_FIRST_HEIGAN            = 50121,
+    REALM_FIRST_LOATHEB           = 50122,
+    REALM_FIRST_ANUBREKHAN        = 50123,
+    REALM_FIRST_FAERLINA          = 50124,
+    REALM_FIRST_MAEXXNA           = 50125,
+    REALM_FIRST_RAZUVIOUS         = 50126,
+    REALM_FIRST_GOTHIK            = 50127,
+    REALM_FIRST_FOUR_HM           = 50128,
+    REALM_FIRST_SAPPHIRON         = 50129
 };
 
 class GameObjectUseRequirement

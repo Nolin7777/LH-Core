@@ -864,6 +864,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 if (m_horsemenDeathCounter >= 4)
                 {
                     SetData(TYPE_FOUR_HORSEMEN, DONE);
+                    sRealmEventAnnounce.boss_kill(181366, GetMap()->GetPlayers());
                 }
             }
             else if(uiData == FAIL)
@@ -1261,8 +1262,21 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
     case NPC_LightningTotem:
         pCreature->DeleteLater();
         break;
+    case 15931:
+    case 15932:
+    case 15928:
+    case 15954:
+    case 15936:
+    case 16011:
+    case 15956:
+    case 15953:
+    case 15952:
+    case 16061:
+    case 16060:
+    case 16028:
+    case 15989:
     case NPC_KELTHUZAD:
-        sRealmEventAnnounce.boss_kill(NPC_KELTHUZAD, GetMap()->GetPlayers());
+        sRealmEventAnnounce.boss_kill(pCreature->GetEntry(), GetMap()->GetPlayers());
         break;
     }
 }

@@ -25,7 +25,7 @@ const std::unordered_map<std::uint32_t, const BossDetails> boss_events {
     { 15339, { REALM_FIRST_AQ20_CLEAR,     5194, 8656, "With the purging of The Ruins of Ahn'Qiraj, the sandstorms tinting the sky orange began to subside. Congratulations %guild, for realm first Ossirian the Unscarred!" }},
     { 15727, { REALM_FIRST_AQ40_CLEAR,     8577, 8700, "With their hearts still in one piece, for the most part, %guild emerged triumphant over C'Thun." }},
     { 14834, { REALM_FIRST_ZG_CLEAR,       8452, 8468, "Zul'Gurub has fallen! Hakkar the Soulflayer is no more. Congratulations, %guild." }},
-    { 15990, { REALM_FIRST_NAXX_CLEAR,     8885, 8691, "With Kel'thuzad's defeat, the chilled veil hanging over Azeroth begins to lift. %guild have emerged from Naxxramas, victorious." }},
+    { 15990, { REALM_FIRST_NAXX_CLEAR,     8885, 8691, "With Kel'thuzad's defeat, the chilled veil hanging over Azeroth begins to lift. Against all odds, %guild have emerged from Naxxramas, victorious." }},
     { 14887, { REALM_FIRST_YSONDRE,        4434, 3523, "Ysondre has returned to the Emerald Nightmare..." }},
     { 14890, { REALM_FIRST_TAERAR,         3900, 3523, "Taerar has returned to the Emerald Nightmare..." }},
     { 14889, { REALM_FIRST_EMERISS,        6669, 3523, "Emeriss has returned to the Emerald Nightmare..." }},
@@ -40,18 +40,32 @@ const std::unordered_map<std::uint32_t, const BossDetails> boss_events {
     { 6500,  { REALM_FIRST_DEVILSAUR_KILL, 0000, 6159, "With their skins no longer having any economic value, the devilsaurs looked forward to roaming free during the final days. Alas, they did not anticipate %player's arrival. Realm first devilsaur kill." }},
     { 6584,  { REALM_FIRST_DEVILSAUR_KILL, 0000, 6159, "With their skins no longer having any economic value, the devilsaurs looked forward to roaming free during the final days. Alas, they did not anticipate %player's arrival. Realm first devilsaur kill." }},
     { 6498,  { REALM_FIRST_DEVILSAUR_KILL, 0000, 6159, "With their skins no longer having any economic value, the devilsaurs looked forward to roaming free during the final days. Alas, they did not anticipate %player's arrival. Realm first devilsaur kill." }},
+    { 15931, { REALM_FIRST_GROBBULUS,      8677, 8711, "%guild have received their slime innoculations. Realm first Grobbulus." }},
+    { 15932, { REALM_FIRST_GLUTH,          8677, 8724, "Thanks to the veterinarians of %guild, Gluth, the foul plague-dog of Naxxramas, is no more." }},
+    { 15928, { REALM_FIRST_THADDIUS,       8883, 8870, "Thank... you... %guild. Realm first Thaddius." }},
+    { 15954, { REALM_FIRST_NOTH,           8677, 8848, "I will serve the master... in death. Noth the Plaguebringer has been defeated by %guild." }},
+    { 15936, { REALM_FIRST_HEIGAN,         8886, 1332, "It's just a jump to the left, and then a step to the right. With your hands on your hips, you bring your knees in tight. But it's the screaming that really drives you insane. Let's do the Heigan dance again. Realm first Heigan the Unclean for %guild." }},
+    { 16011, { REALM_FIRST_LOATHEB,        8677, 8828, "%guild has slain Loatheb." }},
+    { 15956, { REALM_FIRST_ANUBREKHAN,     8677, 8789, "Shhh, %guild... it will all be over soon. Realm first Anub'Rekhan." }},
+    { 15953, { REALM_FIRST_FAERLINA,       8677, 8798, "The master will avenge her! %guild has slain Grand Widow Faerlina." }},
+    { 15952, { REALM_FIRST_MAEXXNA,        8887, 0000, "Maexxna — born deep within the mountains of Northrend many ages ago, she was captured within the dread citadel Naxxramas, where she gives birth to her brood, feeding them the corpses of all who dare venture too deeply into Naxxramas. %guild has slain Maexxna." }},
+    { 16061, { REALM_FIRST_RAZUVIOUS,      8687, 8860, "%guild, my finest students! An honorable... death. Realm first Razuvious." }},
+    { 16060, { REALM_FIRST_GOTHIK,         8677, 8805, "He is... undone. %guild have escaped with their souls and slain Gothik." }},
+    { 181366,{ REALM_FIRST_FOUR_HM,        8677, 6159, "Their bodies battered and bruised, %guild pressed on. The voices of their warriors were hoarse, yet they still commanded the attention of their foes. %guild have defeated The Four Horsemen." }},
+    { 16028, { REALM_FIRST_PATCHWERK,      8888, 8911, "No more play? %guild have defeated Patchwerk." }},
+    { 15989, { REALM_FIRST_SAPPHIRON,      8890, 8729, "As Sapphiron's skeletal remains clattered against the glistening floor, so did the swords and shields of %guild's warriors. Their bones ached and their hands were numb. The frostbite was taking its toll and these heroes knew they would not be able to withstand the chill for much longer. One final push..." }},
 };
 
 const std::unordered_map<std::uint8_t, std::pair<uint32_t, std::string>> class_events {
-    { 1,  {REALM_FIRST_60_WARRIOR, "warrior" } },
-    { 2,  {REALM_FIRST_60_PALADIN, "paladin" } },
-    { 3,  {REALM_FIRST_60_HUNTER,  "hunter"  } },
-    { 4,  {REALM_FIRST_60_ROGUE,   "rogue"   } },
-    { 5,  {REALM_FIRST_60_PRIEST,  "priest"  } },
-    { 7,  {REALM_FIRST_60_SHAMAN,  "shaman"  } },
-    { 8,  {REALM_FIRST_60_MAGE,    "mage"    } },
-    { 9,  {REALM_FIRST_60_WARLOCK, "warlock" } },
-    { 11, {REALM_FIRST_60_DRUID,   "druid"   } }
+    { CLASS_WARRIOR,  {REALM_FIRST_60_WARRIOR, "warrior" } },
+    { CLASS_PALADIN,  {REALM_FIRST_60_PALADIN, "paladin" } },
+    { CLASS_HUNTER,   {REALM_FIRST_60_HUNTER,  "hunter"  } },
+    { CLASS_ROGUE,    {REALM_FIRST_60_ROGUE,   "rogue"   } },
+    { CLASS_PRIEST,   {REALM_FIRST_60_PRIEST,  "priest"  } },
+    { CLASS_SHAMAN,   {REALM_FIRST_60_SHAMAN,  "shaman"  } },
+    { CLASS_MAGE,     {REALM_FIRST_60_MAGE,    "mage"    } },
+    { CLASS_WARLOCK,  {REALM_FIRST_60_WARLOCK, "warlock" } },
+    { CLASS_DRUID,    {REALM_FIRST_60_DRUID,   "druid"   } }
 };
 
 INSTANTIATE_SINGLETON_1(RealmEventAnnounce);
@@ -166,6 +180,15 @@ void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Map::PlayerList&
 
     bool ignore = false;
     const auto& guild_details = determine_guild(players);
+
+    // Any Naxx boss hack
+    if(boss_id == 15954 || boss_id == 16061 || boss_id == 16028 || boss_id == 15956
+        && !sObjectMgr.GetSavedVariable(REALM_FIRST_ANY_NAXX_BOSS, 0, &ignore)) {
+        const auto& message = format_message("Naxxramas has been breached by %guild!", guild_details.second);
+        sObjectMgr.SetSavedVariable(REALM_FIRST_ANY_NAXX_BOSS, 1, true);
+        sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, message.c_str());
+        discord_post(message, REALM_FIRST_ANY_NAXX_BOSS);
+    }
 
     if(!sObjectMgr.GetSavedVariable(it->second.event_id, 0, &ignore)) {
         sObjectMgr.SetSavedVariable(it->second.event_id, 1, true);
@@ -409,6 +432,20 @@ void RealmEventAnnounce::item_acquired(std::uint32_t item, const Player& player)
         sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
         discord_post(ss.str(), REALM_FIRST_THUNDERFURY);
         discord_post("", REALM_FIRST_THUNDERFURY, "https://lightshope.org/api/progress/", player.GetEntry(), player.GetName());
+    }
+
+    if (item == 13086) {
+        std::stringstream ss;
+        ss << player.GetName() << ", having earned the trust of Rivern Frostwind after performing a set of rather arduous and repetitive tasks, %player was bestowed with their very own Winterspring Frostsaber... for a modest price, of course. ";
+        
+        if(!sObjectMgr.GetSavedVariable(REALM_FIRST_THUNDERFURY, 0, &ignore)) {
+            sObjectMgr.SetSavedVariable(REALM_FIRST_THUNDERFURY, 1, true);
+            ss << "Realm first Winterspring Frostsaber!";
+        }
+
+        sWorld.SendWorldText(LANG_REALM_ACHIEVEMENT, ss.str().c_str());
+        discord_post(ss.str(), REALM_FIRST_WS_FROSTSABER);
+        discord_post("", REALM_FIRST_WS_FROSTSABER, "https://lightshope.org/api/progress/", player.GetEntry(), player.GetName());
     }
 
     if (item == 13335) { // so rare that we'll announce them all (probably zero)

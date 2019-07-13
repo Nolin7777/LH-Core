@@ -51,7 +51,7 @@ const std::unordered_map<std::uint8_t, std::pair<uint32_t, std::string>> class_e
     { 7,  {REALM_FIRST_60_SHAMAN,  "shaman"  } },
     { 8,  {REALM_FIRST_60_MAGE,    "mage"    } },
     { 9,  {REALM_FIRST_60_WARLOCK, "warlock" } },
-    { 10, {REALM_FIRST_60_DRUID,   "druid"   } }
+    { 11, {REALM_FIRST_60_DRUID,   "druid"   } }
 };
 
 INSTANTIATE_SINGLETON_1(RealmEventAnnounce);

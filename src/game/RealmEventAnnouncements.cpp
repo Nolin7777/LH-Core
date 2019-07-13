@@ -51,7 +51,7 @@ const std::unordered_map<std::uint32_t, const BossDetails> boss_events {
     { 15952, { REALM_FIRST_MAEXXNA,        8887, 0000, "Maexxna — born deep within the mountains of Northrend many ages ago, she was captured within the dread citadel Naxxramas, where she gives birth to her brood, feeding them the corpses of all who dare venture too deeply into Naxxramas. %guild has slain Maexxna." }},
     { 16061, { REALM_FIRST_RAZUVIOUS,      8687, 8860, "%guild, my finest students! An honorable... death. Realm first Razuvious." }},
     { 16060, { REALM_FIRST_GOTHIK,         8677, 8805, "He is... undone. %guild have escaped with their souls and slain Gothik." }},
-    { 181366,{ REALM_FIRST_FOUR_HM,        8677, 6159, "Their bodies battered and bruised, %guild pressed on. The voices of their warriors were hoarse, yet they still commanded the attention of their foes. %guild have defeated The Four Horsemen." }},
+    { 181366,{ REALM_FIRST_FOUR_HM,        8677, 6159, "Their bodies battered and bruised, %guild pressed on. The voices of their warriors were hoarse, yet they still commanded the attention of their foes. The Four Horsemen have been defeated." }},
     { 16028, { REALM_FIRST_PATCHWERK,      8888, 8911, "No more play? %guild have defeated Patchwerk." }},
     { 15989, { REALM_FIRST_SAPPHIRON,      8890, 8729, "As Sapphiron's skeletal remains clattered against the glistening floor, so did the swords and shields of %guild's warriors. Their bones ached and their hands were numb. The frostbite was taking its toll and these heroes knew they would not be able to withstand the chill for much longer. One final push..." }},
 };
@@ -182,7 +182,7 @@ void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Map::PlayerList&
     const auto& guild_details = determine_guild(players);
 
     // Any Naxx boss hack
-    if(boss_id == 15954 || boss_id == 16061 || boss_id == 16028 || boss_id == 15956
+    if((boss_id == 15954 || boss_id == 16061 || boss_id == 16028 || boss_id == 15956)
         && !sObjectMgr.GetSavedVariable(REALM_FIRST_ANY_NAXX_BOSS, 0, &ignore)) {
         const auto& message = format_message("Naxxramas has been breached by %guild!", guild_details.second);
         sObjectMgr.SetSavedVariable(REALM_FIRST_ANY_NAXX_BOSS, 1, true);

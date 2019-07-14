@@ -482,7 +482,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         VPNStatus GetVPNStatus() { return _vpnStatus; }
         void SetVPNStatus(VPNStatus vpn_status) { _vpnStatus = vpn_status; }
-        void QueueVPNLookup();
+        void QueueVPNLookup(const WorldPacket& packet);
         uint32 GetOrderCounter() const { return _orderCounter; }
         void IncrementOrderCounter() { ++_orderCounter; }
 
@@ -863,7 +863,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleTextEmoteOpcode(WorldPacket& recvPacket);
         void HandleChatIgnoredOpcode(WorldPacket& recvPacket);
         uint32_t ChatCooldown();
-        bool VPNChatBlock(uint32_t type);
+        bool VPNChatBlock(uint32_t type, const WorldPacket& packet);
 
         void HandleReclaimCorpseOpcode( WorldPacket& recvPacket );
         void HandleCorpseQueryOpcode( WorldPacket& recvPacket );

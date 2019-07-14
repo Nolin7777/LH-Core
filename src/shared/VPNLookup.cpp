@@ -175,10 +175,11 @@ void VPNLookup::lookup(const std::uint32_t ip, LookupCallback callback) {
 
     if(cache_res != CacheResult::CACHE_MISS) {
         callback(cache_res == CacheResult::VPN? Result::VPN : Result::NOT_VPN);
+        return;
     }
 
     std::lock_guard<std::mutex> guard(_queue_lock);
-    _queue.push({ip, callback});
+    _queue.push({ip, std::move(callback)});
     _semaphore.release();
 }
 

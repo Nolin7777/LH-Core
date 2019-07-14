@@ -1349,8 +1349,8 @@ bool WorldSession::CanSociallyInteractWith(WorldSession* other) const
 class VPNLookupTask : public AsyncTask
 {
 public:
-    VPNLookupTask(std::uint32_t account_id, const VPNLookup::Result result)
-        : account_id_(account_id), result_(result) {}
+    VPNLookupTask(std::uint32_t account_id, const VPNLookup::Result result, const WorldPacket& packet)
+        : account_id_(account_id), result_(result), packet_(packet) {}
 
     void run() override
     {
@@ -1379,25 +1379,28 @@ public:
             session->SetVPNStatus(VPNStatus::CHECK_FAILED);    
             sLog.outError("Internal error during VPN lookup!");
         }
+
+        session->HandleMessagechatOpcode(packet_);
     }
 
 private:
     const std::uint32_t account_id_;
     const VPNLookup::Result result_;
+    WorldPacket packet_;
 };
 #endif
 
-void WorldSession::QueueVPNLookup()
+void WorldSession::QueueVPNLookup(const WorldPacket& packet)
 {
 #ifdef USE_VPN_DETECT
     auto vpn_lookup = VPNLookup::get_global_vpnlookup();
 
     vpn_lookup->lookup(GetSocket()->GetRemoteAddressInt(),
-        [account_id = GetAccountId()](VPNLookup::Result res) {
-            auto task = new VPNLookupTask(account_id, res);
+        [account_id = GetAccountId(), packet](VPNLookup::Result res) {
+            auto task = new VPNLookupTask(account_id, res, packet);
             sWorld.AddAsyncTask(task);
     });
 #elif
-    sLog.outError("Attempted to perform a VPN lookup yet the feature is disabled.")
+    sLog.outError("Attempted to perform a VPN lookup yet the feature is disabled.");
 #endif
 }

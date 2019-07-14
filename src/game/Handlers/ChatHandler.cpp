@@ -151,13 +151,13 @@ bool WorldSession::VPNChatBlock(const uint32_t type)
         case CHAT_MSG_SAY:
             config_id = CONFIG_UINT32_SAY_MIN_LEVEL;
             break;
-        CHAT_MSG_EMOTE: 
+        case CHAT_MSG_EMOTE: 
             config_id = CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL;
             break;
-        CHAT_MSG_YELL:
+        case CHAT_MSG_YELL:
             config_id = CONFIG_UINT32_YELL_MIN_LEVEL;
             break;
-        CHAT_MSG_WHISPER:
+        case CHAT_MSG_WHISPER:
             config_id = CONFIG_UINT32_WHISP_MIN_LEVEL;
             break;
         default:

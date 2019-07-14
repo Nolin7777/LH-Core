@@ -151,13 +151,13 @@ bool WorldSession::VPNChatBlock(const uint32_t type)
         case CHAT_MSG_SAY:
             config_id = CONFIG_UINT32_SAY_MIN_LEVEL;
             break;
-        case CHAT_MSG_EMOTE: 
+        CHAT_MSG_EMOTE: 
             config_id = CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL;
             break;
-        case CHAT_MSG_YELL:
+        CHAT_MSG_YELL:
             config_id = CONFIG_UINT32_YELL_MIN_LEVEL;
             break;
-        case CHAT_MSG_WHISPER:
+        CHAT_MSG_WHISPER:
             config_id = CONFIG_UINT32_WHISP_MIN_LEVEL;
             break;
         default:
@@ -172,7 +172,7 @@ bool WorldSession::VPNChatBlock(const uint32_t type)
             {
                 SetVPNStatus(VPNStatus::PENDING_LOOKUP);
                 QueueVPNLookup();
-                ChatHandler(this).SendSysMessage("Please wait a few moments and try again...");
+                ChatHandler(this).SendSysMessage("Unable to send chat message. Please try again in a few moments...");
             }
             else
             {
@@ -181,7 +181,7 @@ bool WorldSession::VPNChatBlock(const uint32_t type)
             
             return true;
         }
-        if (GetVPNStatus() == VPNStatus::VPN)
+        else if (GetVPNStatus() == VPNStatus::VPN)
         {
             ChatHandler(this).SendSysMessage("You cannot speak yet (too low level).");
             return true;

@@ -91,7 +91,9 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED),
     m_bot(nullptr), m_lastReceivedPacketTime(0), _clientOS(CLIENT_OS_UNKNOWN), _gameBuild(0), _orderCounter(0), _vpnStatus(VPNStatus::PENDING_LOOKUP),
     _charactersCount(10), _characterMaxLevel(0), m_masterSession(nullptr), m_nodeSession(nullptr), m_masterPlayer(nullptr), m_lastPubChannelMsgTime(NULL),
-    _anticheat(nullptr)
+    _anticheat(nullptr), 
+    _whisper_targets(id, sWorld.getConfig(CONFIG_UINT32_WHISPER_TARGETS_MAX), sWorld.getConfig(CONFIG_UINT32_WHISPER_TARGETS_BYPASS_LEVEL),
+        sWorld.getConfig(CONFIG_UINT32_WHISPER_TARGETS_DECAY))
 {
     if (sock)
     {

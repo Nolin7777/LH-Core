@@ -1017,6 +1017,9 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_INVITE_RESTRICT_CAP,                        "Invites.RestrictionCap",         0);
 
     setConfig(CONFIG_UINT32_VPN_CHAT_LEVEL,                             "VPNChatLevel",         0);
+    setConfig(CONFIG_UINT32_WHISPER_TARGETS_MAX,                        "WhisperTargets.MaxTargets",      0);
+    setConfig(CONFIG_UINT32_WHISPER_TARGETS_BYPASS_LEVEL,               "WhisperTargets.BypassLevel",     0);
+    setConfig(CONFIG_UINT32_WHISPER_TARGETS_DECAY,                      "WhisperTargets.DecayTime",       0);
 
     if (getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT))
         setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, false);

@@ -50,6 +50,7 @@ set (game_SRCS
 	Weather.cpp
 	World.cpp
 	WorldSession.cpp
+	WhisperTargetLimits.cpp
 	AI/AggressorAI.cpp
 	AI/CreatureAI.cpp
 	AI/CreatureAIRegistry.cpp
@@ -264,6 +265,7 @@ set (game_SRCS
 	Weather.h
 	World.h
 	WorldSession.h
+	WhisperTargetLimits.h
 	AI/AggressorAI.h
 	AI/CreatureAI.h
 	AI/CreatureAIImpl.h

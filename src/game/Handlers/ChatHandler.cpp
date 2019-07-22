@@ -533,6 +533,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 {
                     return;
                 }
+
+                auto& whisper_targets = masterPlr->GetSession()->GetWhisperTargets();
+                Player* toPlayer = player->GetSession()->GetPlayer();
+                
+                if(toPlayer && !whisper_targets.can_whisper(toPlayer->GetObjectGuid(), maxLevel)) {
+                    ChatHandler(this).PSendSysMessage(
+                            "You have whispered too many different players too quickly. Please wait a while "
+                            "before whispering any additional players."
+                    );
+                    return;
+                }
             }
 
             if (Player* toPlayer = player->GetSession()->GetPlayer())

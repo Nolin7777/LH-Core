@@ -33,6 +33,7 @@
 #include "Item.h"
 #include "GossipDef.h"
 #include "MapNodes/AbstractPlayer.h"
+#include "WhisperTargetLimits.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -483,6 +484,7 @@ class MANGOS_DLL_SPEC WorldSession
         VPNStatus GetVPNStatus() { return _vpnStatus; }
         void SetVPNStatus(VPNStatus vpn_status) { _vpnStatus = vpn_status; }
         void QueueVPNLookup(const WorldPacket& packet);
+        WhisperTargetLimits& GetWhisperTargets() { return _whisper_targets; }
         uint32 GetOrderCounter() const { return _orderCounter; }
         void IncrementOrderCounter() { ++_orderCounter; }
 
@@ -967,6 +969,8 @@ class MANGOS_DLL_SPEC WorldSession
 
         // anticheat
         std::unique_ptr<SessionAnticheatInterface> _anticheat;
+
+        WhisperTargetLimits _whisper_targets;
 
         time_t _logoutTime;
         bool m_inQueue;                                     // session wait in auth.queue

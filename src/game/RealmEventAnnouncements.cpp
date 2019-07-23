@@ -171,7 +171,15 @@ std::string format_pmessage(std::string message, std::string name) {
     return message;
 }
 
+bool is_enabled() { // no time to recompile everything
+    return sWorld.getConfig(CONFIG_BOOL_REALM_ACHIEVEMENTS);
+}
+
 void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Map::PlayerList& players) {
+    if(!is_enabled) {
+        return;
+    }
+
     const auto it = boss_events.find(boss_id);
 
     if(it == boss_events.end()) {   
@@ -212,6 +220,10 @@ void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Map::PlayerList&
 }
 
 void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Player& player) {
+    if(!is_enabled) {
+        return;
+    }
+
     const auto it = boss_events.find(boss_id);
 
     if(it == boss_events.end()) {
@@ -240,6 +252,10 @@ void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Player& player) 
 }
 
 void RealmEventAnnounce::boss_kill(std::uint32_t boss_id) {
+    if(!is_enabled) {
+        return;
+    }
+
     const auto it = boss_events.find(boss_id);
 
     if(it == boss_events.end()) {
@@ -363,6 +379,10 @@ void RealmEventAnnounce::announce_level_up(std::uint32_t level, const Player& pl
 }
 
 void RealmEventAnnounce::level_up(std::uint32_t level, const Player& player) {
+    if(!is_enabled) {
+        return;
+    }
+
     switch(level) {
         case 20:
         case 30:
@@ -377,6 +397,10 @@ void RealmEventAnnounce::level_up(std::uint32_t level, const Player& player) {
 }
 
 void RealmEventAnnounce::quest_complete(std::uint32_t quest, const Player& player) {
+    if(!is_enabled) {
+        return;
+    }
+
     bool ignore = false;
 
     if (quest == 7631 && !sObjectMgr.GetSavedVariable(REALM_FIRST_DREADSTEED, 0, &ignore)) {
@@ -408,6 +432,10 @@ void RealmEventAnnounce::quest_complete(std::uint32_t quest, const Player& playe
 }
 
 void RealmEventAnnounce::skill_acquired(std::uint32_t skill, const Player& player) {
+    if(!is_enabled) {
+        return;
+    }
+
     bool ignore = false;
 
     if(skill == 33391 && !sObjectMgr.GetSavedVariable(REALM_FIRST_150_RIDING, 0, &ignore)) {
@@ -422,6 +450,10 @@ void RealmEventAnnounce::skill_acquired(std::uint32_t skill, const Player& playe
 }
 
 void RealmEventAnnounce::item_acquired(std::uint32_t item, const Player& player) {
+    if(!is_enabled) {
+        return;
+    }
+
     bool ignore = false;
 
     if (item == 19019 && !sObjectMgr.GetSavedVariable(REALM_FIRST_THUNDERFURY, 0, &ignore)) {

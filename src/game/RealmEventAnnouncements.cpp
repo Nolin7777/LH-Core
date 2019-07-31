@@ -176,7 +176,7 @@ bool is_enabled() { // no time to recompile everything
 }
 
 void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Map::PlayerList& players) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
@@ -220,7 +220,7 @@ void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Map::PlayerList&
 }
 
 void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Player& player) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
@@ -252,7 +252,7 @@ void RealmEventAnnounce::boss_kill(std::uint32_t boss_id, const Player& player) 
 }
 
 void RealmEventAnnounce::boss_kill(std::uint32_t boss_id) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
@@ -379,7 +379,7 @@ void RealmEventAnnounce::announce_level_up(std::uint32_t level, const Player& pl
 }
 
 void RealmEventAnnounce::level_up(std::uint32_t level, const Player& player) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
@@ -397,7 +397,7 @@ void RealmEventAnnounce::level_up(std::uint32_t level, const Player& player) {
 }
 
 void RealmEventAnnounce::quest_complete(std::uint32_t quest, const Player& player) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
@@ -432,7 +432,7 @@ void RealmEventAnnounce::quest_complete(std::uint32_t quest, const Player& playe
 }
 
 void RealmEventAnnounce::skill_acquired(std::uint32_t skill, const Player& player) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
@@ -450,7 +450,7 @@ void RealmEventAnnounce::skill_acquired(std::uint32_t skill, const Player& playe
 }
 
 void RealmEventAnnounce::item_acquired(std::uint32_t item, const Player& player) {
-    if(!is_enabled) {
+    if(!is_enabled()) {
         return;
     }
 
